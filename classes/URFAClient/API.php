@@ -259,6 +259,15 @@ class URFAClient_API {
                             break;
                         }
 
+                    if ($result_value === FALSE)
+                        foreach ($this->_data_input as $v)
+                            if ($v['name'] === $variable)
+                            {
+                                $result_value = $v['value'];
+                                break;
+                            }
+
+                    if ($result_value === FALSE) break;
 
                     switch (gettype($result_value))
                     {

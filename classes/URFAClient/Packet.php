@@ -95,7 +95,7 @@ class URFAClient_Packet {
      */
     public function get_data_int()
     {
-        return $this->_bin2int($this->_data[$this->_iterator++]);
+        return (int) $this->_bin2int($this->_data[$this->_iterator++]);
     }
 
     /**
@@ -103,7 +103,7 @@ class URFAClient_Packet {
      */
     public function get_data_long()
     {
-        return $this->_bin2long($this->_data[$this->_iterator++]);
+        return (int) $this->_bin2long($this->_data[$this->_iterator++]);
     }
 
     /**
@@ -123,7 +123,7 @@ class URFAClient_Packet {
      */
     public function get_data_double()
     {
-        return $this->bin2double($this->_data[$this->_iterator++]);
+        return (float) $this->bin2double($this->_data[$this->_iterator++]);
     }
 
     /**
@@ -143,7 +143,7 @@ class URFAClient_Packet {
      */
     public function get_data_string()
     {
-        return $this->_data[$this->_iterator++];
+        return (string) $this->_data[$this->_iterator++];
     }
 
     /**
@@ -163,7 +163,7 @@ class URFAClient_Packet {
      */
     public function get_data_ip()
     {
-        return long2ip($this->_bin2int($this->_data[$this->_iterator++]) & 0xFFFFFFFF);
+        return (string) long2ip($this->_bin2int($this->_data[$this->_iterator++]) & 0xFFFFFFFF);
     }
 
     /**
