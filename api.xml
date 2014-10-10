@@ -1779,7 +1779,7 @@ _______________________________________
     </output>
   </function>
 
-  <function name="rpcf_get_discount_period" id="0x2602">
+  <function name="rpcf_get_discount_period" id="0x2609">
     <input>
       <integer name="discount_period_id"/>
     </input>
@@ -1790,6 +1790,7 @@ _______________________________________
       <integer name="custom_duration"/>
       <integer name="discounts_per_week"/>
       <integer name="next_discount_period_id"/>
+      <integer name="invoice_month"/>
     </output>
   </function>
 
@@ -1800,19 +1801,20 @@ _______________________________________
       <integer name="expire" />
       <integer name="periodic_type_t" />
       <integer name="cd" />
-      <integer name="di" />
+      <integer name="di" />      
     </input>
     <output/>
   </function>
 
-  <function name="rpcf_add_discount_period_return" id="0x2605">
+  <function name="rpcf_add_discount_period_return" id="0x2608">
     <input>
       <integer name="static_id" default="0"/>
       <integer name="start_date" />
       <integer name="expire_date" default="0"/>
       <integer name="periodic_type" default="3"/>
       <integer name="custom_duration" default="86400"/>
-      <integer name="discount_interval" default="7"/>
+      <integer name="discount_interval" default="7"/>      
+      <integer name="invoice_month" default="0"/>
     </input>
     <output>
       <integer name="discount_period_id"/>
@@ -4302,20 +4304,32 @@ _______________________________________
 
   <function name="rpcf_get_radius_attr" id="0x10101">
     <input>
-      <integer name="sid" />
-      <integer name="st" />
+      <integer name="sid"/>
+      <integer name="st"/>
     </input>
     <output>
-      <integer name="radius_data_size" />
+      <integer name="radius_data_size"/>
       <for name="i" from="0" count="radius_data_size">
-        <integer name="vendor" array_index="i" />
-        <integer name="attr" array_index="i" />
-        <integer name="usage_flags" array_index="i" />
+        <integer name="vendor" array_index="i"/>
+        <integer name="attr" array_index="i"/>
+        <integer name="usage_flags" array_index="i"/>
+        <integer name="expire_date" array_index="i"/>
         <integer name="param1" array_index="i" />
-        <if variable="param1" value="0" condition="eq">
+        <set dst="tmp_type" src="param1" src_index="i"/>
+        <!-- integer -->
+        <if variable="tmp_type" array_index="i" value="0" condition="eq">
           <integer name="val" array_index="i" />
         </if>
-        <if variable="param1" value="1" condition="eq">
+        <!-- string -->
+        <if variable="tmp_type" value="1" condition="eq">
+          <string name="val" array_index="i" />
+        </if>
+        <!-- IP-address -->
+        <if variable="tmp_type" value="2" condition="eq">
+          <integer name="val" array_index="i" />
+        </if>
+        <!-- HEX string -->
+        <if variable="tmp_type" value="3" condition="eq">
           <string name="val" array_index="i" />
         </if>
       </for>
@@ -4461,10 +4475,14 @@ _______________________________________
     </output>
   </function>
 
-  <function name="rpcf_tel_directions_list" id="0x1030d">
+  <function name="rpcf_tel_directions_list" id="0x1031d">
     <input>
         <integer name="start"/>
         <integer name="count"/>
+        <integer name="skip_ids_cnt"/>
+        <for name="i" from="0" count="skip_ids_cnt">
+            <integer name="skip_id" array_index="i"/>
+        </for>
     </input>
     <output>
         <integer name="dir_count"/>
@@ -4481,21 +4499,30 @@ _______________________________________
     </output>
   </function>
     
-  <function name="rpcf_get_tel_directions_count" id="0x1030e">
-      <input/>
+  <function name="rpcf_get_tel_directions_count" id="0x1031e">
+      <input>
+        <integer name="skip_ids_cnt"/>
+        <for name="i" from="0" count="skip_ids_cnt">
+            <integer name="skip_id" array_index="i"/>
+        </for>
+      </input>
       <output>
           <integer name="count"/>
       </output>
   </function>    
   
-  <function name="rpcf_search_tel_dirs" id="0x1032a">
+  <function name="rpcf_search_tel_dirs" id="0x1032b">
       <input>
           <integer name="status"/>
           <integer name="params_cnt"/>
-          <for name="i" from='0' count="params_cnt">
+          <for name="i" from="0" count="params_cnt">
               <integer name="field" array_index="i"/>
               <integer name="criteria" array_index="i"/>
               <string name="value" array_index="i"/>
+          </for>
+          <integer name="skip_ids_cnt"/>
+          <for name="i" from="0" count="skip_ids_cnt">
+              <integer name="skip_id" array_index="i"/>
           </for>
           <integer name="offset"/>
           <integer name="count"/>
@@ -4515,14 +4542,18 @@ _______________________________________
       </output>    
   </function>
   
-  <function name="rpcf_get_founded_tel_dirs_count" id="0x1030f">
+  <function name="rpcf_get_founded_tel_dirs_count" id="0x1031f">
       <input>
           <integer name="status"/>
           <integer name="params_cnt"/>
-          <for name="i" from='0' count="params_cnt">
+          <for name="i" from="0" count="params_cnt">
               <integer name="field" array_index="i"/>
               <integer name="criteria" array_index="i"/>
               <string name="value" array_index="i"/>
+          </for>
+          <integer name="skip_ids_cnt"/>
+          <for name="i" from="0" count="skip_ids_cnt">
+              <integer name="skip_id" array_index="i"/>
           </for>
       </input>
       <output>
@@ -4544,7 +4575,7 @@ _______________________________________
     </output>
   </function>
        	
-  <function name="rpcf_add_tel_service" id="0x1033a">	
+  <function name="rpcf_add_tel_service" id="0x1033d">	
     <input>
 		<integer name="parent_id"/>
 	    <integer name="tariff_id"/>
@@ -4554,6 +4585,7 @@ _______________________________________
 		<integer name="is_dynamic"/>
 		<double name="cost"/>
 		<integer name="discount_method"/>
+                <integer name="radius_sessions_limit"/>
 		<integer name="tariff_class_count"/>
 		<for name="i" from="0" count="tariff_class_count">
 			<integer name="tariff_class" array_index="i"/>
@@ -4583,7 +4615,7 @@ _______________________________________
 	</output>
   </function>
   
-  <function name="rpcf_edit_tel_service" id="0x1033b">
+  <function name="rpcf_edit_tel_service" id="0x1033e">
 	  <input>
 		<integer name="service_id"/>
 		<integer name="parent_id"/>
@@ -4594,6 +4626,7 @@ _______________________________________
 		<integer name="is_dynamic"/>
 		<double name="cost"/>
 		<integer name="discount_method"/>
+                <integer name="radius_sessions_limit"/>
 		<integer name="tariff_class_count"/>
 		<for name="i" from="0" count="tariff_class_count">
 			<integer name="tariff_class" array_index="i"/>
@@ -4623,7 +4656,7 @@ _______________________________________
 	  </output>
   </function>
 
-  <function name="rpcf_get_tel_service" id="0x1033c">
+  <function name="rpcf_get_tel_service" id="0x1033f">
 	  <input>
 		  <integer name="sid"/>
 	  </input>
@@ -4637,6 +4670,7 @@ _______________________________________
 		<integer name="is_dynamic"/>
 		<double name="cost"/>
 		<integer name="discount_method"/>
+                <integer name="radius_sessions_limit"/>
 		<integer name="tariff_class_count"/>
 		<for name="i" from="0" count="tariff_class_count">
 			<integer name="tariff_class" array_index="i"/>
@@ -4782,7 +4816,33 @@ _______________________________________
   <function name="rpcf_tel_supplier_charges_report" id="0x10317">
   <function name="rpcf_get_service_id_for_supplier" id="0x10318">
 -->
-
+  <function name="rpcf_validate_tel_supplier_dirs" id="0x10321">
+    <input>
+      <integer name="supplier_id"/>
+      <integer name="dirs_cnt"/>
+      <for name="i" from="0" count="dirs_cnt">
+          <integer name="dir" array_index="i"/>    
+      </for>    
+    </input>    
+    <output>
+      <integer name="result"/>
+      <integer name="founded_dir_id"/>
+      <integer name="founded_zone_id"/>
+      <integer name="founded_supplier_id"/>        
+    </output>    
+  </function>
+  
+  <function name="rpcf_get_tel_suppliers_directions" id="0x8023">
+    <input/>
+    <output>
+      <integer name="dirs_cnt"/>    
+      <for name="i" from="0" count="dirs_cnt">
+        <integer name="dir_id" array_index="i"/>
+        <integer name="supplier_id" array_index="i"/>
+      </for>      
+    </output>    
+  </function>    
+  
   <function name="rpcf_get_core_time" id="0x11112">
     <input/>
     <output>
