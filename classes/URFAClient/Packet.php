@@ -9,6 +9,11 @@
 class URFAClient_Packet {
 
     /**
+     * @var Boolean
+     */
+    public static $ipv6 = TRUE;
+
+    /**
      * @var Int     Длина пакета
      */
     public $_len = 4;
@@ -152,8 +157,9 @@ class URFAClient_Packet {
      */
     public function set_data_ip($data)
     {
-        $this->_data[] = pack('N', ip2long($data));
-        $this->_len += 8;
+        $data = ((self::$ipv6) ? pack("C", (filter_var($data, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? 4 : 6) : '') . inet_pton($data);
+        $this->_data[] = $data;
+        $this->_len += strlen($data) + 4;
 
         return $this;
     }
@@ -163,7 +169,8 @@ class URFAClient_Packet {
      */
     public function get_data_ip()
     {
-        return (string) long2ip($this->_bin2int($this->_data[$this->_iterator++]) & 0xFFFFFFFF);
+        $data = $this->_data[$this->_iterator++];
+        return (string) inet_ntop((self::$ipv6) ? substr($data, 1) : $data);
     }
 
     /**

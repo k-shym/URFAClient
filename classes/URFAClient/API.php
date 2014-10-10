@@ -39,6 +39,8 @@ class URFAClient_API {
         }
 
         $this->_api = simplexml_load_file($api);
+
+        if ( ! $this->_api->xpath("/urfa/function[contains(@name, 'ipv6')]")) URFAClient_Packet::$ipv6 = FALSE;
     }
 
     /**
