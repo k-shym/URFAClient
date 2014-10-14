@@ -10959,17 +10959,25 @@ fid_dealer_search_users = FID_DEALER(78)
         </input>        
         <output>
             <integer name="size"/>
-            <for name="i" from="0" count="size">
-                <integer name = "id" array_index = "i"/>
-                <string name = "name" array_index = "i"/>
-                <string name = "location" array_index = "i"/>
-                <integer name = "type" array_index = "i"/>
-                <integer name = "ports_count" array_index = "i"/>
-                <string name = "remote_id" array_index = "i"/>
-                <ip_address name = "address" array_index = "i"/>
-                <string name = "login" array_index = "i"/>
-                <string name = "password" array_index = "i"/>
-            </for>
+            <if variable="size" value="-1" condition="ne">
+              <if variable="size" value="-2" condition="ne"> 
+                <if variable="size" value="-3" condition="ne">
+                  <if variable="size" value="-4" condition="ne">                                              
+                    <for name="i" from="0" count="size">
+                        <integer name = "id" array_index = "i"/>
+                        <string name = "name" array_index = "i"/>
+                        <string name = "location" array_index = "i"/>
+                        <integer name = "type" array_index = "i"/>
+                        <integer name = "ports_count" array_index = "i"/>
+                        <string name = "remote_id" array_index = "i"/>
+                        <ip_address name = "address" array_index = "i"/>
+                        <string name = "login" array_index = "i"/>
+                        <string name = "password" array_index = "i"/>
+                    </for>
+                  </if>  
+                </if>      
+              </if> 
+            </if>
         </output>
     </function>
     
