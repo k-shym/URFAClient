@@ -128,7 +128,7 @@ class URFAClient_Packet {
      */
     public function get_data_double()
     {
-        return (float) $this->bin2double($this->_data[$this->_iterator++]);
+        return (float) $this->_bin2double($this->_data[$this->_iterator++]);
     }
 
     /**
