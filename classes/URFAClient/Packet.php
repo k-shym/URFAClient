@@ -58,8 +58,8 @@ class URFAClient_Packet {
             $array = unpack('N', $this->_attr[$code]['data']);
 
             // для 64-х битной версии php
-            if ($array[1] > 2147483647)
-                return $array[1] - 4294967296;
+            if ($array[1] >= 0x80000000)
+                return $array[1] - (0xffffffff + 1);
 
             return $array[1];
         }
@@ -101,6 +101,21 @@ class URFAClient_Packet {
     public function get_data_int()
     {
         return (int) $this->_bin2int($this->_data[$this->_iterator++]);
+    }
+
+    /**
+     * @param   Int                 $data
+     * @return  URFAClient_Packet
+     */
+    public function set_data_long($data)
+    {
+        $hi = bcdiv($data, 0xffffffff + 1);
+        $lo = bcmod($data, 0xffffffff + 1);
+
+        $this->_data[] = pack('N2', $hi, $lo);
+        $this->_len += 12;
+
+        return $this;
     }
 
     /**
@@ -250,15 +265,14 @@ class URFAClient_Packet {
                 $array[1] = $array[1] ^ 0xffffffff;
                 $array[2] = $array[2] ^ 0xffffffff;
                 $array[2] = $array[2] - 1;
-                //$value = 0 - $arr[1]*4294967296 - $arr[2] - 1;
-                $value = bcmul($array[1], 4294967296);
+
+                $value = bcmul($array[1], 0xffffffff + 1);
                 $value = bcsub(0, $value);
                 $value = bcsub($value, $array[2]);
             }
             else
             {
-                //$value = $arr[1]*4294967296 + $arr[2];
-                $value = bcmul($array[1], 4294967296);
+                $value = bcmul($array[1], 0xffffffff + 1);
                 $value = bcadd($value, $array[2]);
             }
         }

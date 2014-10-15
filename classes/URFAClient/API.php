@@ -80,8 +80,8 @@ class URFAClient_API {
         {
             switch ($v['type'])
             {
-                case 'integer':
-                case 'long': $packet->set_data_int($v['value']); break;
+                case 'integer': $packet->set_data_int($v['value']); break;
+                case 'long': $packet->set_data_long($v['value']); break;
                 case 'double': $packet->set_data_double($v['value']); break;
                 case 'ip_address': $packet->set_data_ip($v['value']); break;
                 case 'string': $packet->set_data_string($v['value']); break;
