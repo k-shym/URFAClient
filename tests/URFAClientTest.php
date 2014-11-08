@@ -56,6 +56,22 @@ class URFAClientTest extends URFAClientBaseTest {
     /**
      * @depends test_rpcf_add_user_new
      */
+    public function test_rpcf_get_userinfo(array $user)
+    {
+        $result = $this->_api->rpcf_get_userinfo(array(
+            'user_id' => $user['user_id'],
+        ));
+
+        $this->assertTrue((bool) $result);
+        $this->assertEquals($user['user_id'], $result['user_id']);
+        $this->assertEquals($user['basic_account'], $result['basic_account']);
+        $this->assertEquals('user' . self::prefix(), $result['login']);
+        $this->assertEquals('pass' . self::prefix(), $result['password']);
+    }
+
+    /**
+     * @depends test_rpcf_add_user_new
+     */
     public function test_rpcf_save_user_othersets(array $user)
     {
         $this->assertTrue(is_array($this->_api->rpcf_save_user_othersets(array(
@@ -97,11 +113,26 @@ class URFAClientTest extends URFAClientBaseTest {
     }
 
     /**
+     * @depends test_rpcf_add_iptraffic_service_ex
+     */
+    public function test_rpcf_get_iptraffic_service_ex(array $service)
+    {
+        $result = $this->_api->rpcf_get_iptraffic_service_ex(array(
+            'sid' => $service['service_id'],
+        ));
+
+        $this->assertTrue((bool) $result);
+        $this->assertEquals('service' . self::prefix(), $result['service_name']);
+        $this->assertEquals('Тестовая услуга', $result['comment']);
+        $this->assertEquals(1, $result['discount_method']);
+    }
+
+    /**
      * @depends test_rpcf_add_user_new
      * @depends test_rpcf_add_iptraffic_service_ex
      * @depends test_rpcf_get_discount_periods
      */
-    public function test_rpcf_get_iptraffic_service_link_ipv6(array $user, array $service, array $discount_periods)
+    public function test_rpcf_add_iptraffic_service_link_ipv6(array $user, array $service, array $discount_periods)
     {
         $discount_period = array_pop($discount_periods);
 
@@ -112,7 +143,7 @@ class URFAClientTest extends URFAClientBaseTest {
             'tplink_id'          => 0,
             'discount_period_id' => $discount_period['discount_period_id'],
             'start_date'         => time(),
-            'expire_date'        => strtotime('+1 month'),
+            'expire_date'        => 2000000000,
             'policy_id'          => 1,
             'unabon'             => 0,
             'unprepay'           => 0,
@@ -150,11 +181,35 @@ class URFAClientTest extends URFAClientBaseTest {
     }
 
     /**
+     * @depends test_rpcf_add_iptraffic_service_link_ipv6
+     * @depends test_rpcf_get_discount_periods
+     */
+    public function test_rpcf_get_iptraffic_service_link_ipv6(array $slink, array $discount_periods)
+    {
+        $result = $this->_api->rpcf_get_iptraffic_service_link_ipv6(array(
+            'slink_id' => $slink['slink_id'],
+        ));
+
+        $discount_period = array_pop($discount_periods);
+
+        $this->assertTrue((bool) $result);
+        $this->assertEquals($discount_period['discount_period_id'], $result['discount_period_id']);
+        $this->assertEquals(2000000000, $result['expire_date']);
+        $this->assertTrue(is_array($result['ip_groups_count']));
+
+        foreach ($result['ip_groups_count'] as $ip_group)
+        {
+            $this->assertTrue((bool) filter_var($ip_group['ip_address'], FILTER_VALIDATE_IP));
+            $this->assertEquals(32, $ip_group['mask']);
+        }
+    }
+
+    /**
      * @depends test_rpcf_add_user_new
      * @depends test_rpcf_add_iptraffic_service_ex
      * @depends test_rpcf_get_discount_periods
      */
-    public function test_rpcf_get_iptraffic_service_link_ipv6_without_ip(array $user, array $service, array $discount_periods)
+    public function test_rpcf_add_iptraffic_service_link_ipv6_without_ip(array $user, array $service, array $discount_periods)
     {
         $discount_period = array_pop($discount_periods);
 
@@ -175,6 +230,13 @@ class URFAClientTest extends URFAClientBaseTest {
 
         $this->assertArrayHasKey('slink_id', $result);
         $this->assertTrue($result['slink_id'] === -1);
+    }
+
+    public function test_rpcf_get_userinfo_not_user()
+    {
+        $this->assertFalse($this->_api->rpcf_get_userinfo(array(
+            'user_id' => 0,
+        )));
     }
 
     public function test_not_exist()
