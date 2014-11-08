@@ -49,24 +49,11 @@ class URFAClient_Packet {
 
     /**
      * @param   Int       $code
-     * @return  Int
+     * @return  Mixed
      */
     public function get_attr_int($code)
     {
-        if (isset($this->_attr[$code]['data']))
-        {
-            $array = unpack('N', $this->_attr[$code]['data']);
-
-            // для 64-х битной версии php
-            if ($array[1] >= 0x80000000)
-                return $array[1] - (0xffffffff + 1);
-
-            return $array[1];
-        }
-        else
-        {
-            return FALSE;
-        }
+        return (isset($this->_attr[$code]['data'])) ? $this->_bin2int($this->_attr[$code]['data']) : FALSE;
     }
 
     /**
@@ -100,7 +87,7 @@ class URFAClient_Packet {
      */
     public function get_data_int()
     {
-        return (int) $this->_bin2int($this->_data[$this->_iterator++]);
+        return $this->_bin2int($this->_data[$this->_iterator++]);
     }
 
     /**
@@ -195,6 +182,11 @@ class URFAClient_Packet {
     protected function _bin2int($data)
     {
         $array = unpack('N', $data);
+
+        // для 64-х битной версии php
+        if ($array[1] >= 0x80000000)
+            return $array[1] - (0xffffffff + 1);
+
         return (int) $array[1];
     }
 
