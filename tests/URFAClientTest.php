@@ -232,6 +232,46 @@ class URFAClientTest extends URFAClientBaseTest {
         $this->assertTrue($result['slink_id'] === -1);
     }
 
+    /**
+     * @dataProvider long
+     */
+    public function test_rpcf_add_fwrule_new($long)
+    {
+        $result = $this->_api->rpcf_add_fwrule_new(array(
+            'flags'     => 0,
+            'events'    => $long,
+            'router_id' => 0,
+            'tariff_id' => 0,
+            'group_id'  => 0,
+            'user_id'   => 0,
+            'rule'      => 'ACCOUNT_ID',
+            'comment'   => '',
+        ));
+
+        $this->assertArrayHasKey('rule_id', $result);
+        $this->assertTrue($result['rule_id'] > 0);
+
+        $rule_id = $result['rule_id'];
+
+        $result = $this->_api->rpcf_get_fwrules_list_new();
+
+        $this->assertArrayHasKey('rules_count', $result);
+
+        foreach ($result['rules_count'] as $v)
+            if ($v['rule_id'] == $rule_id)
+                $this->assertEquals($long, $v['events']);
+    }
+
+    public function long()
+    {
+        return array(
+          array('-922334069862591'),
+          array(-9013),
+          array(9013),
+          array('922334069862591')
+        );
+    }
+
     public function test_rpcf_get_userinfo_not_user()
     {
         $this->assertFalse($this->_api->rpcf_get_userinfo(array(
