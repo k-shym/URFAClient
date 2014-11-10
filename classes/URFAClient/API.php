@@ -129,8 +129,7 @@ class URFAClient_API {
 
                     switch ($variable['type'])
                     {
-                        case 'integer':
-                        case 'long': $value = (int) $attr->{'value'}; break;
+                        case 'integer': $value = (int) $attr->{'value'}; break;
                         case 'double': $value = (float) $attr->{'value'}; break;
                         default: $value = (string) $attr->{'value'};
                     }
@@ -200,13 +199,23 @@ class URFAClient_API {
 
         if (isset($args[$name]))
         {
+            $valid = TRUE;
+
             switch ($type)
             {
                 case 'integer':
-                case 'long': $valid = is_int($args[$name]); break;
-                case 'double': $valid = is_float($args[$name]); break;
-                case 'ip_address': $valid = (bool) filter_var($args[$name], FILTER_VALIDATE_IP); break;
-                case 'string': $valid = is_string($args[$name]); break;
+                    $args[$name] = (int) $args[$name];
+                    break;
+                case 'double':
+                    $args[$name] = (float) $args[$name];
+                    break;
+                case 'ip_address':
+                    $valid = (bool) filter_var($args[$name], FILTER_VALIDATE_IP);
+                    break;
+                case 'long':
+                case 'string':
+                    $args[$name] = (string) $args[$name];
+                    break;
                 default: $valid = FALSE;
             }
 
