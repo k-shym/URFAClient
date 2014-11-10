@@ -91,29 +91,6 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   Int                 $data
-     * @return  URFAClient_Packet
-     */
-    public function set_data_long($data)
-    {
-        $hi = bcdiv($data, 0xffffffff + 1);
-        $lo = bcmod($data, 0xffffffff + 1);
-
-        $this->_data[] = pack('N2', $hi, $lo);
-        $this->_len += 12;
-
-        return $this;
-    }
-
-    /**
-     * @return Int
-     */
-    public function get_data_long()
-    {
-        return (int) $this->_bin2long($this->_data[$this->_iterator++]);
-    }
-
-    /**
      * @param   Float               $data
      * @return  URFAClient_Packet
      */
@@ -130,7 +107,8 @@ class URFAClient_Packet {
      */
     public function get_data_double()
     {
-        return (float) $this->_bin2double($this->_data[$this->_iterator++]);
+        $data = unpack('d', strrev($this->_data[$this->_iterator++]));
+        return (float) $data[1];
     }
 
     /**
@@ -176,42 +154,50 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   String      Бианрые данные
-     * @return  Int
+     * @param   String                 $data
+     * @return  URFAClient_Packet
      */
-    protected function _bin2int($data)
+    public function set_data_long($data)
     {
-        $array = unpack('N', $data);
+        if (PHP_INT_SIZE == 4)
+        {
+            throw new Exception('Not implemented for PHP x32');
+        }
+        else
+        {
+            $hi = bcdiv($data, 0xffffffff + 1);
+            $lo = bcmod($data, 0xffffffff + 1);
 
-        // для 64-х битной версии php
-        if ($array[1] >= 0x80000000)
-            return $array[1] - (0xffffffff + 1);
+            if ($hi & 0x80000000)
+            {
+                $hi = $hi & 0xffffffff - 1;
+                $lo = $lo & 0xffffffff;
+            }
 
-        return (int) $array[1];
+            if ($lo & 0x80000000)
+            {
+                $lo = $lo & 0xffffffff;
+                $hi = ( ! $hi) ? 0xffffffff : $hi;
+            }
+        }
+
+        $this->_data[] = pack('N2', $hi, $lo);
+        $this->_len += 12;
+
+        return $this;
     }
 
     /**
-     * @param   String      Бианрые данные
-     * @return  Float
+     * @return String
      */
-    protected function _bin2double($data)
+    public function get_data_long()
     {
-        $array = unpack('d', strrev($data));
-        return (float) $array[1];
-    }
-
-    /**
-     * @param   String      Бианрые данные
-     * @return  Int
-     */
-    protected function _bin2long($data)
-    {
-        $array = unpack('N2', $data);
+        $data = unpack('N2', $this->_data[$this->_iterator++]);
 
         if (PHP_INT_SIZE == 4)
         {
-            $hi = $array[1];
-            $lo = $array[2];
+            $hi = $data[1];
+            $lo = $data[2];
             $neg = $hi < 0;
 
             if ($neg)
@@ -242,34 +228,47 @@ class URFAClient_Packet {
                 $lo += 0x80000000;
             }
 
-            $value = bcmul($hi, 4294967296);
+            $value = bcmul($hi, 0xffffffff + 1);
             $value = bcadd($value, $lo);
 
             if ($neg) $value = bcsub(0, $value);
         }
         else
         {
-            if ($array[2] & 0x80000000)$array[2] = $array[2] & 0xffffffff;
-
-            if ($array[1] & 0x80000000)
+            if ($data[1] & 0x80000000)
             {
-                $array[1] = $array[1] & 0xffffffff;
-                $array[1] = $array[1] ^ 0xffffffff;
-                $array[2] = $array[2] ^ 0xffffffff;
-                $array[2] = $array[2] - 1;
+                $data[1] = $data[1] & 0xffffffff;
+                $data[1] = $data[1] ^ 0xffffffff;
+                $data[2] = $data[2] ^ 0xffffffff;
+                $data[2] = $data[2] + 1;
 
-                $value = bcmul($array[1], 0xffffffff + 1);
+                $value = bcmul($data[1], 0xffffffff + 1);
                 $value = bcsub(0, $value);
-                $value = bcsub($value, $array[2]);
+                $value = bcsub($value, $data[2]);
             }
             else
             {
-                $value = bcmul($array[1], 0xffffffff + 1);
-                $value = bcadd($value, $array[2]);
+                $value = bcmul($data[1], 0xffffffff + 1);
+                $value = bcadd($value, $data[2]);
             }
         }
 
         return $value;
+    }
+
+    /**
+     * @param   String      Бианрые данные
+     * @return  Int
+     */
+    protected function _bin2int($data)
+    {
+        $array = unpack('N', $data);
+
+        // для 64-х битной версии php
+        if ($array[1] >= 0x80000000)
+            return $array[1] - (0xffffffff + 1);
+
+        return (int) $array[1];
     }
 
     /**
