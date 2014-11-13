@@ -240,6 +240,7 @@ class URFAClient_API {
      *
      * @param SimpleXMLElement  $node   Элемент дерева api.xml
      * @param URFAClient_Packet $packet Пакет с бинарными данными
+     * @return Array
      */
     protected function _proccess_data_output(SimpleXMLElement $output, URFAClient_Packet $packet)
     {

@@ -72,13 +72,14 @@ final class URFAClient_Log {
      * @param Mixed $result Результат работы метода
      * @param String $error Сообщение ошибки
      */
-    public function method($name, $params = NULL, $result = NULL, $error = '')
+    public function method($name, $params = NULL, $result = NULL, $time = 0, $error = '')
     {
         $params = trim(preg_replace('/\s+/', ' ', print_r($params, TRUE)));
         $result = trim(preg_replace('/\s+/', ' ', print_r($result, TRUE)));
+        $time = round($time, 3);
 
         if ($error) $this->error("$name( $params ): $error");
-        else $this->info("$name( $params ) -> $result");
+        else $this->info("$name( $params ) -> $result {$time}ms");
     }
 
     /**
@@ -122,5 +123,4 @@ final class URFAClient_Log {
     {
         $this->_trace_log = array();
     }
-
 }

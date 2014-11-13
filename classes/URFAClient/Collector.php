@@ -30,11 +30,13 @@ final class URFAClient_Collector {
      */
     public function __call($name, Array $args) {
         try {
+            $ts = microtime(TRUE);
             $result = call_user_func_array(array($this->_api, $name), $args);
-            URFAClient_Log::instance()->method($name, ($args) ? $args[0] : array(), $result);
+            $te = microtime(TRUE);
+            URFAClient_Log::instance()->method($name, ($args) ? $args[0] : array(), $result, $te - $ts);
             return $result;
         } catch (Exception $e) {
-            URFAClient_Log::instance()->method($name, ($args) ? $args[0] : array(), NULL, $e->getMessage());
+            URFAClient_Log::instance()->method($name, ($args) ? $args[0] : array(), NULL, 0, $e->getMessage());
             return FALSE;
         }
     }
