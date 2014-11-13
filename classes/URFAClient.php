@@ -43,12 +43,12 @@ abstract class URFAClient {
     public static function init(Array $data)
     {
         $data = array_merge(array(
-            'login'    => '',
-            'password' => '',
-            'address'  => '',
+            'login'    => 'init',
+            'password' => 'init',
+            'address'  => 'localhost',
             'port'     => 11758,
             'admin'    => TRUE,
-            'api'      => dirname(__FILE__) . '/../api.xml',
+            'api'      => __DIR__ . '/../api.xml',
             'log'      => FALSE,
         ), $data);
 
