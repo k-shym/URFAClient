@@ -35,7 +35,7 @@ final class URFAClient_Connection {
         if ($data['admin'])
         {
             stream_context_set_option($context, 'ssl', 'capture_peer_cert', TRUE);
-            stream_context_set_option($context, 'ssl', 'local_cert', dirname(__FILE__) . '/../../admin.crt');
+            stream_context_set_option($context, 'ssl', 'local_cert', __DIR__ . '/../../admin.crt');
             stream_context_set_option($context, 'ssl', 'passphrase', 'netup');
         }
         else
@@ -45,10 +45,12 @@ final class URFAClient_Connection {
 
         $data['address'] = gethostbyname($data['address']);
 
-        $this->_socket = stream_socket_client("tcp://{$data['address']}:{$data['port']}", $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $context);
+        $this->_socket = stream_socket_client("tcp://{$data['address']}:{$data['port']}", $errno, $errstr, $data['timeout'], STREAM_CLIENT_CONNECT, $context);
 
         if ( ! $this->_socket)
             throw new Exception("$errstr ($errno)");
+
+        stream_set_timeout($this->_socket, $data['timeout']);
 
         if ( ! $this->_auth($data['login'], $data['password'], $data['admin']))
             throw new Exception('Login or password incorrect');

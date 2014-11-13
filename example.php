@@ -1,13 +1,14 @@
 <?php
 
-include dirname(__FILE__) . '/init.php';
+include __DIR__ . '/init.php';
 
 /********** Админ **********/
 
 $api = URFAClient::init(array(
     'login'    => 'init',
     'password' => 'init',
-    'address'  => 'bill.example.org',
+    'address'  => 'localhost',
+    'timeout'  => 10,
     'log'      => TRUE,
 ));
 
