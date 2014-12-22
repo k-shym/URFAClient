@@ -7293,7 +7293,7 @@ _______________________________________
           <integer name="discount_period_id" />
           <integer name="start_date" />
           <integer name="expire_date" />
-          <integer name="policy_id"/>          
+          <integer name="policy_id"/>
           <double name="cost_coef" default="1"/>
         </if>
         <!-- iptraffic service -->
@@ -7303,7 +7303,7 @@ _______________________________________
           <integer name="discount_period_id"/>
           <integer name="start_date" />
           <integer name="expire_date" />
-          <integer name="policy_id"/>          
+          <integer name="policy_id"/>
           <double name="cost_coef" default="1"/>
           <integer name="ip_groups_count" default="size(ip_address)"/>
           <for name="i" from="0" count="size(ip_address)">
@@ -7335,7 +7335,7 @@ _______________________________________
           <integer name="discount_period_id"/>
           <integer name="start_date" />
           <integer name="expire_date" />
-          <integer name="policy_id"/>          
+          <integer name="policy_id"/>
           <double name="cost_coef" default="1"/>
           <string  name="hotspot_login"/>
           <string  name="hotspot_password"/>
@@ -7347,7 +7347,7 @@ _______________________________________
           <integer name="discount_period_id"/>
           <integer name="start_date" />
           <integer name="expire_date" />
-          <integer name="policy_id"/>          
+          <integer name="policy_id"/>
           <double name="cost_coef" default="1"/>
           <string  name="dialup_login"/>
           <string  name="dialup_password" />
@@ -7362,7 +7362,7 @@ _______________________________________
           <integer name="discount_period_id"/>
           <integer name="start_date" />
           <integer name="expire_date" />
-          <integer name="policy_id"/>          
+          <integer name="policy_id"/>
           <double name="cost_coef" default="1"/>
           <integer name="tel_numbers_count" default="size(tel_number)"/>
           <for name="i" from="0" count="size(tel_number)">
@@ -9389,6 +9389,15 @@ fid_dealer_search_users = FID_DEALER(78)
           <integer name="result"/>
       </output>
   </function>
+
+  <function name="rpcf_delete_invoice" id="0x7042">
+      <input>
+          <integer name="invoice_id"/>
+      </input>
+      <output>
+          <integer name="result"/>
+      </output>
+  </function>
   
   <function name="rpcf_del_uaparam_new" id="0x4411">
     <input>
@@ -10998,7 +11007,7 @@ fid_dealer_search_users = FID_DEALER(78)
         </output>
     </function>
         
-    <function name = "rpcf_get_switch_type" id = "0x500">
+    <function name = "rpcf_get_switch_type" id = "0x505">
         <input>
             <integer name = "id"/>
         </input>
@@ -11006,6 +11015,7 @@ fid_dealer_search_users = FID_DEALER(78)
             <integer name = "id"/>
             <string name = "name"/>
             <string name = "supp_volumes"/>
+            <integer name = "port_start_offset"/>
             <integer name = "tec_id_type"/>
             <integer name = "tec_id_len"/>
             <integer name = "tec_id_disp"/>
@@ -11021,10 +11031,11 @@ fid_dealer_search_users = FID_DEALER(78)
         </output>
     </function>
     
-    <function name = "rpcf_add_switch_type" id = "0x501">
+    <function name = "rpcf_add_switch_type" id = "0x506">
          <input>            
             <string name = "name"/>
             <string name = "supp_volumes"/>
+            <integer name = "port_start_offset"/>
             <integer name = "tec_id_type"/>
             <integer name = "tec_id_len"/>
             <integer name = "tec_id_disp"/>
@@ -11052,11 +11063,12 @@ fid_dealer_search_users = FID_DEALER(78)
         </output>
     </function>
     
-    <function name = "rpcf_edit_switch_type" id = "0x503">
+    <function name = "rpcf_edit_switch_type" id = "0x507">
         <input>            
             <integer name = "id"/>
             <string name = "name"/>
             <string name = "supp_volumes"/>
+            <integer name = "port_start_offset"/>
             <integer name = "tec_id_type"/>
             <integer name = "tec_id_len"/>
             <integer name = "tec_id_disp"/>
@@ -11075,13 +11087,14 @@ fid_dealer_search_users = FID_DEALER(78)
         </output>
     </function>
     
-    <function name = "rpcf_get_switch_types_list" id = "0x504">
+    <function name = "rpcf_get_switch_types_list" id = "0x508">
         <output>
             <integer name = "size"/>
             <for name="i" from="0" count="size">
                 <integer name = "id" array_index="i"/>
                 <string name = "name" array_index="i"/>
                 <string name = "supp_volumes" array_index="i"/>
+                <integer name = "port_start_offset" array_index="i"/>
                 <integer name = "tec_id_type" array_index="i"/>
                 <integer name = "tec_id_len" array_index="i"/>
                 <integer name = "tec_id_disp" array_index="i"/>
@@ -11276,6 +11289,5 @@ fid_dealer_search_users = FID_DEALER(78)
         <string name="err_desc"/>
       </output>
     </function>
-
 </urfa>
 
