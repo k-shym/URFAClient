@@ -43,6 +43,9 @@ final class URFAClient_Connection {
             stream_context_set_option($context, 'ssl', 'ciphers', 'ADH-RC4-MD5');
         }
 
+        stream_context_set_option($context, 'ssl', 'verify_peer', FALSE);
+        stream_context_set_option($context, 'ssl', 'verify_peer_name', FALSE);
+
         $data['address'] = gethostbyname($data['address']);
 
         $this->_socket = stream_socket_client("tcp://{$data['address']}:{$data['port']}", $errno, $errstr, $data['timeout'], STREAM_CLIENT_CONNECT, $context);
