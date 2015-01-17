@@ -3,6 +3,15 @@ URFAClient 1.0.8
 
 Универсальный PHP клиент для биллинговой системы NetUp UTM5 на основе api.xml
 
+## Установка (composer)
+```
+{
+    "require":{
+        "k-shym/urfa-client": "1.0.*"
+    }
+}
+```
+
 ## Зависимости
 - UTM 5.2.1-008+
 - PHP 5.3+
