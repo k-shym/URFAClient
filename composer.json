@@ -1,0 +1,21 @@
+{
+    "name": "URFAClient",
+    "description": "Universal PHP client billing system NetUp UTM5 based api.xml",
+    "version":"1.0.8",
+    "type": "library",
+    "license": "GPL-3.0",
+	"authors": [
+		{
+			"name": "Konstantin Shum",
+			"email": "ks.shym@gmail.com",
+			"homepage": "http://www.shym.su",
+            "role": "Developer"
+		}
+	],
+    "require":{
+        "php": ">=5.3.3"
+    },
+    "autoload":{
+        "files" : ["init.php"]
+    }
+}
