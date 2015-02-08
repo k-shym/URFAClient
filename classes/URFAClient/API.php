@@ -151,7 +151,13 @@ class URFAClient_API {
 
                     if ( ! isset($sibling[0])) throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
 
-                    foreach ($args[(string) $sibling[0]->attributes()->{'name'}] as $v)
+                    $name = (string) $sibling[0]->attributes()->{'name'};
+
+                    if ( ! isset($args[$name])) break;
+
+                    if ( ! is_array($args[$name])) throw new Exception("$name can only be an array");
+
+                    foreach ($args[$name] as $v)
                     {
                         if ( ! is_array($v))
                             throw new Exception('To tag "for" an array must be two-dimensional');
@@ -185,19 +191,16 @@ class URFAClient_API {
 
         if ($sibling AND $sibling->getName() === 'for')
         {
-            if (isset($args[$name]) AND is_array($args[$name]))
-                $this->_data_input[] = array(
-                    'name'  => $name,
-                    'value' => count($args[$name]),
-                    'type'  => $type,
-                );
-            else
-                throw new Exception("$name can only be an array");
+            $this->_data_input[] = array(
+                'name'  => $name,
+                'value' => (isset($args[$name]) AND is_array($args[$name])) ? count($args[$name]) : 0,
+                'type'  => $type,
+            );
 
             return;
         }
 
-        if (isset($args[$name]))
+        if (array_key_exists($name, $args))
         {
             $valid = TRUE;
 

@@ -118,10 +118,8 @@ Array
 </function>
 */
 $result = $api->rpcf_add_user_new(array(
-    'login'=>'test',
-    'password'=>'test',
-    'parameters_count' => array(),
-    'groups_count' => array(),
+    'login'    => 'test',
+    'password' => 'test',
 ));
 /*
 Array

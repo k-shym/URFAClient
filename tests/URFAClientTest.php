@@ -43,8 +43,6 @@ class URFAClientTest extends URFAClientBaseTest {
         $result = $this->_api->rpcf_add_user_new(array(
             'login'            => 'user' . self::prefix(),
             'password'         => 'pass' . self::prefix(),
-            'parameters_count' => array(),
-            'groups_count'     => array(),
         ));
 
         $this->assertArrayHasKey('user_id', $result);
@@ -101,9 +99,6 @@ class URFAClientTest extends URFAClientBaseTest {
             'discount_method'      => 1,
             'sessions_limit'       => 0,
             'null_service_prepaid' => 0,
-            'num_of_borders'       => array(),
-            'num_of_prepaid'       => array(),
-            'num_of_groups'        => array(),
         ));
 
         $this->assertArrayHasKey('service_id', $result);
@@ -171,7 +166,6 @@ class URFAClientTest extends URFAClientBaseTest {
                     'router_id'      => 0,
                 ),
             ),
-            'quotas_count'       => array(),
         ));
 
         $this->assertArrayHasKey('slink_id', $result);
@@ -224,8 +218,6 @@ class URFAClientTest extends URFAClientBaseTest {
             'policy_id'          => 1,
             'unabon'             => 0,
             'unprepay'           => 0,
-            'ip_groups_count'    => array(),
-            'quotas_count'       => array(),
         ));
 
         $this->assertArrayHasKey('slink_id', $result);
