@@ -29,7 +29,7 @@ URFAClient 1.0.10
 - URFAClient_Collector - сборщик информации для класса API
 - URFAClient_Log - журнал с собранными данными
 - admin.crt - сертификат для вызова админских функций
-- api.xml - файл с описанием api (UTM-5.3-002-update9)
+- api.xml - файл с описанием api ядра UTM5
 
 ## Описание конфига
 - login (required) - логин админа или абонента
@@ -42,58 +42,71 @@ URFAClient 1.0.10
 - log (default: FALSE) - сборщик логов. Если TRUE, перехватывает исключения из URFAClient_API.
 
 ## Пример
-Рассмотрим пример использования библиотеки на примере функции rpcf_add_user, у нас есть XML описание:
+Рассмотрим пример использования библиотеки на примере функции rpcf_add_user_new, у нас есть XML описание:
 ```
-<function name="rpcf_add_user" id="0x2005">
-  <input>
-    <integer name="user_id" default="0"/>
-    <string name="login"/>
-    <string name="password"/>
-    <string name="full_name" default=""/>
-    <if variable="user_id" value="0" condition="eq">
-      <integer name="unused" default="0"/>
-    </if>
-    <integer name="is_juridical" default="0"/>
-    <string name="jur_address" default=""/>
-    <string name="act_address" default=""/>
-    <string name="flat_number" default=""/>
-    <string name="entrance" default=""/>
-    <string name="floor" default=""/>
-    <string name="district" default=""/>
-    <string name="building" default=""/>
-    <string name="passport" default=""/>
-    <integer name="house_id" default="0"/>
-    <string name="work_tel" default=""/>
-    <string name="home_tel" default=""/>
-    <string name="mob_tel" default=""/>
-    <string name="web_page" default=""/>
-    <string name="icq_number" default=""/>
-    <string name="tax_number" default=""/>
-    <string name="kpp_number" default=""/>
-    <string name="email" default=""/>
-    <integer name="bank_id" default="0"/>
-    <string name="bank_account" default=""/>
-    <string name="comments" default=""/>
-    <string name="personal_manager" default=""/>
-    <integer name="connect_date" default="0"/>
-    <integer name="is_send_invoice" default="0"/>
-    <integer name="advance_payment" default="0"/>
-    <integer name="parameters_count" default="size(parameter_value)"/>
-    <for name="i" from="0" count="size(parameter_value)">
-      <integer name="parameter_id" array_index="i"/>
-      <string name="parameter_value" array_index="i"/>
-    </for>
-  </input>
-  <output>
-    <integer name="user_id"/>
-    <string name="error_msg"/>
-    <if variable="user_id" value="0" condition="eq">
-      <error code="10" comment="unable to add or edit user"/>
-    </if>
-    <if variable="user_id" value="-1" condition="eq">
-      <error code="10" comment="unable to add user, probably login exists"/>
-    </if>
-  </output>
+<function name="rpcf_add_user_new" id="0x2125">
+    <input>
+        <string name="login"/>
+        <string name="password"/>
+        <string name="full_name" default=""/>
+        <integer name="is_juridical" default="0"/>
+        <string name="jur_address" default=""/>
+        <string name="act_address" default=""/>
+        <string name="flat_number" default=""/>
+        <string name="entrance" default=""/>
+        <string name="floor" default=""/>
+        <string name="district" default=""/>
+        <string name="building" default=""/>
+        <string name="passport" default=""/>
+        <integer name="house_id" default="0"/>
+        <string name="work_tel" default=""/>
+        <string name="home_tel" default=""/>
+        <string name="mob_tel" default=""/>
+        <string name="web_page" default=""/>
+        <string name="icq_number" default=""/>
+        <string name="tax_number" default=""/>
+        <string name="kpp_number" default=""/>
+        <string name="email" default=""/>
+        <integer name="bank_id" default="0"/>
+        <string name="bank_account" default=""/>
+        <string name="comments" default=""/>
+        <string name="personal_manager" default=""/>
+        <integer name="connect_date" default="0"/>
+        <integer name="is_send_invoice" default="0"/>
+        <integer name="advance_payment" default="0"/>
+
+        <integer name="switch_id" default="0"/>
+        <integer name="port_number" default="0"/>
+        <integer name="binded_currency_id" default="810"/>
+
+        <integer name="parameters_count" default="size(parameter_value)"/>
+        <for name="i" from="0" count="size(parameter_value)">
+            <integer name="parameter_id" array_index="i"/>
+            <string name="parameter_value" array_index="i"/>
+        </for>
+
+        <integer name="groups_count" default="size(groups)"/>
+        <for name="i" from="0" count="size(groups)">
+            <integer name="groups" array_index="i"/>
+        </for>
+
+        <integer name="is_blocked" default="0"/>
+        <double name="balance" default="0.0"/>
+        <double name="credit" default="0.0"/>
+        <double name="vat_rate" default="0.0"/>
+        <double name="sale_tax_rate" default="0.0"/>
+        <integer name="int_status" default="1"/>
+    </input>
+    <output>
+        <integer name="user_id"/>
+        <if variable="user_id" value="0" condition="eq">
+            <integer name="error_code"/>
+            <string name="error_description"/>
+        </if>
+        <if variable="user_id" value="0" condition="ne">
+            <integer name="basic_account"/>
+        </if>
+    </output>
 </function>
 ```
 И так, нам нужно описать входные параметры (элемент input) в ассоциативный массив.
@@ -106,8 +119,7 @@ URFAClient 1.0.10
 И так далее, порядок параметров неважен.
 
 А вот про циклы расскажу более подробно. Как было замечено, разработчики биллинга не пришли к единому формату описания.
-В нашем примере используется count="size(parameter_value)", в других можно встретить название поля счетчика,
-для нашего примера там было бы написано count="parameters_count". Отсюда возникает вопрос, какое имя давать параметру для массива?
+В нашем примере используется count="size(parameter_value)", в других можно встретить название поля счетчика. Отсюда возникает вопрос, какое имя давать параметру для массива?
 Поэтому было принято решение использовать имя атрибута счетчика в качестве имени для параметра массива. В нашем случае будет так:
 ```
 ...
@@ -120,7 +132,15 @@ URFAClient 1.0.10
         'parameter_id' => 1,
         'parameter_value' => '13.06.2014',
     ),
-)
+),
+'groups_count' => array(
+    array(
+        'groups' => 1000,
+    ),
+    array(
+        'groups' => 1001,
+    ),
+),
 ...
 ```
 Если попадется элемент error будет выброшено исключение _XML Described error:_, а далее атрибуты ошибки.
@@ -131,13 +151,13 @@ C условиями тоже все просто, если истина, то �
 ```
 include 'URFAClient/init.php';
 
-$api = URFAClient::init(array(
+$urfa = URFAClient::init(array(
     'login'    => 'init',
     'password' => 'init',
     'address'  => 'localhost',
 ));
 
-$result = $api->rpcf_add_user(array(
+$result = $urfa->rpcf_add_user_new(array(
     'login'=>'test',
     'password'=>'test',
 ));
@@ -145,7 +165,7 @@ $result = $api->rpcf_add_user(array(
 В переменную $result попадут данные которые описаны в элементе output. Более расширенные примеры смотри в example.php.
 
 ## Возможные проблемы
-- Тестировалось на версиях биллинга UTM-5.2.1-008-update6 и UTM-5.3-002-update12
+- Тестировалось на версиях биллинга UTM-5.2.1-008-update6 и UTM-5.3-002-update18
 - Тестировались не все функции из api.xml
 - Не реализована передача типа long для PHP x32
 - При обновлении api.xml обязательно проверяйте используемые функции, в них бывают ошибки.

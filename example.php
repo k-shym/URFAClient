@@ -4,7 +4,7 @@ include __DIR__ . '/init.php';
 
 /********** Админ **********/
 
-$api = URFAClient::init(array(
+$urfa = URFAClient::init(array(
     'login'    => 'init',
     'password' => 'init',
     'address'  => 'localhost',
@@ -25,7 +25,7 @@ $api = URFAClient::init(array(
     </output>
 </function>
 */
-$result = $api->rpcf_liburfa_list();
+$result = $urfa->rpcf_liburfa_list();
 /*
 Array
 (
@@ -117,7 +117,7 @@ Array
     </output>
 </function>
 */
-$result = $api->rpcf_add_user_new(array(
+$result = $urfa->rpcf_add_user_new(array(
     'login'    => 'test',
     'password' => 'test',
 ));
@@ -140,7 +140,7 @@ Array
 
 /********** Пользователь **********/
 
-$api = URFAClient::init(array(
+$urfa = URFAClient::init(array(
     'login'    => 'test',
     'password' => 'test',
     'address'  => 'bill.example.org',
@@ -159,7 +159,7 @@ $api = URFAClient::init(array(
     </output>
 </function>
 */
-$result = $api->rpcf_user5_change_password(array(
+$result = $urfa->rpcf_user5_change_password(array(
     'old_password' => 'test',
     'new_password' => 'test_new',
     'new_password_ret' => 'test_new',
