@@ -108,6 +108,9 @@ class URFAClient_Packet {
     public function get_data_double()
     {
         $data = unpack('d', strrev($this->_data[$this->_iterator++]));
+
+        if ( ! $data) return NULL;
+
         return (float) $data[1];
     }
 
@@ -194,6 +197,8 @@ class URFAClient_Packet {
     {
         $data = unpack('N2', $this->_data[$this->_iterator++]);
 
+        if ( ! $data) return NULL;
+
         if (PHP_INT_SIZE == 4)
         {
             $hi = $data[1];
@@ -262,13 +267,15 @@ class URFAClient_Packet {
      */
     protected function _bin2int($data)
     {
-        $array = unpack('N', $data);
+        $data = unpack('N', $data);
+
+        if ( ! $data) return NULL;
 
         // для 64-х битной версии php
-        if ($array[1] >= 0x80000000)
-            return $array[1] - (0xffffffff + 1);
+        if ($data[1] >= 0x80000000)
+            return $data[1] - (0xffffffff + 1);
 
-        return (int) $array[1];
+        return (int) $data[1];
     }
 
     /**
