@@ -515,58 +515,6 @@ _______________________________________
     <output/>
   </function>
 
-  <function name="rpcf_add_user" id="0x2005">
-    <input>
-      <integer name="user_id" default="0"/>
-      <string name="login"/>
-      <string name="password"/>
-      <string name="full_name" default=""/>
-      <if variable="user_id" value="0" condition="eq">
-        <integer name="unused" default="0"/>
-      </if>
-      <integer name="is_juridical" default="0"/>
-      <string name="jur_address" default=""/>
-      <string name="act_address" default=""/>
-      <string name="flat_number" default=""/>
-      <string name="entrance" default=""/>
-      <string name="floor" default=""/>
-      <string name="district" default=""/>
-      <string name="building" default=""/>
-      <string name="passport" default=""/>
-      <integer name="house_id" default="0"/>
-      <string name="work_tel" default=""/>
-      <string name="home_tel" default=""/>
-      <string name="mob_tel" default=""/>
-      <string name="web_page" default=""/>
-      <string name="icq_number" default=""/>
-      <string name="tax_number" default=""/>
-      <string name="kpp_number" default=""/>
-      <string name="email" default=""/>
-      <integer name="bank_id" default="0"/>
-      <string name="bank_account" default=""/>
-      <string name="comments" default=""/>
-      <string name="personal_manager" default=""/>
-      <integer name="connect_date" default="0"/>
-      <integer name="is_send_invoice" default="0"/>
-      <integer name="advance_payment" default="0"/>
-      <integer name="parameters_count" default="size(parameter_value)"/>
-      <for name="i" from="0" count="size(parameter_value)">
-        <integer name="parameter_id" array_index="i"/>
-        <string name="parameter_value" array_index="i"/>
-      </for>
-    </input>
-    <output>
-      <integer name="user_id"/>
-      <string name="error_msg"/>
-      <if variable="user_id" value="0" condition="eq">
-        <error code="10" comment="unable to add or edit user"/>
-      </if>
-      <if variable="user_id" value="-1" condition="eq">
-        <error code="10" comment="unable to add user, probably login exists"/>
-      </if>
-    </output>
-  </function>
-
   <function name="rpcf_get_userinfo" id="0x2006">
     <input>
       <integer name="user_id"/>
@@ -2223,7 +2171,7 @@ _______________________________________
       </output>
   </function>
 
-  <function name = "rpcf_get_charge_policy_for_service" id = "0x15107">
+  <function name="rpcf_get_charge_policy_for_service" id = "0x15107">
       <input>
           <integer name="service_id"/>          
       </input>
@@ -2232,6 +2180,25 @@ _______________________________________
       </output>
   </function>
 
+   <function name="rpcf_set_multiple_linking_for_service" id = "0x15110">
+      <input>
+          <integer name="service_id"/>
+          <integer name="multiple_linking"/>
+      </input>
+      <output>
+          <integer name="result"/>
+      </output>
+  </function>
+
+  <function name = "rpcf_get_multiple_linking_for_service" id = "0x1510f">
+      <input>
+          <integer name="service_id"/>
+      </input>
+      <output>
+          <integer name="multiple_linking"/>
+      </output>
+  </function>
+  
   <function name="rpcf_get_periodic_link_stats" id="0x15108">
     <input>
       <integer name="slink_id"/>
@@ -4290,12 +4257,16 @@ _______________________________________
         <integer name="vendor" array_index="i" />
         <integer name="attr" array_index="i" />
         <integer name="usage_flags" array_index="i" />
+        <integer name="expire_date" array_index="i" default="2000000000"/>
         <integer name="param1" array_index="i" />
         <if variable="param1" value="1" condition="eq">
           <string name="cval" array_index="i" />
         </if>
-        <if variable="param1" value="1" condition="ne">
+        <if variable="param1" value="2" condition="eq">
           <integer name="ival" array_index="i" />
+        </if>
+        <if variable="param1" value="3" condition="eq">
+          <string name="val" array_index="i" />
         </if>
       </for>
     </input>
@@ -5164,10 +5135,11 @@ _______________________________________
     </output>
   </function>
 
-  <function name="rpcf_user5_change_password_service" id="-0x4025">
+  <function name="rpcf_user5_change_password_service" id="-0x4302">
     <input>
       <integer name="slink_id" />
       <integer name="item_id" />
+      <string name="login" />
       <string name="old_password" />
       <string name="new_password" />
       <string name="new_password_ret" />
