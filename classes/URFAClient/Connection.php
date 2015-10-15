@@ -160,10 +160,14 @@ final class URFAClient_Connection {
     public function read(URFAClient_Packet $packet)
     {
         $this->_code = ord(fread($this->_socket, 1));
+
+        if ( ! $this->_code)
+            throw new Exception("Error code {$this->_code}");
+
         $version = ord(fread($this->_socket, 1));
 
         if ($version !== $this->_version)
-            throw new Exception('Error code ' . ord(fread($this->_socket, 1)) . '. Version: ' . $version);
+            throw new Exception("Error code {$this->_code}. Version: $version");
 
         list(, $packet->_len) = unpack('n', fread($this->_socket, 2));
 
