@@ -29,7 +29,7 @@ class URFAClient_API {
      * @param String                $api            Путь до файла api
      * @param URFAClient_Connection $connection     Объект соединения с ядром
      */
-    public function __construct($api, URFAClient_Connection $connection)
+    public function __construct($api, URFAClient_Connection $connection = NULL)
     {
         $this->_connection = $connection;
 
@@ -52,6 +52,8 @@ class URFAClient_API {
      */
     public function __call($name, $args)
     {
+        if ( ! $this->_connection) throw new Exception("No object URFAClient_Connection");
+
         $this->_data_input = array();
 
         $method = FALSE;
@@ -64,7 +66,7 @@ class URFAClient_API {
             }
         }
 
-        if ( ! $method) throw new Exception("Method $name not found");
+        if ( ! $method) throw new Exception("Function $name not found");
 
         $args = (isset($args[0]) AND is_array($args[0])) ? (array) $args[0] : array();
 
