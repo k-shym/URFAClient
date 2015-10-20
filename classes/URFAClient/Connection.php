@@ -24,6 +24,11 @@ final class URFAClient_Connection {
     protected $_code;
 
     /**
+     * @var Bool
+     */
+    public $ipv6 = TRUE;
+
+    /**
      * Конструктор соединения
      *
      * @param Array $data Конфигурация
@@ -78,7 +83,7 @@ final class URFAClient_Connection {
 
             switch ($this->_code) {
                 case 192:
-                    $digest = $packet->_attr[6]['data'];
+                    $digest = $packet->attr[6]['data'];
                     $ctx = hash_init('md5');
                     hash_update($ctx, $digest);
                     hash_update($ctx, $password);
@@ -169,11 +174,11 @@ final class URFAClient_Connection {
         if ($version !== $this->_version)
             throw new Exception("Error code {$this->_code}. Version: $version");
 
-        list(, $packet->_len) = unpack('n', fread($this->_socket, 2));
+        list(, $packet->len) = unpack('n', fread($this->_socket, 2));
 
         $len = 4;
 
-        while ($len < $packet->_len) {
+        while ($len < $packet->len) {
             list(, $code) = unpack('s', fread($this->_socket, 2));
             list(, $length) = unpack('n', fread($this->_socket, 2));
             $len += $length;
@@ -182,12 +187,12 @@ final class URFAClient_Connection {
 
             if ($code == 5)
             {
-                $packet->_data[] = $data;
+                $packet->data[] = $data;
             }
             else
             {
-                $packet->_attr[$code]['data'] = $data;
-                $packet->_attr[$code]['len'] = $length;
+                $packet->attr[$code]['data'] = $data;
+                $packet->attr[$code]['len'] = $length;
             }
         }
     }
@@ -202,16 +207,16 @@ final class URFAClient_Connection {
     {
         fwrite($this->_socket, chr($this->_code));
         fwrite($this->_socket, chr($this->_version));
-        fwrite($this->_socket, pack('n', $packet->_len));
+        fwrite($this->_socket, pack('n', $packet->len));
 
-        foreach ($packet->_attr as $code => $value)
+        foreach ($packet->attr as $code => $value)
         {
             fwrite($this->_socket, pack('v', $code));
             fwrite($this->_socket, pack('n', $value['len']));
             fwrite($this->_socket, $value['data']);
         }
 
-        foreach ($packet->_data as $code => $value)
+        foreach ($packet->data as $code => $value)
         {
             fwrite($this->_socket, pack('v', 5));
             fwrite($this->_socket, pack('n', strlen($value) + 4));
@@ -226,7 +231,7 @@ final class URFAClient_Connection {
      */
     public function packet()
     {
-        return new URFAClient_Packet;
+        return new URFAClient_Packet($this->ipv6);
     }
 
     /**

@@ -11,27 +11,32 @@ class URFAClient_Packet {
     /**
      * @var Boolean
      */
-    public static $ipv6 = TRUE;
+    protected $_ipv6;
 
     /**
      * @var Int     Длина пакета
      */
-    public $_len = 4;
+    public $len = 4;
 
     /**
      * @var Int     Счетчик пакета
      */
-    public $_iterator = 0;
+    public $iterator = 0;
 
     /**
      * @var Array     Атрибуты пакета
      */
-    public $_attr = array();
+    public $attr = array();
 
     /**
      * @var Array     Данные пакета
      */
-    public $_data = array();
+    public $data = array();
+
+    public function __construct($ipv6)
+    {
+        $this->_ipv6 = $ipv6;
+    }
 
     /**
      * @param   Int                 $data
@@ -40,9 +45,9 @@ class URFAClient_Packet {
      */
     public function set_attr_int($data, $code)
     {
-        $this->_attr[$code]['data'] = pack('N', $data);
-        $this->_attr[$code]['len'] = 8;
-        $this->_len += 8;
+        $this->attr[$code]['data'] = pack('N', $data);
+        $this->attr[$code]['len'] = 8;
+        $this->len += 8;
 
         return $this;
     }
@@ -53,7 +58,7 @@ class URFAClient_Packet {
      */
     public function get_attr_int($code)
     {
-        return (isset($this->_attr[$code]['data'])) ? $this->_bin2int($this->_attr[$code]['data']) : FALSE;
+        return (isset($this->attr[$code]['data'])) ? $this->_bin2int($this->attr[$code]['data']) : FALSE;
     }
 
     /**
@@ -63,9 +68,9 @@ class URFAClient_Packet {
      */
     public function set_attr_string($data, $code)
     {
-        $this->_attr[$code]['data'] = $data;
-        $this->_attr[$code]['len'] = strlen($data) + 4;
-        $this->_len += strlen($data) + 4;
+        $this->attr[$code]['data'] = $data;
+        $this->attr[$code]['len'] = strlen($data) + 4;
+        $this->len += strlen($data) + 4;
 
         return $this;
     }
@@ -76,8 +81,8 @@ class URFAClient_Packet {
      */
     public function set_data_int($data)
     {
-        $this->_data[] = pack('N', $data);
-        $this->_len += 8;
+        $this->data[] = pack('N', $data);
+        $this->len += 8;
 
         return $this;
     }
@@ -87,7 +92,7 @@ class URFAClient_Packet {
      */
     public function get_data_int()
     {
-        return $this->_bin2int($this->_data[$this->_iterator++]);
+        return $this->_bin2int($this->data[$this->iterator++]);
     }
 
     /**
@@ -96,8 +101,8 @@ class URFAClient_Packet {
      */
     public function set_data_double($data)
     {
-        $this->_data[] = strrev(pack('d', $data));
-        $this->_len += 12;
+        $this->data[] = strrev(pack('d', $data));
+        $this->len += 12;
 
         return $this;
     }
@@ -107,7 +112,7 @@ class URFAClient_Packet {
      */
     public function get_data_double()
     {
-        $data = unpack('d', strrev($this->_data[$this->_iterator++]));
+        $data = unpack('d', strrev($this->data[$this->iterator++]));
 
         if ( ! $data) return NULL;
 
@@ -120,8 +125,8 @@ class URFAClient_Packet {
      */
     public function set_data_string($data)
     {
-        $this->_data[] = $data;
-        $this->_len += strlen($data) + 4;
+        $this->data[] = $data;
+        $this->len += strlen($data) + 4;
 
         return $this;
     }
@@ -131,7 +136,7 @@ class URFAClient_Packet {
      */
     public function get_data_string()
     {
-        return (string) $this->_data[$this->_iterator++];
+        return (string) $this->data[$this->iterator++];
     }
 
     /**
@@ -140,9 +145,9 @@ class URFAClient_Packet {
      */
     public function set_data_ip($data)
     {
-        $data = ((self::$ipv6) ? pack("C", (filter_var($data, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? 4 : 6) : '') . inet_pton($data);
-        $this->_data[] = $data;
-        $this->_len += strlen($data) + 4;
+        $data = (($this->_ipv6) ? pack("C", (filter_var($data, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? 4 : 6) : '') . inet_pton($data);
+        $this->data[] = $data;
+        $this->len += strlen($data) + 4;
 
         return $this;
     }
@@ -152,8 +157,8 @@ class URFAClient_Packet {
      */
     public function get_data_ip()
     {
-        $data = $this->_data[$this->_iterator++];
-        return (string) inet_ntop((self::$ipv6) ? substr($data, 1) : $data);
+        $data = $this->data[$this->iterator++];
+        return (string) inet_ntop(($this->_ipv6) ? substr($data, 1) : $data);
     }
 
     /**
@@ -184,8 +189,8 @@ class URFAClient_Packet {
             }
         }
 
-        $this->_data[] = pack('N2', $hi, $lo);
-        $this->_len += 12;
+        $this->data[] = pack('N2', $hi, $lo);
+        $this->len += 12;
 
         return $this;
     }
@@ -195,7 +200,7 @@ class URFAClient_Packet {
      */
     public function get_data_long()
     {
-        $data = unpack('N2', $this->_data[$this->_iterator++]);
+        $data = unpack('N2', $this->data[$this->iterator++]);
 
         if ( ! $data) return NULL;
 
@@ -285,10 +290,10 @@ class URFAClient_Packet {
      */
     public function clean()
     {
-        $this->_len = 4;
-        $this->_iterator = 0;
-        $this->_attr = array();
-        $this->_data = array();
+        $this->len = 4;
+        $this->iterator = 0;
+        $this->attr = array();
+        $this->data = array();
 
         return $this;
     }
