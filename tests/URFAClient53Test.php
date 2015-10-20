@@ -12,6 +12,7 @@ class URFAClient53Test extends URFAClientBaseTest {
         'login'    => 'init',
         'password' => 'init',
         'address'  => 'bill.example.org',
+        'protocol' => 'tls',
         'api'      => __DIR__ . '/../xml/api_53-003.xml',
         'log'      => TRUE,
     );
@@ -53,6 +54,35 @@ class URFAClient53Test extends URFAClientBaseTest {
         $this->assertEquals($user['basic_account'], $result['basic_account']);
         $this->assertEquals('user' . self::prefix(), $result['login']);
         $this->assertEquals('pass' . self::prefix(), $result['password']);
+    }
+
+    /**
+     * @depends test_rpcf_add_user_new
+     */
+    public function test_init_api_user()
+    {
+        $this->_config['login'] = 'user' . self::prefix();
+        $this->_config['password'] = 'pass' . self::prefix();
+        $this->_config['admin'] = FALSE;
+        $api_user = URFAClient::init($this->_config);
+
+        $this->assertInstanceOf('URFAClient_Collector', $api_user);
+
+        return $api_user;
+    }
+
+    /**
+     * @depends test_init_api_user
+     */
+    public function test_rpcf_user5_change_password(URFAClient_Collector $api)
+    {
+         $result = $api->rpcf_user5_change_password(array(
+            'old_password' => 'pass' . self::prefix(),
+            'new_password' => 'pass' . self::prefix(),
+            'new_password_ret' => 'pass' . self::prefix(),
+        ));
+
+        $this->assertTrue($result['result'] > 0);
     }
 
     /**

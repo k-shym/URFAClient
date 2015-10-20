@@ -37,7 +37,7 @@ final class URFAClient_Connection {
     {
         $context = stream_context_create();
 
-        if ($data['admin'])
+        if ($data['admin'] AND $data['protocol'] !== 'tls')
         {
             stream_context_set_option($context, 'ssl', 'capture_peer_cert', TRUE);
             stream_context_set_option($context, 'ssl', 'local_cert', __DIR__ . '/../../admin.crt');
@@ -61,7 +61,7 @@ final class URFAClient_Connection {
 
         stream_set_timeout($this->_socket, $data['timeout']);
 
-        if ( ! $this->_auth($data['login'], $data['password'], $data['admin']))
+        if ( ! $this->_auth($data['login'], $data['password'], $data['admin'], $data['protocol']))
             throw new Exception('Login or password incorrect');
     }
 
@@ -73,7 +73,7 @@ final class URFAClient_Connection {
      * @param   Bool      $admin
      * @return  Bool
      */
-    protected function _auth($login, $password, $admin)
+    protected function _auth($login, $password, $admin, $protocol)
     {
         $packet = $this->packet();
 
@@ -93,13 +93,16 @@ final class URFAClient_Connection {
                     $packet->set_attr_string($login, 2);
                     $packet->set_attr_string($digest, 8);
                     $packet->set_attr_string($hash, 9);
-                    $packet->set_attr_int(($admin) ? 4 : 2, 10);
+                    $packet->set_attr_int(($protocol === 'tls') ? 6 : (($admin) ? 4 : 2), 10);
                     $packet->set_attr_int(2, 1);
                     $this->write($packet);
                     break;
 
                 case 194:
-                    if ($packet->get_attr_int(10))
+                    $attr_protocol = $packet->get_attr_int(10);
+                    if ($attr_protocol === 6)
+                        stream_socket_enable_crypto($this->_socket, TRUE, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+                    elseif ($attr_protocol)
                         stream_socket_enable_crypto($this->_socket, TRUE, STREAM_CRYPTO_METHOD_SSLv3_CLIENT);
 
                     return TRUE;

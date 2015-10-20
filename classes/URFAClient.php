@@ -48,6 +48,7 @@ abstract class URFAClient {
             'address'  => 'localhost',
             'port'     => 11758,
             'timeout'  => 30,
+            'protocol' => 'ssl',
             'admin'    => TRUE,
             'api'      => __DIR__ . '/../xml/api_53-003.xml',
             'log'      => FALSE,
