@@ -1,0 +1,12 @@
+<phpunit colors="true">
+	<testsuites>
+		<testsuite name="URFAClient Tests">
+            <directory suffix="Test.php">.</directory>
+		</testsuite>
+	</testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">.</directory>
+        </whitelist>
+    </filter>
+</phpunit>

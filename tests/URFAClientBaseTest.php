@@ -42,6 +42,16 @@ abstract class URFAClientBaseTest extends PHPUnit_Framework_TestCase {
         $this->_api = URFAClient::init($this->_config);
     }
 
+    public function test_rpcf_liburfa_list()
+    {
+        $this->assertTrue((bool) count($this->_api->rpcf_liburfa_list()));
+    }
+
+    public function test_not_exist()
+    {
+        $this->assertFalse($this->_api->not_exist());
+    }
+
     /**
      * Делаем финальные проверки и закрываем соединение
      */

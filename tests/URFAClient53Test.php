@@ -3,28 +3,19 @@
 include_once 'URFAClientBaseTest.php';
 
 /**
- * Класс тестов текущей версии api.xml
- *
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md
  * @author  Konstantin Shum <k.shym@ya.ru>
  */
-class URFAClientTest extends URFAClientBaseTest {
+class URFAClient53Test extends URFAClientBaseTest {
 
     protected $_config = array(
         'login'    => 'init',
         'password' => 'init',
         'address'  => 'bill.example.org',
+        'api'      => __DIR__ . '/../xml/api_53-003.xml',
         'log'      => TRUE,
     );
 
-    public function test_rpcf_liburfa_list()
-    {
-        $this->assertTrue((bool) count($this->_api->rpcf_liburfa_list()));
-    }
-
-    /**
-     * @depends test_rpcf_liburfa_list
-     */
     public function test_rpcf_get_discount_periods()
     {
         $result = $this->_api->rpcf_get_discount_periods();
@@ -35,9 +26,6 @@ class URFAClientTest extends URFAClientBaseTest {
         return $result['discount_periods_count'];
     }
 
-    /**
-     * @depends test_rpcf_liburfa_list
-     */
     public function test_rpcf_add_user_new()
     {
         $result = $this->_api->rpcf_add_user_new(array(
@@ -83,9 +71,6 @@ class URFAClientTest extends URFAClientBaseTest {
         ))));
     }
 
-    /**
-     * @depends test_rpcf_liburfa_list
-     */
     public function test_rpcf_add_iptraffic_service_ex()
     {
         $result = $this->_api->rpcf_add_iptraffic_service_ex(array(
@@ -269,10 +254,5 @@ class URFAClientTest extends URFAClientBaseTest {
         $this->assertFalse($this->_api->rpcf_get_userinfo(array(
             'user_id' => 0,
         )));
-    }
-
-    public function test_not_exist()
-    {
-        $this->assertFalse($this->_api->not_exist());
     }
 }

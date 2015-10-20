@@ -8,7 +8,7 @@
  */
 abstract class URFAClient {
 
-    const VERSION = '1.0.11';
+    const VERSION = '1.1.0';
 
     /**
      * Автозагрузка класса
@@ -49,7 +49,7 @@ abstract class URFAClient {
             'port'     => 11758,
             'timeout'  => 30,
             'admin'    => TRUE,
-            'api'      => __DIR__ . '/../api.xml',
+            'api'      => __DIR__ . '/../xml/api_53-003.xml',
             'log'      => FALSE,
         ), $data);
 

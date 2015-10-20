@@ -1,13 +1,13 @@
-URFAClient 1.0.11
+URFAClient 1.1.0
 ==========
 
 Универсальный PHP клиент для биллинговой системы NetUp UTM5 на основе api.xml
 
 ## Установка (composer)
-```
+```json
 {
     "require":{
-        "k-shym/urfa-client": "1.0.*"
+        "k-shym/urfa-client": "1.*"
     }
 }
 ```
@@ -43,7 +43,7 @@ URFAClient 1.0.11
 
 ## Пример
 Рассмотрим пример использования библиотеки на примере функции rpcf_add_user_new, у нас есть XML описание:
-```
+```xml
 <function name="rpcf_add_user_new" id="0x2125">
     <input>
         <string name="login"/>
@@ -121,34 +121,36 @@ URFAClient 1.0.11
 А вот про циклы расскажу более подробно. Как было замечено, разработчики биллинга не пришли к единому формату описания.
 В нашем примере используется count="size(parameter_value)", в других можно встретить название поля счетчика. Отсюда возникает вопрос, какое имя давать параметру для массива?
 Поэтому было принято решение использовать имя атрибута счетчика в качестве имени для параметра массива. В нашем случае будет так:
-```
-...
-'parameters_count' => array(
-    array(
-        'parameter_id' => 0,
-        'parameter_value' => 'м',
+```php
+array(
+    // ...
+    'parameters_count' => array(
+        array(
+            'parameter_id' => 0,
+            'parameter_value' => 'м',
+        ),
+        array(
+            'parameter_id' => 1,
+            'parameter_value' => '13.06.2014',
+        ),
     ),
-    array(
-        'parameter_id' => 1,
-        'parameter_value' => '13.06.2014',
+    'groups_count' => array(
+        array(
+            'groups' => 1000,
+        ),
+        array(
+            'groups' => 1001,
+        ),
     ),
-),
-'groups_count' => array(
-    array(
-        'groups' => 1000,
-    ),
-    array(
-        'groups' => 1001,
-    ),
-),
-...
+    // ...
+)
 ```
 Если попадется элемент error будет выброшено исключение _XML Described error:_, а далее атрибуты ошибки.
 
 C условиями тоже все просто, если истина, то заходим внутрь. И содержание обрабатывается как описано выше.
 
 В итоге получаем минимальный набор параметров для создания пользователя:
-```
+```php
 include 'URFAClient/init.php';
 
 $urfa = URFAClient::init(array(
@@ -176,6 +178,7 @@ $result = $urfa->rpcf_add_user_new(array(
 
 **v1.1.0**
 - Добавлен консольный помощник cmd.php (описание функций api.xml в php array)
+- Добавлены XML с описанием API из более ранних версий и отдельные тесты к ним
 
 **v1.0.11**
 - Исправлена некорректная работа параметра timeout
