@@ -30,8 +30,8 @@ class URFAClient53Test extends URFAClientBaseTest {
     public function test_rpcf_add_user_new()
     {
         $result = $this->_api->rpcf_add_user_new(array(
-            'login'            => 'user' . self::prefix(),
-            'password'         => 'pass' . self::prefix(),
+            'login'    => 'user' . self::prefix(),
+            'password' => 'pass' . self::prefix(),
         ));
 
         $this->assertArrayHasKey('user_id', $result);
@@ -77,8 +77,8 @@ class URFAClient53Test extends URFAClientBaseTest {
     public function test_rpcf_user5_change_password(URFAClient_Collector $api)
     {
          $result = $api->rpcf_user5_change_password(array(
-            'old_password' => 'pass' . self::prefix(),
-            'new_password' => 'pass' . self::prefix(),
+            'old_password'     => 'pass' . self::prefix(),
+            'new_password'     => 'pass' . self::prefix(),
             'new_password_ret' => 'pass' . self::prefix(),
         ));
 

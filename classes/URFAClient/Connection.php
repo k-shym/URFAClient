@@ -77,11 +77,13 @@ final class URFAClient_Connection {
     {
         $packet = $this->packet();
 
-        while ( ! feof($this->_socket)) {
+        while ( ! feof($this->_socket))
+        {
             $packet->clean();
             $this->read($packet);
 
-            switch ($this->_code) {
+            switch ($this->_code)
+            {
                 case 192:
                     $digest = $packet->attr[6]['data'];
                     $ctx = hash_init('md5');
@@ -143,21 +145,22 @@ final class URFAClient_Connection {
      *
      * @return  URFAClient_Packet
      */
- 	public function result()
+    public function result()
     {
- 	    $packet = $this->packet();
+        $packet = $this->packet();
 
- 	    while(TRUE)
+        while (TRUE)
         {
             if ( ! feof($this->_socket))
             {
                 $this->read($packet);
-                if ($packet->get_attr_int(4)) break;
+                if ($packet->get_attr_int(4))
+                    break;
             }
- 	    }
+        }
 
- 	    return $packet;
- 	}
+        return $packet;
+    }
 
     /**
      * Читаем данные из соединения
@@ -181,7 +184,8 @@ final class URFAClient_Connection {
 
         $len = 4;
 
-        while ($len < $packet->len) {
+        while ($len < $packet->len)
+        {
             list(, $code) = unpack('s', fread($this->_socket, 2));
             list(, $length) = unpack('n', fread($this->_socket, 2));
             $len += $length;
@@ -242,9 +246,6 @@ final class URFAClient_Connection {
      */
     public function __destruct()
     {
-        if ($this->_socket)
-        {
-            fclose($this->_socket);
-        }
+        if ($this->_socket) fclose($this->_socket);
     }
 }

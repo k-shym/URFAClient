@@ -18,7 +18,8 @@ final class URFAClient_Collector {
      *
      * @param   URFAClient_API  $api
      */
-    public function __construct(URFAClient_API $api) {
+    public function __construct(URFAClient_API $api)
+    {
         $this->_api = $api;
     }
 
@@ -28,8 +29,10 @@ final class URFAClient_Collector {
      * @param   String    $name   Имя метода
      * @param   Array     $args   Аргументы
      */
-    public function __call($name, Array $args) {
-        try {
+    public function __call($name, Array $args)
+    {
+        try
+        {
             $ts = microtime(TRUE);
             $result = call_user_func_array(array($this->_api, $name), $args);
             $te = microtime(TRUE);

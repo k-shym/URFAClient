@@ -15,12 +15,12 @@ final class URFAClient_Log {
      *
      * @return URFAClient_Log
      */
-	public static function instance()
+    public static function instance()
     {
-		if (is_null(self::$_instance))
-			self::$_instance = new URFAClient_Log();
-		return self::$_instance;
-	}
+        if (is_null(self::$_instance))
+            self::$_instance = new URFAClient_Log();
+        return self::$_instance;
+    }
 
     private
         $_trace_log = array(),
