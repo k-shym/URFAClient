@@ -10,6 +10,8 @@ abstract class URFAClient {
 
     const VERSION = '1.1.0';
 
+    const API_XML = 'api_53-003.xml';
+
     /**
      * Автозагрузка класса
      *
@@ -50,7 +52,7 @@ abstract class URFAClient {
             'timeout'  => 30,
             'protocol' => 'ssl',
             'admin'    => TRUE,
-            'api'      => __DIR__ . '/../xml/api_53-003.xml',
+            'api'      => __DIR__ . '/../xml/' . self::API_XML,
             'log'      => FALSE,
         ), $data);
 

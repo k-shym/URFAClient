@@ -3,10 +3,12 @@
 
 require __DIR__ . '/init.php';
 
+$api_xml = '/xml/' . URFAClient::API_XML;
+
 $doc = <<<DOC
 
 The options are as follows:
-   [-a, --api <path> ]             Path to api.xml, default: ./api.xml
+   [-a, --api <path> ]             Path to api.xml, default: .$api_xml
    [-f, --function <name>]         Name function from api.xml
    [-h, --help ]                   This help
    [-v, --version ]                Version URFAClient
@@ -16,7 +18,7 @@ DOC;
 
 $options = getopt("a:f:v", array('api:', 'function:', 'version'));
 
-$api_xml = __DIR__ . '/api.xml';
+$api_xml = __DIR__ . $api_xml;
 if (isset($options['a']))
 {
     $api_xml = $options['a'];
