@@ -11,7 +11,7 @@ class URFAClient52Test extends URFAClientBaseTest {
     protected $_config = array(
         'login'    => 'init',
         'password' => 'init',
-        'address'  => 'bill.example.org',
+        'address'  => 'localhost',
         'api'      => __DIR__ . '/../xml/api_52-008.xml',
         'log'      => TRUE,
     );

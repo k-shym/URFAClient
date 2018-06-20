@@ -11,7 +11,7 @@ class URFAClient53Test extends URFAClientBaseTest {
     protected $_config = array(
         'login'    => 'init',
         'password' => 'init',
-        'address'  => 'bill.example.org',
+        'address'  => 'localhost',
         'protocol' => 'tls',
         'api'      => __DIR__ . '/../xml/api_53-003.xml',
         'log'      => TRUE,
@@ -83,6 +83,32 @@ class URFAClient53Test extends URFAClientBaseTest {
         ));
 
         $this->assertTrue($result['result'] > 0);
+    }
+
+    /**
+     * @depends test_init_api_user
+     */
+    public function test_rpcf_user5_edit_user(URFAClient_Collector $api)
+    {
+        $data = array(
+            'full_name'         => 'full_name' . self::prefix(),
+            'actual_address'    => 'actual_address' . self::prefix(),
+            'juridical_address' => 'juridical_address' . self::prefix(),
+            'work_telephone'    => 'work_telephone' . self::prefix(),
+            'home_telephone'    => 'home_telephone' . self::prefix(),
+            'mobile_telephone'  => 'mobile_telephone' . self::prefix(),
+            'web_page'          => 'web_page' . self::prefix(),
+            'icq_number'        => 'icq_number' . self::prefix(),
+            'pasport'           => 'pasport' . self::prefix(),
+            'bank_id'           => 0,
+            'bank_account'      => 'bank_account' . self::prefix(),
+            'email'             => 'email' . self::prefix(),
+        );
+
+        $api->rpcf_user5_edit_user($data);
+        $result = $api->rpcf_user5_get_user_info_new();
+
+        foreach ($data as $k => $v) $this->assertEquals($result[$k], $v);
     }
 
     /**
