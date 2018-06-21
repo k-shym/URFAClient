@@ -1,4 +1,4 @@
-URFAClient 1.1.0
+URFAClient 1.3.0
 ==========
 
 Универсальный PHP клиент для биллинговой системы NetUp UTM5 на основе api.xml
@@ -13,12 +13,12 @@ URFAClient 1.1.0
 ```
 
 ## Зависимости
-- UTM 5.2.1-008+
-- PHP 5.3+
+- UTM 5.2.1-008 >=
+- PHP 5.3 >=
+- OpenSSL 1.0 <=
 - Bcmath
 - Filter
 - Hash
-- OpenSSL
 - SimpleXML
 
 ## Описание файлов
@@ -50,6 +50,8 @@ php cmd.php -h
 The options are as follows:
    [-a, --api <path> ]             Path to api.xml
    [-f, --function <name>]         Name function from api.xml
+   [-t, --type <type>]             Type return array or xml, default: array
+   [-l, --list]                    List of functions from api.xml
    [-h, --help ]                   This help
    [-v, --version ]                Version URFAClient
 
@@ -236,14 +238,20 @@ $result = $urfa->rpcf_add_user_new(array(
 В переменную `$result` попадут данные которые описаны в элементе output.
 
 ## Возможные проблемы
-- Тестировалось на версиях биллинга UTM-5.2.1-008-update6 и UTM-5.3-003-update5
+- Тестировалось на версии биллинга UTM-5.3-003-update15
 - Тестировались не все функции из api.xml
 - Не реализована передача типа long для PHP x32
-- При обновлении api.xml обязательно проверяйте используемые функции, в них бывают ошибки.
+- При обновлении api.xml обязательно проверяйте используемые функции, в могут быть ошибки.
 
-По возникшим проблемам присылайте лог(URFAClient::trace_log()), api.xml и версию ядра UTM5. Удачи!
+По возникшим проблемам присылайте лог(URFAClient::trace_log()), api.xml и полную версию ядра UTM5. Удачи!
 
 ## История изменений
+
+**v1.3.0**
+- Доработан анализ узла `output`
+- Добавлена обработка тэга `set`
+- Просмотр списка функций и описание XML через cmd.php в файле api.xml
+- Добавлены и обновлены api.xml
 
 **v1.1.0**
 - Добавлен консольный помощник cmd.php (описание функций api.xml в php array)

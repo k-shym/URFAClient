@@ -20,7 +20,7 @@ abstract class URFAClientBaseTest extends PHPUnit_Framework_TestCase {
      */
     protected static function prefix()
     {
-        if (is_null(self::$_prefix)) self::$_prefix = 'test' . date('YmdHis');
+        if (is_null(self::$_prefix)) self::$_prefix = date('YmdHis');
         return self::$_prefix;
     }
 

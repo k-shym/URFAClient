@@ -24,6 +24,11 @@ class URFAClient_API {
     protected $_data_input = array();
 
     /**
+     * @var Array
+     */
+    protected $_data_output = array();
+
+    /**
      * Конструктор класса
      *
      * @param String                $api            Путь до файла api
@@ -54,7 +59,7 @@ class URFAClient_API {
     {
         if ( ! $this->_connection) throw new Exception("No object URFAClient_Connection");
 
-        $this->_data_input = array();
+        $this->_data_input = $this->_data_output = array();
 
         $method = FALSE;
         foreach ($this->_api->function as $function)
@@ -149,7 +154,7 @@ class URFAClient_API {
                     break;
 
                 case 'for':
-                    $sibling = $node->xpath('preceding-sibling::*[1]');
+                    $sibling = $node->xpath('preceding-sibling::integer[1]');
 
                     if ( ! isset($sibling[0])) throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
 
@@ -265,6 +270,18 @@ class URFAClient_API {
 
                 case 'error': $this->_proccess_data_error($node); break;
 
+                case 'set':
+                    $dst = (string) $node->attributes()->{'dst'};
+                    $src = (string) $node->attributes()->{'src'};
+                    $value = (string) $node->attributes()->{'value'};
+
+                    if ( ! $dst) break;
+
+                    if ($src AND isset($result[$src])) $value = $result[$src];
+
+                    $result[$dst] = $value;
+                    break;
+
                 case 'if':
                     $variable = (string) $attr->{'variable'};
 
@@ -297,25 +314,24 @@ class URFAClient_API {
                     switch ((string) $attr->{'condition'})
                     {
                         case 'eq':
-                            if ($result_value === $value) $result += $this->_proccess_data_output($node, $packet);
+                            if ($result_value === $value) $result = array_merge($result, $this->_proccess_data_output($node, $packet));
                             break;
 
                         case 'ne':
-                            if ($result_value !== $value) $result += $this->_proccess_data_output($node, $packet);
+                            if ($result_value !== $value) $result = array_merge($result, $this->_proccess_data_output($node, $packet));
                             break;
                     }
                     break;
 
                 case 'for':
-                    $sibling = $node->xpath('preceding-sibling::*[1]');
+                    $sibling = $node->xpath('preceding-sibling::integer[1]');
 
-                    if (isset($sibling[0]) AND $sibling[0]->getName() === 'set')
-                        $sibling = $sibling[0]->xpath('preceding-sibling::*[1]');
+                    if ( ! $sibling) $sibling = $node->xpath('parent::*[1]/preceding-sibling::integer[1]');
 
                     if ( ! isset($sibling[0])) throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
 
                     $name = (string) $sibling[0]->attributes()->{'name'};
-                    $count = (int) $result[$name];
+                    $count = (int) (isset($result[$name])) ? $result[$name] : $this->_data_output[$name];
                     $array = array();
                     for ($i=0; $i<$count; $i++) $array[] = $this->_proccess_data_output($node, $packet);
 
@@ -323,6 +339,8 @@ class URFAClient_API {
 
                     break;
             }
+
+            $this->_data_output += $result;
         }
 
         return $result;

@@ -7,17 +7,18 @@
 class URFAClient_Cmd extends URFAClient_API {
 
     /**
-     * Возвращает массив параметров функции
+     * Возвращает функцию из api.xml в определённом виде
      *
-     * @param  string $function_name   Имя функции
-     * @return Array
+     * @param  string $name   Имя функции
+     * @param  string $type   Тип представления
+     * @return mixed
      */
-    public function options($function_name)
+    public function method($name, $type = NULL)
     {
         $method = FALSE;
         foreach ($this->_api->function as $function)
         {
-            if ((string) $function->attributes()->{'name'} === $function_name)
+            if ((string) $function->attributes()->{'name'} === $name)
             {
                 $method = $function;
                 break;
@@ -26,7 +27,26 @@ class URFAClient_Cmd extends URFAClient_API {
 
         if ( ! $method) throw new Exception("Function $name not found");
 
-        return $this->_proccess_options_input($method->input);
+        return ($type === 'xml') ? $method->asXML() : $this->_proccess_options_input($method->input);
+    }
+
+    /**
+     * Возвращает список функций
+     *
+     * @return Array
+     */
+    public function methods()
+    {
+        $list = array();
+        foreach ($this->_api->function as $function)
+        {
+            $attr = $function->attributes();
+            $list[(string) $attr->{'name'}] = (string) $attr->{'id'};
+        }
+
+        asort($list);
+
+        return $list;
     }
 
     /**
@@ -36,7 +56,7 @@ class URFAClient_Cmd extends URFAClient_API {
      * @param  Array             $options_input   Опции функции
      * @return Array
      */
-    public function _proccess_options_input(SimpleXMLElement $input, Array &$options_input = array())
+    protected function _proccess_options_input(SimpleXMLElement $input, Array &$options_input = array())
     {
         foreach ($input->children() as $node)
         {

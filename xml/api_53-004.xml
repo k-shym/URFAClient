@@ -75,6 +75,20 @@
     </output>
   </function>
 
+  <function name="rpcf_refresh_archives" id="0x00fb">
+    <input/>
+    <output>
+      <integer name="result" />
+    </output>
+  </function>
+
+  <function name="rpcf_verify_archives" id="0x00fc">
+    <input/>
+    <output>
+      <integer name="result" />
+    </output>
+  </function>
+
   <function name="rpcf_get_archive_list" id="0x00fd">
     <input/>
     <output>
@@ -107,6 +121,54 @@
       <output>
         <integer name="has_no_license"/>
       </output>
+  </function>
+
+  <function name="rpcf_get_registry_setting_groups" id="0x103">
+    <input>
+      <integer name="component_id" default="1"/>
+    </input>
+    <output>
+      <integer name="count"/>
+      <for name="i" from="0" count="count">
+        <integer name="group_id_array" array_index="i"/>
+        <integer name="reserved_array" array_index="i"/>
+        <string name="description_array" array_index="i"/>
+      </for>
+    </output>
+  </function>
+
+  <function name="rpcf_get_registry_form" id="0x104">
+    <input>
+      <integer name="group_id"/>
+      <integer name="object_id" default="0"/>
+    </input>
+    <output>
+      <integer name="count"/>
+      <for name="i" from="0" count="count">
+        <integer name="setting_id_array" array_index="i"/>
+        <string name="description_array" array_index="i"/>
+        <integer name="value_type_array" array_index="i"/>
+        <integer name="attr_array" array_index="i"/>
+        <integer name="value_size"/>
+        <for name="j" from="0" count="value_size">
+          <string name="value_array" array_index="i,j"/>
+        </for>
+      </for>
+    </output>
+  </function>
+
+  <function name="rpcf_set_registry_setting" id="0x105">
+    <input>
+      <integer name="setting_id"/>
+      <integer name="value_size"/>
+      <for name="i" from="0" count="value_size">
+        <string name="value_array" array_index="i"/>
+      </for>
+      <integer name="object_id" default="0"/>
+    </input>
+    <output>
+      <integer name="result"/>
+    </output>
   </function>
 
   <!-- TODO: function 0x1005 description -->
@@ -386,8 +448,8 @@ _______________________________________
       <integer name="select_type" />
       <integer name="patterns_count" default="size(what_id)"/>
       <for name="i" from="0" count="size(what_id)">
-        <integer name="what"/>
         <set dst="what" src="what_id" src_index="i"/>
+        <integer name="what"/>
         <integer name="criteria_id" array_index="i" />
         <if variable="what" value="33" condition="eq" comment="date">
             <integer name="pattern" array_index="i" />
@@ -1190,21 +1252,22 @@ _______________________________________
       <output/>
     </function>
 
-    <function name="rpcf_add_iptraffic_service_link_ipv6" id="0x293a">
+    <function name="rpcf_add_iptraffic_service_link_ipv6" id="0x293e">
         <input>
             <integer name="user_id" />
             <integer name="account_id" />
             <integer name="service_id" />
             <integer name="tplink_id" />
             <integer name="discount_period_id" />
-            <integer name="start_date" />
-            <integer name="expire_date" />
+            <integer name="start_date" default="now()" />
+            <integer name="expire_date" default="max_time()" />
             <integer name="policy_id" />
             <integer name="unabon" />
             <double name="cost_coef" default="1.0"/>
             <integer name="unprepay" />
             <integer name="ip_groups_count" />
             <for name="i" from="0" count="ip_groups_count">
+                <integer name="id" array_index="i" />
                 <ip_address name="ip" array_index="i"/>
                 <integer name="mask" array_index="i" />
                 <string name="mac" array_index="i" />
@@ -1219,6 +1282,31 @@ _______________________________________
                 <integer name="port_id" array_index="i" default="0"/>
                 <integer name="vlan_id" array_index="i" default="0"/>
                 <integer name="pool_id" array_index="i" default="0"/>
+                <integer name="dhcp_option_owner_id" array_index="i" default="0"/>
+                <integer name="dhcp_option_owner_type" array_index="i" default="0"/>
+                <integer name="dhcp_options_size" array_index="i" default="0" />
+                <for name="ii" from="0" count="dhcp_options_size">
+                    <integer name="dhcp_option_id" array_index="i,ii" default="0" />
+                    <integer name="dhcp_data_type" array_index="i,ii" default="0" />
+                    <if variable="dhcp_data_type" value="1" condition="eq">
+                        <integer name="dhcp_attr_data_int" array_index="i,ii" default="0" />
+                    </if>
+                    <if variable="dhcp_data_type" value="2" condition="eq">
+                        <string name="dhcp_attr_data_string" array_index="i,ii" default="0" />
+                    </if>
+                    <if variable="dhcp_data_type" value="3" condition="eq">
+                        <ip_address name="dhcp_attr_data_ip" array_index="i,ii" default="0" />
+                    </if>
+                    <if variable="dhcp_data_type" value="4" condition="eq">
+                        <string name="dhcp_attr_data_hex_bin" array_index="i,ii" default="0" />
+                    </if>
+                    <if variable="dhcp_data_type" value="5" condition="eq">
+                        <integer name="ip_array_size" array_index="i,ii" default="0" />
+                        <for name="iii" from="0" count="ip_array_size">
+                            <ip_address name="attr_data_ip" array_index="i,ii,iii"/>
+                        </for>
+                    </if>
+                </for>
             </for>
             <integer name="quotas_count"/>
             <for name="i" from="0" count="quotas_count">
@@ -1401,6 +1489,7 @@ _______________________________________
         <ip_address name="nexthop" array_index="i"/>
         <integer name="tcp_flags" array_index="i"/>
         <ip_address name="ip_from" array_index="i"/>
+        <integer name="nfprovider_id" array_index="i"/>
         <integer name="use_sport" array_index="i"/>
         <integer name="use_input" array_index="i"/>
         <integer name="use_src_as" array_index="i"/>
@@ -1446,6 +1535,7 @@ _______________________________________
         <ip_address name="nexthop" array_index="i"/>
         <integer name="tcp_flags" array_index="i"/>
         <ip_address name="ip_from" array_index="i"/>
+        <integer name="nfprovider_id" array_index="i"/>
         <integer name="use_sport" array_index="i"/>
         <integer name="use_input" array_index="i"/>
         <integer name="use_src_as" array_index="i"/>
@@ -1472,7 +1562,7 @@ _______________________________________
       <integer name="dont_save" />
       <integer name="local_traf_policy" />
       <integer name="tclass_count" />
-      <for name="x" from="0" count="tclass_count">
+      <for name="i" from="0" count="tclass_count">
         <ip_address name="saddr" array_index="i"/>
         <integer name="saddr_mask" array_index="i"/>
         <integer name="sport" array_index="i"/>
@@ -1488,6 +1578,7 @@ _______________________________________
         <ip_address name="nexthop" array_index="i"/>
         <integer name="tcp_flags" array_index="i"/>
         <ip_address name="ip_from" array_index="i"/>
+        <integer name="nfprovider_id" array_index="i"/>
         <integer name="use_sport" array_index="i"/>
         <integer name="use_input" array_index="i"/>
         <integer name="use_src_as" array_index="i"/>
@@ -1874,7 +1965,7 @@ _______________________________________
     </output>
   </function>
 
-  <function name="rpcf_get_iptraffic_service_link_ipv6" id="0x271e">
+  <function name="rpcf_get_iptraffic_service_link_ipv6" id="0x271f">
     <input>
       <integer name="slink_id"/>
     </input>
@@ -1894,6 +1985,7 @@ _______________________________________
       <integer name="bandwidth_out"/>
       <integer name="ip_groups_count"/>
       <for name="i" from="0" count="ip_groups_count">
+        <integer name="id" array_index="i"/>
         <ip_address name="ip_address" array_index="i"/>
         <integer name="mask" array_index="i"/>
         <string name="mac" array_index="i"/>
@@ -1909,6 +2001,29 @@ _______________________________________
         <integer name="port_id" array_index="i"/>
         <integer name="vlan_id" array_index="i"/>
         <integer name="pool_id" array_index="i"/>
+        <integer name="dhcp_options_size" array_index="i" default="0" />
+        <for name="ii" from="0" count="dhcp_options_size">
+            <integer name="dhcp_option_id" array_index="i,ii" default="0" />
+            <integer name="dhcp_data_type" array_index="i,ii" default="0" />
+            <if variable="dhcp_data_type" value="1" condition="eq">
+                <integer name="dhcp_attr_data_int" array_index="i,ii" default="0" />
+            </if>
+            <if variable="dhcp_data_type" value="2" condition="eq">
+                <string name="dhcp_attr_data_string" array_index="i,ii" default="0" />
+            </if>
+            <if variable="dhcp_data_type" value="3" condition="eq">
+                <ip_address name="dhcp_attr_data_ip" array_index="i,ii" default="0" />
+            </if>
+            <if variable="dhcp_data_type" value="4" condition="eq">
+                <string name="dhcp_attr_data_hex_bin" array_index="i,ii" default="0" />
+            </if>
+            <if variable="dhcp_data_type" value="5" condition="eq">
+                <integer name="ip_array_size" array_index="i,ii" default="0" />
+                <for name="iii" from="0" count="ip_array_size">
+                    <ip_address name="attr_data_ip" array_index="i,ii,iii"/>
+                </for>
+            </if>
+        </for>
       </for>
       <integer name="quotas_count"/>
       <for name="i" from="0" count="quotas_count">
@@ -2104,6 +2219,52 @@ _______________________________________
         <string name="ipzone_name" array_index="i" />
       </for>
     </output>
+  </function>
+
+  <function name="rpcf_get_streets_list" id="0x2816">
+    <input/>
+    <output>
+      <integer name="streets_size" />
+      <for name="i" from="0" count="streets_size">
+        <integer name="street_id" array_index="i" />
+        <string name="country" array_index="i" />
+        <string name="region" array_index="i" />
+        <string name="city" array_index="i" />
+        <string name="street" array_index="i" />
+      </for>
+    </output>
+  </function>
+
+  <function name="rpcf_add_street" id="0x2817">
+    <input>
+      <integer name="street_id" />
+      <string name="country" />
+      <string name="region" />
+      <string name="city" />
+      <string name="street" />
+      <string name="number" />
+    </input>
+    <output/>
+  </function>
+
+  <function name="rpcf_get_street" id="0x2818">
+    <input>
+      <integer name="street_id" />
+    </input>
+    <output>
+      <integer name="street_id" />
+      <string name="country" />
+      <string name="region" />
+      <string name="city" />
+      <string name="street" />
+    </output>
+  </function>
+
+  <function name="rpcf_remove_street" id="0x2819">
+    <input>
+      <integer name="street_id" />
+    </input>
+    <output/>
   </function>
 
   <function name="rpcf_get_free_ips_for_house" id="0x15101">
@@ -2756,7 +2917,7 @@ _______________________________________
 
   <!-- TODO: function 0x301e description -->
 
-  <function name="rpcf_general_report_new" id="0x3022">
+  <function name="rpcf_general_report_new" id="0x3025">
     <input>
       <integer name="user_id" default="0"/>
       <integer name="account_id" default="0"/>
@@ -2778,6 +2939,8 @@ _______________________________________
         <double name="discounted_hotspot" array_index="i"/>
         <double name="discounted_dialup" array_index="i"/>
         <double name="discounted_telephony" array_index="i"/>
+        <double name="discounted_iptv" array_index="i"/>
+        <double name="discounted_vod" array_index="i"/>
         <double name="discounted_other_charges" array_index="i"/>
         <double name="tax" array_index="i"/>
         <double name="discounted_with_tax" array_index="i"/>
@@ -2998,62 +3161,34 @@ _______________________________________
     <output/>
   </function>
 
+  <function name="rpcf_add_hotspot_user" id="0x4292">
+    <input>
+      <string name="tel_number" default="8 800 000 00 00"/>
+      <integer name="card_pool_id" default="0"/>
+      <integer name="tariff_id" default="0"/>
+      <ip_address name="client_ip" default="127.0.0.1"/>
+      <integer name="till" default="0"/>
+      <string name="comments" default=""/>
+      <string name="password" default=""/>
+    </input>
+    <output>
+      <integer name="user_id"/>
+        <if variable="user_id" value="0" condition="ne" >
+            <integer name="account_id"/>
+            <string name="login"/>
+            <string name="password"/>
+        </if>
+        <if variable="user_id" value="0" condition="eq" >
+            <string name="error"/>
+        </if>
+    </output>
+  </function>
+
   <!-- TODO: function 0x4305 description -->
 
   <!-- TODO: function 0x4306 description -->
 
   <!-- TODO: function 0x4307 description -->
-
-  <function name="rpcf_get_settings_list" id="0x4400">
-    <input/>
-    <output>
-      <integer name="values_size" />
-      <for name="i" from="0" count="values_size">
-        <integer name="id" array_index="i" />
-        <string name="name" array_index="i" />
-        <string name="value" array_index="i" />
-      </for>
-    </output>
-  </function>
-
-  <function name="rpcf_add_setting" id="0x4401">
-    <input>
-      <integer name="id" />
-      <string name="variable" />
-      <string name="old_value" />
-      <string name="new_value" />
-    </input>
-    <output/>
-  </function>
-
-  <function name="rpcf_edit_setting" id="0x4402">
-    <input>
-      <integer name="id" />
-      <string name="variable" />
-      <string name="param" default="" />
-      <string name="new_value" />
-    </input>
-    <output/>
-  </function>
-
-  <function name="rpcf_remove_setting" id="0x4403">
-    <input>
-      <integer name="id" />
-    </input>
-    <output/>
-  </function>
-
-  <function name="rpcf_get_setting" id="0x4404">
-    <input>
-      <string name="variable" />
-    </input>
-    <output>
-      <integer name="values_count"/>
-      <for name="i" from="0" count="values_count">
-        <string name="value"/>
-      </for>
-    </output>
-  </function>
 
   <function name="rpcf_get_sys_users_list" id="0x4413">
     <input/>
@@ -3285,7 +3420,7 @@ _______________________________________
     </output>
   </function>
 
-  <function name="rpcf_get_version_info" id="0x5010">
+  <function name="rpcf_get_version_info" id="0x5013">
     <input/>
     <output>
       <string name="name" />
@@ -3296,6 +3431,7 @@ _______________________________________
       <string name="email" />
       <string name="tel" />
       <string name="web" />
+      <string name="valid_till" />
     </output>
   </function>
 
@@ -3338,16 +3474,28 @@ _______________________________________
     </output>
   </function>
 
-  <function name="rpcf_get_traffic_detailed" id="0x5018">
+  <function name="rpcf_request_traffic_detailed" id="0x502a">
     <input>
       <integer name="user_id" default="0" />
       <integer name="account_id"   />
-      <integer name="apid" />
+      <integer name="collector_id" />
       <integer name="time_start" />
       <integer name="time_end" />
     </input>
     <output>
+      <!-- if is_immediate == 0 request queued,  else - request processing immediate -->
+      <integer name="is_immediate" />
+    </output>
+  </function>
+
+  <function name="rpcf_get_traffic_detailed" id="0x502b">
+    <input>
+      <integer name="stop" />
+      <integer name="apid" />
+    </input>
+    <output>
       <integer name="nf5a_size" />
+      <integer name="is_finish" />
       <for name="i" from="0" count="nf5a_size">
         <integer name="timestamp" array_index="i" />
         <integer name="slink_id" array_index="i" />
@@ -3733,6 +3881,83 @@ _______________________________________
     </output>
   </function>
 
+  <function name="rpcf_get_invoices_doc_list" id="0x8030">
+    <input>
+      <integer name="aid" />
+      <integer name="time_start" />
+      <integer name="time_end" />
+      <integer name="gid" />
+      <integer name="doc_type" />
+    </input>
+    <output>
+      <integer name="accts_size" />
+      <for name="i" from="0" count="accts_size">
+        <integer name="count_of_invoice" />
+        <set dst="count_of_invoice_array" src="count_of_invoice" dst_index="i" />
+        <if variable="count_of_invoice" value="0" condition="ne">
+          <integer name="currency_id" array_index="i" />
+          <string name="currency_name" array_index="i" />
+          <string name="payment_rule" array_index="i" />
+        </if>
+        <for name="j" from="0" count="count_of_invoice">
+          <integer name="id" array_index="i,j" />
+          <string name="alt_num" array_index="i,j" />
+          <string name="ext_num" array_index="i,j" />
+          <integer name="invoice_date" array_index="i,j" />
+          <integer name="uid" array_index="i,j" />
+          <integer name="payment_transaction_id" array_index="i,j" />
+          <integer name="expire_date" array_index="i,j" />
+          <integer name="tmp_is_payed"/>
+          <set src="tmp_is_payed" dst="is_payed" dst_index="i,j"/>
+          <integer name="is_printed" array_index="i,j" />
+          <integer name="account_id" array_index="i,j" />
+          <integer name="odt_status" array_index="i,j" />
+          <integer name="odt_created" array_index="i,j" />
+          <integer name="odt_modified" array_index="i,j" />
+          <integer name="is_odt_mailed" array_index="i,j" />
+          <integer name="pdf_status" array_index="i,j" />
+          <integer name="pdf_created" array_index="i,j" />
+          <integer name="pdf_modified" array_index="i,j" />
+          <integer name="is_pdf_mailed" array_index="i,j" />
+          <string name="full_name" array_index="i,j" />
+          <if variable="tmp_is_payed" value="0" condition="ne">
+            <integer name="accInvcInfo_id" array_index="i,j" />
+            <integer name="accInvcInfo_date" array_index="i,j" />
+            <integer name="accInvcInfo_payed_date" array_index="i,j" />
+            <string name="payment_ext_number" array_index="i,j" />
+            <integer name="is_printed" array_index="i,j" />
+          </if>
+          <if variable="tmp_is_payed" value="0" condition="eq">
+            <set dst="accInvcInfo_id" dst_index="i,j" value="0"/>
+            <set dst="accInvcInfo_date" dst_index="i,j" value="0" />
+            <set dst="accInvcInfo_payed_date" dst_index="i,j" value="0" />
+            <set dst="payment_ext_number" dst_index="i,j" value=""/>
+            <set dst="is_printed" dst_index="i,j" value="0"/>
+          </if>
+          <integer name="entry_size" />
+          <set dst="entry_size_array" src="entry_size" dst_index="i,j" />
+          <for name="x" from="0" count="entry_size">
+            <string name="name" array_index="i,j,x" />
+            <integer name="invoice_id" array_index="i,j,x" />
+            <integer name="slink_id" array_index="i,j,x" />
+            <integer name="service_type" array_index="i,j,x" />
+            <integer name="discount_period_id" array_index="i,j,x" />
+            <integer name="date" array_index="i,j,x" />
+            <double name="qnt" array_index="i,j,x" />
+            <double name="base" array_index="i,j,x" />
+            <double name="sum" array_index="i,j,x" />
+            <double name="tax" array_index="i,j,x" />
+          </for>
+          <if variable="entry_size" value="0" condition="ne">
+            <double name="total_sum" array_index="i,j" />
+            <double name="total_tax" array_index="i,j" />
+            <double name="total_sum_plus_total_tax" array_index="i,j" />
+          </if>
+        </for>
+      </for>
+    </output>
+  </function>
+
   <function name="rpcf_get_invc_lst_addpay" id="0x8002">
     <input>
       <integer name="user_id" />
@@ -3773,6 +3998,15 @@ _______________________________________
     <input>
       <integer name="aid" />
       <integer name="invc_id" />
+    </input>
+    <output/>
+  </function>
+
+  <function name="rpcf_sendDocument2mail" id="0x8005">
+    <input>
+      <integer name="aid" />
+      <integer name="invc_id" />
+      <integer name="doc_type" />
     </input>
     <output/>
   </function>
@@ -3923,6 +4157,52 @@ _______________________________________
       <integer name="service_id" />
       <integer name="invoice_sup_id" />
     </input>
+  </function>
+
+  <function name="rpcf_cportal_get_daily_accouting_period" id="0x8100">
+    <input>
+      <integer name="periodic_type" />
+      <integer name="custom_duration" />
+    </input>
+    <output>
+      <integer name="period_id" />
+    </output>
+  </function>
+
+  <function name="rpcf_cportal_check_user" id="0x8101">
+    <input>
+      <string name="login" />
+      <string name="password" />
+      <integer name="tariff_id" />
+      <integer name="accounting_period_id" />
+      <integer name="count" />
+      <for name="i" from="0" count="count">
+        <string name="parameter_name" array_index="i" />
+        <string name="parameter_value" array_index="i" />
+      </for>
+    </input>
+    <output>
+      <integer name="err_code" />
+      <string name="err_message" />
+    </output>
+  </function>
+
+  <function name="rpcf_cportal_add_user" id="0x8102">
+    <input>
+      <string name="login" />
+      <string name="password" />
+      <integer name="tariff_id" />
+      <integer name="accounting_period_id" />
+      <integer name="count" />
+      <for name="i" from="0" count="count">
+        <string name="parameter_name" array_index="i" />
+        <string name="parameter_value" array_index="i" />
+      </for>
+    </input>
+    <output>
+      <integer name="user_id" />
+      <integer name="account_id" />
+    </output>
   </function>
 
   <function name="rpcf_get_tech_param_by_uid" id="0x9000">
@@ -4090,7 +4370,7 @@ _______________________________________
     </output>
   </function>
 
-  <function name="rpcf_set_radius_attr" id="0x10103">
+  <function name="rpcf_set_radius_attr" id="0x10105">
     <input>
       <integer name="sid" />
       <integer name="st" />
@@ -4098,16 +4378,25 @@ _______________________________________
       <for name="i" from="0" count="cnt">
         <integer name="vendor" array_index="i" />
         <integer name="attr" array_index="i" />
+        <integer name="tag" array_index="i" />
         <integer name="usage_flags" array_index="i" />
         <integer name="expire_date" array_index="i" default="2000000000"/>
         <integer name="param1" array_index="i" />
-        <if variable="param1" value="1" condition="eq">
-          <string name="cval" array_index="i" />
+        <set dst="tmp_type" src="param1" src_index="i"/>
+        <!-- integer -->
+        <if variable="tmp_type" value="0" condition="eq">
+          <integer name="val" array_index="i" />
         </if>
-        <if variable="param1" value="2" condition="eq">
-          <integer name="ival" array_index="i" />
+        <!-- string -->
+        <if variable="tmp_type" value="1" condition="eq">
+          <string name="val" array_index="i" />
         </if>
-        <if variable="param1" value="3" condition="eq">
+        <!-- IP-address -->
+        <if variable="tmp_type" value="2" condition="eq">
+          <integer name="val" array_index="i" />
+        </if>
+        <!-- HEX string -->
+        <if variable="tmp_type" value="3" condition="eq">
           <string name="val" array_index="i" />
         </if>
         <integer name="prop_size" array_index="i"/>
@@ -4120,7 +4409,7 @@ _______________________________________
     <output/>
   </function>
 
-  <function name="rpcf_get_radius_attr" id="0x10104">
+  <function name="rpcf_get_radius_attr" id="0x10106">
     <input>
       <integer name="sid"/>
       <integer name="st"/>
@@ -4130,6 +4419,7 @@ _______________________________________
       <for name="i" from="0" count="radius_data_size">
         <integer name="vendor" array_index="i"/>
         <integer name="attr" array_index="i"/>
+        <integer name="tag" array_index="i"/>
         <integer name="usage_flags" array_index="i"/>
         <integer name="expire_date" array_index="i"/>
         <integer name="param1" array_index="i" />
@@ -4413,7 +4703,7 @@ _______________________________________
 		<integer name="tariff_class_count"/>
 		<for name="i" from="0" count="tariff_class_count">
 			<integer name="tariff_class" array_index="i"/>
-			<integer name="border_count" array_index="i"/>
+			<integer name="border_count" />
 			<for name="j" from="0" count="border_count">
 			    <integer name="border" array_index="i,j"/>
 				<double name="cost_mult" array_index="i,j"/>
@@ -4424,7 +4714,7 @@ _______________________________________
 				<double name="cost" array_index="i,j"/>
 			</for>
 			<integer name="prepaid_array" array_index="i"/>
-			<integer name="fixed_cost_array" array_index="i"/>
+			<double name="fixed_cost_array" array_index="i"/>
 		</for>
 		<integer name="free_time"/>
 		<integer name="first_period_length"/>
@@ -4454,7 +4744,7 @@ _______________________________________
 		<integer name="tariff_class_count"/>
 		<for name="i" from="0" count="tariff_class_count">
 			<integer name="tariff_class" array_index="i"/>
-			<integer name="border_count" array_index="i"/>
+			<integer name="border_count" />
 			<for name="j" from="0" count="border_count">
 			    <integer name="border" array_index="i,j"/>
 				<double name="cost_mult" array_index="i,j"/>
@@ -4465,7 +4755,7 @@ _______________________________________
 				<double name="cost" array_index="i,j"/>
 			</for>
 			<integer name="prepaid_array" array_index="i"/>
-			<integer name="fixed_cost_array" array_index="i"/>
+			<double name="fixed_cost_array" array_index="i"/>
 		</for>
 		<integer name="free_time"/>
 		<integer name="first_period_length"/>
@@ -4494,22 +4784,25 @@ _______________________________________
 		<integer name="is_dynamic"/>
 		<double name="cost"/>
 		<integer name="discount_method"/>
-                <integer name="radius_sessions_limit"/>
+        <integer name="radius_sessions_limit"/>
 		<integer name="tariff_class_count"/>
 		<for name="i" from="0" count="tariff_class_count">
 			<integer name="tariff_class" array_index="i"/>
-			<integer name="border_count" array_index="i"/>
+			<integer name="border_count"/>
+
 			<for name="j" from="0" count="border_count">
-			    <integer name="border" array_index="i,j"/>
+				<integer name="border" array_index="i,j"/>
 				<double name="cost_mult" array_index="i,j"/>
 			</for>
-			<integer name="timerange_count"/>
-			<for name="j" from ="0" count="timerange_count">
-				<integer name="timerange_id" array_index="i,j"/>
-				<double name="cost" array_index="i,j"/>
-			</for>
+
+            <integer name="timerange_count"/>
+            <for name="j" from="0" count="timerange_count">
+                <integer name="timerange_id" array_index="i,j"/>
+                <double name="cost" array_index="i,j" />
+            </for>
+
 			<integer name="prepaid_array" array_index="i"/>
-			<integer name="fixed_cost_array" array_index="i"/>
+			<double name="fixed_cost_array" array_index="i"/>
 		</for>
 		<integer name="free_time"/>
 		<integer name="first_period_length"/>
@@ -4517,7 +4810,7 @@ _______________________________________
 		<integer name="second_period_step"/>
 		<integer name="time_unit_size"/>
 		<integer name="discount_free_time"/>
-                <double name="min_charge"/>
+        <double name="min_charge"/>
 	  </output>
   </function>
 
@@ -4530,7 +4823,7 @@ _______________________________________
 		  <integer name="discount_period_id"/>
 		  <integer name="start_date"/>
 		  <integer name="expire_date"/>
-                  <integer name="policy_id"/>
+          <integer name="policy_id"/>
 		  <integer name="recalc_fee"/>
           <double name="cost_coef" default="1.0"/>
 		  <integer name="login_count"/>
@@ -4637,8 +4930,9 @@ _______________________________________
   <function name="rpcf_get_tel_supplier_service" id="0x10314">
   <function name="rpcf_delete_tel_supplier_service" id="0x10315">
   <function name="rpcf_tel_supplier_payments_report" id="0x10316">
-  <function name="rpcf_tel_supplier_charges_report" id="0x10317">
+  <function name="rpcf_tel_supplier_charges_report" id="0x10322">
   <function name="rpcf_get_service_id_for_supplier" id="0x10318">
+  <function name="rpcf_tel_supplier_users_report" id="0x10323">
 -->
   <function name="rpcf_validate_tel_supplier_dirs" id="0x10321">
     <input>
@@ -7996,6 +8290,19 @@ _______________________________________
         </output>
     </function>
 
+    <function name="rpcf_dealer_get_document" id="0x7000007b">
+        <input>
+            <integer name="user_id"/>
+            <integer name="doc_type"/>
+            <integer name="base_id"/>
+            <integer name="file_type"/>
+        </input>
+        <output>
+            <integer name="result"/>
+            <binary name="doc_data"/>
+        </output>
+    </function>
+
     <function name="rpcf_tel_report_for_dealer" id="0x13028">
       <input>
           <integer name="dealer_id"/>
@@ -9557,6 +9864,24 @@ fid_dealer_search_users = FID_DEALER(78)
     </output>
   </function>
 
+  <function name="rpcf_get_requirement_payment" id="0x15111">
+    <input>
+      <integer name="account_id" />
+    </input>
+    <output>
+      <double name="result" />
+    </output>
+  </function>
+
+  <function name="rpcf_user5_get_requirement_payment" id="-0x15060">
+    <input>
+      <integer name="account_id" />
+    </input>
+    <output>
+      <double name="result" />
+    </output>
+  </function>
+
   <function name="rpcf_user5_get_tlink" id="-0x15004">
     <input>
       <integer name="account_id" default="0"/>
@@ -9603,6 +9928,7 @@ fid_dealer_search_users = FID_DEALER(78)
 
   <function name="rpcf_user5_set_next_tp" id="-0x15006">
     <input>
+      <integer name="account_id" default="0"/>
       <integer name="tp_link" default="0"/>
       <integer name="tp_next" default="0"/>
     </input>
@@ -10180,7 +10506,7 @@ fid_dealer_search_users = FID_DEALER(78)
     </output>
   </function>
 
-  <function name="rpcf_edit_iptraffic_service_link_ipv6" id="0x293b">
+  <function name="rpcf_edit_iptraffic_service_link_ipv6" id="0x293f">
     <input>
       <integer name="slink_id" default="0"/>
         <integer name="start_date" default="now()"/>
@@ -10188,7 +10514,8 @@ fid_dealer_search_users = FID_DEALER(78)
         <integer name="policy_id"/>
         <double  name="cost_coef"/>
         <integer name="ip_groups_count" default="size(ip_address)"/>
-        <for name="i" from="0" count="size(ip_address)">
+        <for name="i" from="0" count="ip_groups_count">
+          <integer name="id" array_index="i"/>
           <ip_address name="ip_address" array_index="i"/>
           <integer name="mask" array_index="i"/>
           <string name="mac" array_index="i" default=""/>
@@ -10203,6 +10530,32 @@ fid_dealer_search_users = FID_DEALER(78)
           <integer name="port_id" array_index="i" default="0"/>
           <integer name="vlan_id" array_index="i" default="0"/>
           <integer name="pool_id" array_index="i" default="0"/>
+
+          <integer name="dhcp_option_owner_id" array_index="i" default="0"/>
+          <integer name="dhcp_option_owner_type" array_index="i" default="0"/>
+          <integer name="dhcp_options_size" array_index="i" default="0" />
+          <for name="ii" from="0" count="dhcp_options_size">
+            <integer name="dhcp_option_id" array_index="i,ii" default="0" />
+            <integer name="dhcp_data_type" array_index="i,ii" default="0" />
+            <if variable="dhcp_data_type" value="1" condition="eq">
+              <integer name="dhcp_attr_data_int" array_index="i,ii" default="0" />
+            </if>
+            <if variable="dhcp_data_type" value="2" condition="eq">
+              <string name="dhcp_attr_data_string" array_index="i,ii" default="" />
+            </if>
+            <if variable="dhcp_data_type" value="3" condition="eq">
+              <ip_address name="dhcp_attr_data_ip" array_index="i,ii" default="0" />
+            </if>
+            <if variable="dhcp_data_type" value="4" condition="eq">
+              <string name="dhcp_attr_data_hex_bin" array_index="i,ii" default="" />
+            </if>
+            <if variable="dhcp_data_type" value="5" condition="eq">
+              <integer name="ip_array_size" array_index="i,ii" default="0" />
+              <for name="iii" from="0" count="ip_array_size">
+                <ip_address name="attr_data_ip" array_index="i,ii,iii"/>
+              </for>
+            </if>
+          </for>
         </for>
         <integer name="quotas_count" default="size(quota)"/>
         <for name="i" from="0" count="size(quota)">
@@ -10247,6 +10600,152 @@ fid_dealer_search_users = FID_DEALER(78)
       <string name="external_id"/>
     </output>
   </function>
+
+  <function name="rpcf_user5_get_user_megogo_tariff_list" id="-0x15040">
+    <input>
+    </input>
+    <output>
+      <integer name="user_tariffs_size"/>
+      <for name="i" from="0" count="user_tariffs_size">
+        <integer name="tariff_id_array" array_index="i"/>
+        <string name="tariff_name_array" array_index="i"/>
+        <string name="tariff_comments_array" array_index="i"/>
+        <double name="cost" array_index="i"/>
+        <integer name="delay" array_index="i"/>
+        <integer name="is_base" array_index="i"/>
+      </for>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_activate_megogo_tariff" id="-0x15041">
+    <input>
+      <integer name="tariff_plan_id"/>
+    </input>
+    <output>
+      <integer name="status"/>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_get_user_megogo_status" id="-0x15042">
+    <input>
+    </input>
+    <output>
+      <integer name="user_tariffs_size"/>
+      <for name="i" from="0" count="user_tariffs_size">
+          <integer name="tariff_plan_id" array_index="i"/>
+          <integer name="tariff_link_id" array_index="i"/>
+          <integer name="account_id" array_index="i"/>
+          <integer name="next_tariff_id" array_index="i"/>
+      </for>
+
+    </output>
+  </function>
+
+  <function name="rpcf_user5_get_user_megogo_link" id="-0x15043">
+    <input>
+    </input>
+    <output>
+      <string name="link"/>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_add_user_to_megogo" id="-0x15044">
+    <input>
+      <string name="megogo_login"/>
+      <string name="megogo_password"/>
+      <string name="megogo_email"/>
+    </input>
+    <output>
+      <integer name="result"/>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_change_megogo_credentials" id="-0x15045">
+    <input>
+      <string name="megogo_login"/>
+      <string name="megogo_password"/>
+      <string name="megogo_email"/>
+    </input>
+    <output>
+      <integer name="result"/>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_is_megogo_user" id="-0x15046">
+    <input>
+    </input>
+    <output>
+      <integer name="result"/>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_get_user_lifestream_tariff_list" id="-0x15050">
+    <input>
+    </input>
+    <output>
+      <integer name="user_tariffs_size"/>
+      <for name="i" from="0" count="user_tariffs_size">
+        <integer name="tariff_id_array" array_index="i"/>
+        <string name="tariff_name_array" array_index="i"/>
+        <string name="tariff_comments_array" array_index="i"/>
+        <double name="cost" array_index="i"/>
+      </for>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_activate_lifestream_tariff" id="-0x15051">
+    <input>
+      <integer name="tariff_plan_id"/>
+    </input>
+    <output>
+      <integer name="status"/>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_get_user_lifestream_status" id="-0x15052">
+    <input>
+    </input>
+    <output>
+      <integer name="user_tariffs_size"/>
+      <for name="i" from="0" count="user_tariffs_size">
+          <integer name="tariff_plan_id" array_index="i"/>
+          <integer name="tariff_link_id" array_index="i"/>
+          <integer name="account_id" array_index="i"/>
+          <integer name="next_tariff_id" array_index="i"/>
+      </for>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_add_user_to_lifestream" id="-0x15053">
+    <input>
+      <string name="lifestream_login"/>
+      <string name="lifestream_password"/>
+      <string name="lifestream_email"/>
+    </input>
+    <output>
+      <string name="lifestream_id"/>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_change_lifestream_credentials" id="-0x15054">
+    <input>
+      <string name="lifestream_login"/>
+      <string name="lifestream_password"/>
+      <string name="lifestream_email"/>
+    </input>
+    <output>
+      <string name="lifestream_id"/>
+    </output>
+  </function>
+
+  <function name="rpcf_user5_is_lifestream_user" id="-0x15055">
+    <input>
+    </input>
+    <output>
+      <integer name="result"/>
+    </output>
+  </function>
+
 
 <function name="rpcf_get_periodic_service_ex" id="0x2130">
     <input>
@@ -11098,22 +11597,138 @@ fid_dealer_search_users = FID_DEALER(78)
       </output>
     </function>
 
-    <function name="rpcf_get_media_contents" id="0x4507">
+
+    <function name="rpcf_add_vod_service" id="0x4510">
+      <input>
+        <integer name="parent_id"/>
+        <integer name="tariff_id"/>
+        <string name="service_name"/>
+        <string name="comment"/>
+        <integer name="link_by_default"/>
+        <integer name="is_dynamic"/>
+        <double name="cost"/>
+        <integer name="duration"/>
+        <integer name="media_content"/>
+        <long name="media_group"/>
+      </input>
+      <output>
+        <integer name="service_id"/>
+      </output>
+    </function>
+
+    <function name="rpcf_edit_vod_service" id="0x4511">
+      <input>
+        <integer name="service_id"/>
+        <integer name="parent_id"/>
+        <integer name="tariff_id"/>
+        <string name="service_name"/>
+        <string name="comment"/>
+        <integer name="link_by_default"/>
+        <integer name="is_dynamic"/>
+        <double name="cost"/>
+        <integer name="duration"/>
+        <integer name="media_content"/>
+        <long name="media_group"/>
+      </input>
+      <output>
+        <integer name="result"/>
+      </output>
+    </function>
+
+    <function name="rpcf_get_vod_service" id="0x4512">
+      <input>
+        <integer name="service_id"/>
+      </input>
+      <output>
+        <integer name="service_id"/>
+        <integer name="parent_id"/>
+        <integer name="tariff_id"/>
+        <string name="service_name"/>
+        <string name="comment"/>
+        <integer name="link_by_default"/>
+        <integer name="is_dynamic"/>
+        <double name="cost"/>
+        <integer name="duration"/>
+        <integer name="media_content"/>
+        <long name="media_group"/>
+      </output>
+    </function>
+
+    <function name="rpcf_add_vod_service_link" id="0x4514">
+      <input>
+        <integer name="user_id"/>
+        <integer name="account_id"/>
+        <integer name="service_id"/>
+        <integer name="tp_link_id"/>
+        <integer name="start_date"/>
+        <double name="cost_coef" default="1.0"/>
+      </input>
+      <output>
+        <integer name="slink_id"/>
+      </output>
+    </function>
+
+    <function name="rpcf_edit_vod_service_link" id="0x4515">
+      <input>
+        <integer name="slink_id"/>
+        <integer name="start_date"/>
+        <double name="cost_coef" default="1.0"/>
+      </input>
+      <output>
+        <integer name="slink_id"/>
+      </output>
+    </function>
+
+    <function name="rpcf_get_vod_service_link" id="0x4516">
+      <input>
+        <integer name="slink_id"/>
+      </input>
+      <output>
+        <integer name="slink_id"/>
+        <integer name="ap_id"/>
+        <integer name="start_date"/>
+        <integer name="expire_date"/>
+        <double name="cost_coef" default="1.0"/>
+      </output>
+    </function>
+
+    <function name="rpcf_get_iptv_custom_data" id="0x4517">
+      <input>
+        <integer name="slink_id"/>
+      </input>
+      <output>
+        <string name="data"/>
+      </output>
+    </function>
+
+    <function name="rpcf_set_iptv_custom_data" id="0x4518">
+      <input>
+        <integer name="slink_id"/>
+        <string name="data"/>
+      </input>
+      <output>
+        <integer name="status"/>
+      </output>
+    </function>
+
+    <function name="rpcf_get_media_contents" id="0x450d">
       <output>
         <integer name="size"/>
         <for name="i" from="0" count="size">
           <integer name="id" array_index="i"/>
           <string name="name" array_index="i"/>
+          <integer name="type" array_index="i"/>
         </for>
       </output>
     </function>
 
-    <function name="rpcf_get_media_groups" id="0x4508">
+    <function name="rpcf_get_media_groups" id="0x450e">
       <output>
         <integer name="size"/>
         <for name="i" from="0" count="size">
           <long name="id" array_index="i"/>
           <string name="name" array_index="i"/>
+          <integer name="type" array_index="i"/>
         </for>
       </output>
     </function>
@@ -11246,7 +11861,32 @@ fid_dealer_search_users = FID_DEALER(78)
       </output>
     </function>
 
-    <function name="rpcf_get_document" id="0x4601">
+    <function name="rpcf_get_document" id="0x4620">
+        <input>
+            <integer name="user_id"/>
+            <integer name="doc_type"/>
+            <integer name="base_id"/>
+            <integer name="file_type"/>
+        </input>
+        <output>
+            <integer name="result"/>
+            <binary name="doc_data"/>
+        </output>
+    </function>
+
+    <function name="rpcf_upload_document" id="0x4621">
+        <input>
+            <integer name="user_id"/>
+            <integer name="doc_type"/>
+            <integer name="base_id"/>
+            <binary name="odt_data"/>
+        </input>
+        <output>
+            <integer name="result"/>
+        </output>
+    </function>
+
+    <function name="rpcf_remove_document" id="0x4622">
         <input>
             <integer name="user_id"/>
             <integer name="doc_type"/>
@@ -11254,7 +11894,17 @@ fid_dealer_search_users = FID_DEALER(78)
         </input>
         <output>
             <integer name="result"/>
-            <binary name="doc_data"/>
+        </output>
+    </function>
+
+    <function name="rpcf_revert_document" id="0x4623">
+        <input>
+            <integer name="user_id"/>
+            <integer name="doc_type"/>
+            <integer name="base_id"/>
+        </input>
+        <output>
+            <integer name="result"/>
         </output>
     </function>
 
@@ -11760,5 +12410,117 @@ fid_dealer_search_users = FID_DEALER(78)
 
         </output>
     </function>
+
+  <function name="rpcf_get_nf_providers_list" id="0x5061">
+    <input/>
+    <output>
+            <integer name="size" />
+            <for name="i" from="0" count="size">
+              <integer name="id" array_index="i" />
+              <integer name="collector_id" array_index="i" />
+              <string name="name" array_index="i" />
+              <string name="comments" array_index="i" />
+              <ip_address name="address" array_index="i" />
+            </for>
+    </output>
+  </function>
+
+  <function name="rpcf_put_nf_provider" id="0x5062">
+    <input>
+              <integer name="id" />
+              <integer name="collector_id" />
+              <string name="name" />
+              <string name="comments" />
+              <ip_address name="address" />
+    </input>
+    <output>
+              <string name="error_message" />
+    </output>
+  </function>
+
+  <function name="rpcf_del_nf_provider" id="0x5063">
+    <input>
+              <integer name="id" />
+    </input>
+    <output>
+              <string name="error_message" />
+    </output>
+  </function>
+
+  <function name="rpcf_get_traffic_collectors_list" id="0x5064">
+    <input/>
+    <output>
+            <integer name="size" />
+            <for name="i" from="0" count="size">
+              <integer name="id" array_index="i" />
+              <string name="name" array_index="i" />
+              <string name="comments" array_index="i" />
+              <integer name="state" array_index="i" />
+            </for>
+    </output>
+  </function>
+
+  <function name="rpcf_put_traffic_collector" id="0x5065">
+    <input>
+              <integer name="id" />
+              <string name="name" />
+              <string name="comments" />
+    </input>
+    <output>
+              <string name="error_message" />
+    </output>
+  </function>
+
+  <function name="rpcf_del_traffic_collector" id="0x5066">
+    <input>
+              <integer name="id" />
+    </input>
+    <output>
+              <string name="error_message" />
+    </output>
+  </function>
+
+  <function name="rpcf_get_registry_settings_list" id="0x5070">
+    <input/>
+    <output>
+            <integer name="size" />
+            <for name="i" from="0" count="size">
+              <integer name="id" array_index="i" />
+              <string name="name" array_index="i" />
+              <string name="description" array_index="i" />
+              <integer name="validation_type" array_index="i" />
+              <integer name="object_size" array_index="i" />
+                  <for name="j" from="0" count="object_size">
+                      <integer name="object_id" array_index="i,j" />
+                      <string name="value" array_index="i,j" />
+                  </for>
+            </for>
+    </output>
+  </function>
+
+  <function name="rpcf_set_registry_setting" id="0x5071">
+    <input>
+            <string name="name"/>
+            <integer name="object_id" />
+            <integer name="size" />
+            <for name="i" from="0" count="size">
+              <string name="value" array_index="i" />
+            </for>
+    </input>
+    <output/>
+  </function>
+
+  <function name="rpcf_remove_registry_setting" id="0x5072">
+    <input>
+              <string name="name" />
+              <integer name="object_id" />
+    </input>
+    <output/>
+  </function>
+
+  <function name="rpcf_notify_registry" id="0x5073">
+    <input/>
+    <output/>
+  </function>
 
 </urfa>
