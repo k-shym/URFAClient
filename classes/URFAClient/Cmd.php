@@ -35,7 +35,7 @@ class URFAClient_Cmd extends URFAClient_API {
      *
      * @return Array
      */
-    public function listing()
+    public function methods()
     {
         $list = array();
         foreach ($this->_api->function as $function)

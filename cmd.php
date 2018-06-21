@@ -40,9 +40,9 @@ $api = new URFAClient_Cmd($api_xml);
 
 if (isset($options['l']) OR isset($options['list']))
 {
-    $listing = $api->listing();
-    foreach($listing as $name => $id) print "$name ($id)\n";
-    die('Count of functions: ' . count($listing) . "\n");
+    $methods = $api->methods();
+    foreach($methods as $name => $id) print "$name ($id)\n";
+    die('Count of functions: ' . count($methods) . "\n");
 }
 
 $function = (isset($options['f'])) ? $options['f'] : NULL;
