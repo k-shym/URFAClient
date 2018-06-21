@@ -24,9 +24,28 @@ class URFAClient_Cmd extends URFAClient_API {
             }
         }
 
-        if ( ! $method) throw new Exception("Function $name not found");
+        if ( ! $method) throw new Exception("Function $function_name not found");
 
         return $this->_proccess_options_input($method->input);
+    }
+
+    /**
+     * Возвращает список функций
+     *
+     * @return Array
+     */
+    public function listing()
+    {
+        $list = array();
+        foreach ($this->_api->function as $function)
+        {
+            $attr = $function->attributes();
+            $list[(string) $attr->{'name'}] = (string) $attr->{'id'};
+        }
+
+        asort($list);
+
+        return $list;
     }
 
     /**
@@ -36,7 +55,7 @@ class URFAClient_Cmd extends URFAClient_API {
      * @param  Array             $options_input   Опции функции
      * @return Array
      */
-    public function _proccess_options_input(SimpleXMLElement $input, Array &$options_input = array())
+    protected function _proccess_options_input(SimpleXMLElement $input, Array &$options_input = array())
     {
         foreach ($input->children() as $node)
         {
