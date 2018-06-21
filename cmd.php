@@ -10,6 +10,7 @@ $doc = <<<DOC
 The options are as follows:
    [-a, --api <path> ]             Path to api.xml, default: .$api_xml
    [-f, --function <name>]         Name function from api.xml
+   [-t, --type <type>]             Type return array or xml, default: array
    [-l, --list]                    List of functions from api.xml
    [-h, --help ]                   This help
    [-v, --version ]                Version URFAClient
@@ -17,7 +18,7 @@ The options are as follows:
 
 DOC;
 
-$options = getopt("a:f:lv", array('api:', 'function:', 'list', 'version'));
+$options = getopt("a:f:t:lv", array('api:', 'function:', 'type:', 'list', 'version'));
 
 $api_xml = __DIR__ . $api_xml;
 if (isset($options['a']))
@@ -47,9 +48,12 @@ if (isset($options['l']) OR isset($options['list']))
 $function = (isset($options['f'])) ? $options['f'] : NULL;
 $function = (isset($options['function'])) ? $options['function'] : $function;
 
+$type = (isset($options['t'])) ? $options['t'] : NULL;
+$type = (isset($options['type'])) ? $options['type'] : $type;
+
 try
 {
-    var_export($api->options($function));
+    var_export($api->method($function, $type));
     die("\n");
 }
 catch (Exception $e)

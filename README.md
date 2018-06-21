@@ -50,6 +50,7 @@ php cmd.php -h
 The options are as follows:
    [-a, --api <path> ]             Path to api.xml
    [-f, --function <name>]         Name function from api.xml
+   [-t, --type <type>]             Type return array or xml, default: array
    [-l, --list]                    List of functions from api.xml
    [-h, --help ]                   This help
    [-v, --version ]                Version URFAClient
@@ -249,7 +250,7 @@ $result = $urfa->rpcf_add_user_new(array(
 **v1.3.0**
 - Доработан анализ узла `output`
 - Добавлена обработка тэга `set`
-- Просмотр списка функций в файле api.xml через cmd.php
+- Просмотр списка функций и описание XML через cmd.php в файле api.xml
 
 **v1.1.0**
 - Добавлен консольный помощник cmd.php (описание функций api.xml в php array)

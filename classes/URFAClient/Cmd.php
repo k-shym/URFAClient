@@ -7,26 +7,27 @@
 class URFAClient_Cmd extends URFAClient_API {
 
     /**
-     * Возвращает массив параметров функции
+     * Возвращает функцию из api.xml в определённом виде
      *
-     * @param  string $function_name   Имя функции
-     * @return Array
+     * @param  string $name   Имя функции
+     * @param  string $type   Тип представления
+     * @return mixed
      */
-    public function options($function_name)
+    public function method($name, $type = NULL)
     {
         $method = FALSE;
         foreach ($this->_api->function as $function)
         {
-            if ((string) $function->attributes()->{'name'} === $function_name)
+            if ((string) $function->attributes()->{'name'} === $name)
             {
                 $method = $function;
                 break;
             }
         }
 
-        if ( ! $method) throw new Exception("Function $function_name not found");
+        if ( ! $method) throw new Exception("Function $name not found");
 
-        return $this->_proccess_options_input($method->input);
+        return ($type === 'xml') ? $method->asXML() : $this->_proccess_options_input($method->input);
     }
 
     /**
