@@ -240,6 +240,50 @@ class URFAClient53Test extends URFAClientBaseTest {
     }
 
     /**
+     * @depends test_rpcf_add_iptraffic_service_link_ipv6
+     */
+    public function test_rpcf_set_radius_attr(array $slink)
+    {
+        $radius_attrs = array(
+            array (
+                'vendor'      => 100000,
+                'attr'        => 1,
+                'usage_flags' => 1,
+                'param1'      => 1,
+                'cval'        => 'c102400',
+            ),
+            array (
+                'vendor'      => 1000,
+                'attr'        => 2,
+                'usage_flags' => 2,
+                'param1'      => 1,
+                'cval'        => 'c1024',
+            ),
+        );
+
+        $this->_api->rpcf_set_radius_attr(array(
+            'sid' => $slink['slink_id'],
+            'st'  => 10000,
+            'cnt' => $radius_attrs,
+        ));
+
+        $result = $this->_api->rpcf_get_radius_attr(array(
+            'sid' => $slink['slink_id'],
+            'st'  => 10000,
+        ));
+
+        $this->assertTrue(count($result['radius_data_size']) === count($radius_attrs));
+        foreach ($result['radius_data_size'] as $k => $v)
+        {
+            $this->assertTrue($v['vendor'] === $radius_attrs[$k]['vendor']);
+            $this->assertTrue($v['attr'] === $radius_attrs[$k]['attr']);
+            $this->assertTrue($v['usage_flags'] === $radius_attrs[$k]['usage_flags']);
+            $this->assertTrue($v['param1'] === $radius_attrs[$k]['param1']);
+            $this->assertTrue($v['val'] === $radius_attrs[$k]['cval']);
+        }
+    }
+
+    /**
      * @depends test_rpcf_add_user_new
      * @depends test_rpcf_add_iptraffic_service_ex
      * @depends test_rpcf_get_discount_periods
