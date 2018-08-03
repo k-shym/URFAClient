@@ -37,14 +37,14 @@ final class URFAClient_Connection {
     {
         $context = stream_context_create();
 
-        if ($data['admin'] AND $data['protocol'] !== 'tls')
+        if ($data['admin'] AND $data['protocol'] === 'ssl')
         {
             stream_context_set_option($context, 'ssl', 'capture_peer_cert', TRUE);
             stream_context_set_option($context, 'ssl', 'local_cert', __DIR__ . '/../../admin.crt');
             stream_context_set_option($context, 'ssl', 'passphrase', 'netup');
             stream_context_set_option($context, 'ssl', 'ciphers', 'SSLv3');
         }
-        else
+        elseif ($data['protocol'] === 'tls' OR $data['protocol'] === 'ssl')
         {
             stream_context_set_option($context, 'ssl', 'ciphers', 'ADH-RC4-MD5');
         }
@@ -95,7 +95,7 @@ final class URFAClient_Connection {
                     $packet->set_attr_string($login, 2);
                     $packet->set_attr_string($digest, 8);
                     $packet->set_attr_string($hash, 9);
-                    $packet->set_attr_int(($protocol === 'tls') ? 6 : (($admin) ? 4 : 2), 10);
+                    $packet->set_attr_int(($protocol === 'ssl') ? (($admin) ? 4 : 2) : 6, 10);
                     $packet->set_attr_int(2, 1);
                     $this->write($packet);
                     break;
@@ -103,7 +103,7 @@ final class URFAClient_Connection {
                 case 194:
                     $attr_protocol = $packet->get_attr_int(10);
                     if ($attr_protocol === 6)
-                        stream_socket_enable_crypto($this->_socket, TRUE, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+                        stream_socket_enable_crypto($this->_socket, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
                     elseif ($attr_protocol)
                         stream_socket_enable_crypto($this->_socket, TRUE, STREAM_CRYPTO_METHOD_SSLv3_CLIENT);
 
