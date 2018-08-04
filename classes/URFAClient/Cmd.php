@@ -12,6 +12,7 @@ class URFAClient_Cmd extends URFAClient_API {
      * @param  string $name   Имя функции
      * @param  string $type   Тип представления
      * @return mixed
+     * @throws Exception
      */
     public function method($name, $type = NULL)
     {
@@ -27,13 +28,13 @@ class URFAClient_Cmd extends URFAClient_API {
 
         if ( ! $method) throw new Exception("Function $name not found");
 
-        return ($type === 'xml') ? $method->asXML() : $this->_proccess_options_input($method->input);
+        return ($type === 'xml') ? $method->asXML() : $this->_process_options_input($method->input);
     }
 
     /**
      * Возвращает список функций
      *
-     * @return Array
+     * @return array
      */
     public function methods()
     {
@@ -53,10 +54,11 @@ class URFAClient_Cmd extends URFAClient_API {
      * Рекурсивная функция обработки входных параметров api.xml
      *
      * @param  SimpleXMLElement  $input           Элемент дерева api.xml
-     * @param  Array             $options_input   Опции функции
-     * @return Array
+     * @param  array             $options_input   Опции функции
+     * @return array
+     * @throws Exception
      */
-    protected function _proccess_options_input(SimpleXMLElement $input, Array &$options_input = array())
+    protected function _process_options_input(SimpleXMLElement $input, Array &$options_input = array())
     {
         foreach ($input->children() as $node)
         {
@@ -69,13 +71,13 @@ class URFAClient_Cmd extends URFAClient_API {
                 case 'double': $options_input[$name] = 0.0; break;
                 case 'ip_address': $options_input[$name] = '0.0.0.0'; break;
                 case 'string': $options_input[$name] = ''; break;
-                case 'if': $this->_proccess_options_input($node, $options_input); break;
+                case 'if': $this->_process_options_input($node, $options_input); break;
                 case 'for':
                     $sibling = $node->xpath('preceding-sibling::*[1]');
 
                     if ( ! isset($sibling[0])) throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
 
-                    $options_input[(string) $sibling[0]->attributes()->{'name'}] = array($this->_proccess_options_input($node));
+                    $options_input[(string) $sibling[0]->attributes()->{'name'}] = array($this->_process_options_input($node));
                     break;
             }
         }

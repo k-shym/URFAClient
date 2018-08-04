@@ -14,24 +14,25 @@ final class URFAClient_Connection {
     protected $_socket;
 
     /**
-     * @var Int
+     * @var integer
      */
     protected $_version = 35;
 
     /**
-     * @var Int
+     * @var integer
      */
     protected $_code;
 
     /**
-     * @var Bool
+     * @var bool
      */
     public $ipv6 = TRUE;
 
     /**
      * Конструктор соединения
      *
-     * @param Array $data Конфигурация
+     * @param array $data Конфигурация
+     * @throws Exception
      */
     public function __construct(Array $data)
     {
@@ -54,10 +55,10 @@ final class URFAClient_Connection {
 
         $data['address'] = gethostbyname($data['address']);
 
-        $this->_socket = stream_socket_client("tcp://{$data['address']}:{$data['port']}", $errno, $errstr, $data['timeout'], STREAM_CLIENT_CONNECT, $context);
+        $this->_socket = stream_socket_client("tcp://{$data['address']}:{$data['port']}", $err_no, $err_str, $data['timeout'], STREAM_CLIENT_CONNECT, $context);
 
         if ( ! $this->_socket)
-            throw new Exception("$errstr ($errno)");
+            throw new Exception("$err_str ($err_no)");
 
         stream_set_timeout($this->_socket, $data['timeout']);
 
@@ -68,10 +69,12 @@ final class URFAClient_Connection {
     /**
      * Аутентификация пользователя
      *
-     * @param   String    $login
-     * @param   String    $password
-     * @param   Bool      $admin
-     * @return  Bool
+     * @param   string    $login
+     * @param   string    $password
+     * @param   bool      $admin
+     * @param   string    $protocol
+     * @return  bool
+     * @throws Exception
      */
     protected function _auth($login, $password, $admin, $protocol)
     {
@@ -112,13 +115,16 @@ final class URFAClient_Connection {
                 case 195: return FALSE;
             }
         }
+
+        return FALSE;
     }
 
     /**
      * Вызов функции
      *
-     * @param   Int    $code
-     * @return  Bool
+     * @param   integer    $code
+     * @return  bool
+     * @throws Exception
      */
     public function call($code)
     {
@@ -138,12 +144,15 @@ final class URFAClient_Connection {
                     else return FALSE;
             }
         }
+
+        return FALSE;
     }
 
     /**
      * Результат вызова функции
      *
      * @return  URFAClient_Packet
+     * @throws Exception
      */
     public function result()
     {
@@ -166,7 +175,7 @@ final class URFAClient_Connection {
      * Читаем данные из соединения
      *
      * @param   URFAClient_Packet $packet
-     * @return  void
+     * @throws Exception
      */
     public function read(URFAClient_Packet $packet)
     {
@@ -208,7 +217,6 @@ final class URFAClient_Connection {
      * Записываем данные в соединение
      *
      * @param   URFAClient_Packet $packet
-     * @return  void
      */
     public function write(URFAClient_Packet $packet)
     {

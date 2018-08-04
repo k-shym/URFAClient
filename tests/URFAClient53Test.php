@@ -13,7 +13,6 @@ class URFAClient53Test extends URFAClientBaseTest {
         'password' => 'init',
         'address'  => 'localhost',
         'protocol' => 'tls',
-        'api'      => __DIR__ . '/../xml/api_53-003.xml',
         'log'      => TRUE,
     );
 
@@ -58,6 +57,7 @@ class URFAClient53Test extends URFAClientBaseTest {
 
     /**
      * @depends test_rpcf_add_user_new
+     * @throws Exception
      */
     public function test_init_api_user()
     {
@@ -245,19 +245,12 @@ class URFAClient53Test extends URFAClientBaseTest {
     public function test_rpcf_set_radius_attr(array $slink)
     {
         $radius_attrs = array(
-            array (
+            array(
                 'vendor'      => 100000,
                 'attr'        => 1,
                 'usage_flags' => 1,
                 'param1'      => 1,
                 'cval'        => 'c102400',
-            ),
-            array (
-                'vendor'      => 1000,
-                'attr'        => 2,
-                'usage_flags' => 2,
-                'param1'      => 1,
-                'cval'        => 'c1024',
             ),
         );
 
@@ -351,7 +344,7 @@ class URFAClient53Test extends URFAClientBaseTest {
 
     public function test_rpcf_get_userinfo_not_user()
     {
-        $this->assertFalse($this->_api->rpcf_get_userinfo(array(
+        $this->assertFalse((bool) $this->_api->rpcf_get_userinfo(array(
             'user_id' => 0,
         )));
     }

@@ -39,10 +39,11 @@ abstract class URFAClient {
     /**
      * Метод инициализации
      *
-     * @param   Array $data
-     * @return  URFAClient_API
+     * @param   array $data
+     * @return  URFAClient_Function
+     * @throws  Exception
      */
-    public static function init(Array $data)
+    public static function init(array $data)
     {
         $data = array_merge(array(
             'login'    => 'init',
@@ -64,7 +65,7 @@ abstract class URFAClient {
     /**
      * Лог выполненых запросов
      *
-     * @return Array
+     * @return array
      */
     public static function trace_log() {
         return URFAClient_Log::instance()->extract_trace_log();
@@ -73,7 +74,7 @@ abstract class URFAClient {
     /**
      * Последняя ошибка
      *
-     * @return String
+     * @return string
      */
     public static function last_error() {
         return URFAClient_Log::instance()->get_last_error();

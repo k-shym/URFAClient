@@ -24,8 +24,8 @@ final class URFAClient_Log {
 
     private
         $_trace_log = array(),
-        $_trace_lenght = 100,
-        $_last_lrror = '';
+        $_trace_length = 100,
+        $_last_error = '';
 
     /**
      * Конструктор журнала
@@ -35,7 +35,7 @@ final class URFAClient_Log {
     /**
      * Получить данные журнала
      *
-     * @return Array
+     * @return array
      */
     public function get_traceLog()
     {
@@ -45,7 +45,7 @@ final class URFAClient_Log {
     /**
      * Извлечь данные журнала
      *
-     * @return Array
+     * @return array
      */
     public function extract_trace_log()
     {
@@ -57,20 +57,21 @@ final class URFAClient_Log {
     /**
      * Получить последнюю ошибку
      *
-     * @return String
+     * @return string
      */
     public function get_last_error()
     {
-        return $this->_last_lrror;
+        return $this->_last_error;
     }
 
     /**
      * Метод записи вызова метода
      *
-     * @param String $name Имя метода
-     * @param Mixed $params Переданные параметры метода
-     * @param Mixed $result Результат работы метода
-     * @param String $error Сообщение ошибки
+     * @param string  $name Имя метода
+     * @param mixed   $params Переданные параметры метода
+     * @param mixed   $result Результат работы метода
+     * @param integer $time Время работы метода
+     * @param string  $error Сообщение ошибки
      */
     public function method($name, $params = NULL, $result = NULL, $time = 0, $error = '')
     {
@@ -85,17 +86,17 @@ final class URFAClient_Log {
     /**
      * Метод описания ошибочных сообщений
      *
-     * @param String $msg Сообщение
+     * @param string $msg Сообщение
      */
     public function error($msg) {
-        $this->_last_lrror = $msg;
+        $this->_last_error = $msg;
         $this->write("ERROR: $msg");
     }
 
     /**
      * Метод описания информационных сообщений
      *
-     * @param String $msg Сообщение
+     * @param string $msg Сообщение
      */
     public function info($msg)
     {
@@ -105,19 +106,16 @@ final class URFAClient_Log {
     /**
      * Метод записи в журнал
      *
-     * @param String $string Строка для записи
-     * @return void
+     * @param string $string Строка для записи
      */
     private function write($string)
     {
-        if (count($this->_trace_log) >= $this->_trace_lenght) array_shift($this->_trace_log);
+        if (count($this->_trace_log) >= $this->_trace_length) array_shift($this->_trace_log);
         $this->_trace_log[] = date('Y.m.d H:i:s') . " $string";
     }
 
     /**
      * Удаляем собранные данные
-     *
-     * @return void
      */
     public function clear()
     {
