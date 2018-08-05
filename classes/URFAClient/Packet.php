@@ -9,27 +9,27 @@
 class URFAClient_Packet {
 
     /**
-     * @var Boolean
+     * @var bool
      */
     protected $_ipv6;
 
     /**
-     * @var Int     Длина пакета
+     * @var integer  Длина пакета
      */
     public $len = 4;
 
     /**
-     * @var Int     Счетчик пакета
+     * @var integer  Счетчик пакета
      */
     public $iterator = 0;
 
     /**
-     * @var Array     Атрибуты пакета
+     * @var array    Атрибуты пакета
      */
     public $attr = array();
 
     /**
-     * @var Array     Данные пакета
+     * @var array    Данные пакета
      */
     public $data = array();
 
@@ -39,8 +39,8 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   Int                 $data
-     * @param   Int                 $code
+     * @param   integer             $data
+     * @param   integer             $code
      * @return  URFAClient_Packet
      */
     public function set_attr_int($data, $code)
@@ -53,8 +53,8 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   Int       $code
-     * @return  Mixed
+     * @param   integer   $code
+     * @return  mixed
      */
     public function get_attr_int($code)
     {
@@ -62,8 +62,8 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   String              $data
-     * @param   Int                 $code
+     * @param   string              $data
+     * @param   integer             $code
      * @return  URFAClient_Packet
      */
     public function set_attr_string($data, $code)
@@ -76,7 +76,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   Int                 $data
+     * @param   integer             $data
      * @return  URFAClient_Packet
      */
     public function set_data_int($data)
@@ -88,7 +88,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @return Int
+     * @return integer
      */
     public function get_data_int()
     {
@@ -96,7 +96,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   Float               $data
+     * @param   float               $data
      * @return  URFAClient_Packet
      */
     public function set_data_double($data)
@@ -108,7 +108,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @return Float
+     * @return float
      */
     public function get_data_double()
     {
@@ -120,7 +120,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   String              $data
+     * @param   string              $data
      * @return  URFAClient_Packet
      */
     public function set_data_string($data)
@@ -132,7 +132,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function get_data_string()
     {
@@ -140,7 +140,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   String              $data
+     * @param   string              $data
      * @return  URFAClient_Packet
      */
     public function set_data_ip($data)
@@ -153,7 +153,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @return  String
+     * @return  string
      */
     public function get_data_ip()
     {
@@ -162,8 +162,9 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   String                 $data
+     * @param   string                 $data
      * @return  URFAClient_Packet
+     * @throws  Exception
      */
     public function set_data_long($data)
     {
@@ -196,7 +197,7 @@ class URFAClient_Packet {
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function get_data_long()
     {
@@ -267,8 +268,8 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   String      Бианрые данные
-     * @return  Int
+     * @param   string      Бианрые данные
+     * @return  integer
      */
     protected function _bin2int($data)
     {
