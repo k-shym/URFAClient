@@ -336,7 +336,10 @@ class URFAClient_API extends URFAClient_Function {
                     if ( ! isset($sibling[0])) throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
 
                     $name = (string) $sibling[0]->attributes()->{'name'};
-                    $count = (int) (isset($result[$name])) ? $result[$name] : $this->_data_output[$name];
+
+                    if (isset($result[$name]) AND is_array($result[$name])) break;
+
+                    $count = (int) ((isset($result[$name])) ? $result[$name] : $this->_data_output[$name]);
                     $array = array();
                     for ($i=0; $i<$count; $i++) $array[] = $this->_process_data_output($node, $packet);
 
