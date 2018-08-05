@@ -57,6 +57,30 @@ class URFAClient53Test extends URFAClientBaseTest {
 
     /**
      * @depends test_rpcf_add_user_new
+     */
+    public function test_rpcf_search_users_new(array $user)
+    {
+        $result = $this->_api->rpcf_search_users_new(array(
+            'select_type'    => 0,
+            'patterns_count' => array(
+                array(
+                    'what'        => 2,
+                    'criteria_id' => 3,
+                    'pattern'     => 'user' . self::prefix(),
+                ),
+            ),
+        ));
+
+        $this->assertArrayHasKey('user_data_size', $result);
+        $this->assertTrue(count($result['user_data_size']) === 1);
+        $result = $result['user_data_size'][0];
+        $this->assertEquals($user['user_id'], $result['user_id']);
+        $this->assertEquals($user['basic_account'], $result['basic_account']);
+        $this->assertEquals('user' . self::prefix(), $result['login']);
+    }
+
+    /**
+     * @depends test_rpcf_add_user_new
      * @throws Exception
      */
     public function test_init_api_user()
