@@ -1,4 +1,4 @@
-URFAClient 1.3.1
+URFAClient 2.0.0
 ==========
 
 Универсальный PHP клиент для биллинговой системы NetUp UTM5 на основе api.xml
@@ -7,14 +7,14 @@ URFAClient 1.3.1
 ```json
 {
     "require":{
-        "k-shym/urfa-client": "1.*"
+        "siomkin/urfa-client": "^2.*"
     }
 }
 ```
 
 ## Зависимости
-- UTM 5.2.1-008 >=
-- PHP 5.3 >=
+- UTM 5.3-005 >=
+- PHP 7.1 >=
 - Ext: OpenSSL, SimpleXML, Bcmath, Hash, Filter
 
 ## Описание параметров
@@ -27,22 +27,8 @@ port | 11758 | порт ядра UTM5
 timeout | 30 | время ожидания ответа от сервера
 protocol | ssl | **ssl** или **tls** (доступно с версии UTM-5.3-002-update16) или **auto** (доступно с версии UTM-5.3-005-update2, работает с OpenSSL 1.1)
 admin | TRUE | указываем какой пользователь подключается, если TRUE предоставляет сертификат admin.crt для соединения, используется только для протокола **ssl**
-api | api_53-003.xml | путь до файла api.xml
+api | api_53-005.xml | путь до файла api.xml
 log | FALSE | сборщик логов, если TRUE, перехватывает исключения из URFAClient_API
-
-## CMD
-```
-php cmd.php -h
-
-The options are as follows:
-   [-a, --api <path> ]             Path to api.xml
-   [-f, --function <name>]         Name function from api.xml
-   [-t, --type <type>]             Type return array or xml, default: array
-   [-l, --list]                    List of functions from api.xml
-   [-h, --help ]                   This help
-   [-v, --version ]                Version URFAClient
-
-```
 
 ## Пример
 Рассмотрим пример использования библиотеки на примере функции rpcf_add_user_new, у нас есть XML описание:
@@ -233,6 +219,14 @@ $result = $urfa->rpcf_add_user_new(array(
 По возникшим проблемам присылайте лог(URFAClient::trace_log()), api.xml и полную версию ядра UTM5. Удачи!
 
 ## История изменений
+**v2.0.0**
+- Рефакторинг
+- Использование стандарта PSR-4 для автозагрузки (PSR-4: Autoloader)
+- Логирование (PSR-3: Logger Interface)
+- Поддерживаемая версия php >= 7.1
+- Поддерживаемая версия биллинга >= 5.3-005
+
+
 **v1.3.1**
 - Добавлен автоматический выбор протокола SSL соединения, работает с OpenSSL 1.1 и ядром UTM-5.3-005-update2
 
