@@ -1,3 +1,6 @@
 .idea
 .vagrant
 /vendor
+composer.phar
+composer.lock
+src/index.php
