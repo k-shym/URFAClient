@@ -2,9 +2,10 @@
 
 namespace UrfaClient\Client;
 
+use Psr\Cache\CacheItemPoolInterface;
 use SimpleXMLElement;
-use UrfaClient\Common\Connection;
-use UrfaClient\Common\Packet;
+use UrfaClient\Common\UrfaConnection;
+use UrfaClient\Common\UrfaPacket;
 use UrfaClient\Exception\UrfaClientException;
 
 /**
@@ -20,7 +21,7 @@ class UrfaClientApi extends UrfaClientAbstract
 {
 
     /**
-     * @var Connection
+     * @var UrfaConnection
      */
     protected $connection;
 
@@ -39,17 +40,23 @@ class UrfaClientApi extends UrfaClientAbstract
      */
     protected $dataOutput = [];
 
+    /**
+     * @var CacheItemPoolInterface
+     */
+    private $cache;
+
 
     /**
      * Конструктор класса
      *
-     * @param  string $apiXmlFile Путь до файла api
-     * @param  Connection $connection Объект соединения с ядром
-     * @throws UrfaClientException
+     * @param UrfaConnection $connection Объект соединения с ядром
+     * @param CacheItemPoolInterface|null $cache
      */
-    public function __construct($apiXmlFile, Connection $connection = null)
+    public function __construct(UrfaConnection $connection, CacheItemPoolInterface $cache = null)
     {
         $this->connection = $connection;
+
+        $apiXmlFile = $connection->getConfig()->api;
 
         if (!file_exists($apiXmlFile)) {
             throw new \InvalidArgumentException("File $apiXmlFile not found");
@@ -60,6 +67,7 @@ class UrfaClientApi extends UrfaClientAbstract
         if (!$this->apiXmlContent->xpath("/urfa/function[contains(@name, 'ipv6')]")) {
             $this->connection->ipv6 = false;
         }
+        $this->cache = $cache;
     }
 
     /**
@@ -300,11 +308,11 @@ class UrfaClientApi extends UrfaClientAbstract
      * Рекурсивная функция обработки выходных параметров api.xml
      *
      * @param SimpleXMLElement $output Элемент дерева api.xml
-     * @param Packet $packet Пакет с бинарными данными
+     * @param UrfaPacket $packet Пакет с бинарными данными
      * @return array
      * @throws UrfaClientException
      */
-    protected function processDataOutput(SimpleXMLElement $output, Packet $packet): array
+    protected function processDataOutput(SimpleXMLElement $output, UrfaPacket $packet): array
     {
         $result = [];
 

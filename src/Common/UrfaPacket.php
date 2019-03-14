@@ -10,7 +10,7 @@ use UrfaClient\Exception\UrfaClientException;
  * @license https://github.com/k-shym/UrfaClient/blob/master/LICENSE.md
  * @author  Konstantin Shum <k.shym@ya.ru>
  */
-class Packet
+class UrfaPacket
 {
 
     /**
@@ -46,9 +46,9 @@ class Packet
     /**
      * @param int $data
      * @param int $code
-     * @return Packet
+     * @return UrfaPacket
      */
-    public function setAttrInt(int $data, int $code): Packet
+    public function setAttrInt(int $data, int $code): UrfaPacket
     {
         $this->attr[$code]['data'] = pack('N', $data);
         $this->attr[$code]['len'] = 8;
@@ -69,9 +69,9 @@ class Packet
     /**
      * @param string $data
      * @param int $code
-     * @return Packet
+     * @return UrfaPacket
      */
-    public function setAttrString(string $data, int $code): Packet
+    public function setAttrString(string $data, int $code): UrfaPacket
     {
         $this->attr[$code]['data'] = $data;
         $this->attr[$code]['len'] = strlen($data) + 4;
@@ -82,9 +82,9 @@ class Packet
 
     /**
      * @param int $data
-     * @return Packet
+     * @return UrfaPacket
      */
-    public function setDataInt(int $data): Packet
+    public function setDataInt(int $data): UrfaPacket
     {
         $this->data[] = pack('N', $data);
         $this->len += 8;
@@ -102,9 +102,9 @@ class Packet
 
     /**
      * @param   float $data
-     * @return  Packet
+     * @return  UrfaPacket
      */
-    public function setDataDouble($data): Packet
+    public function setDataDouble($data): UrfaPacket
     {
         $this->data[] = strrev(pack('d', $data));
         $this->len += 12;
@@ -130,7 +130,7 @@ class Packet
      * @param string $data
      * @return $this
      */
-    public function setDataString(string $data): Packet
+    public function setDataString(string $data): UrfaPacket
     {
         $this->data[] = $data;
         $this->len += strlen($data) + 4;
@@ -148,9 +148,9 @@ class Packet
 
     /**
      * @param string $data
-     * @return Packet
+     * @return UrfaPacket
      */
-    public function setDataIp(string $data): Packet
+    public function setDataIp(string $data): UrfaPacket
     {
         $data = ($this->ipv6 ? pack("C", filter_var($data, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 4 : 6) : '').inet_pton($data);
         $this->data[] = $data;
@@ -171,10 +171,10 @@ class Packet
 
     /**
      * @param string $data
-     * @return Packet
+     * @return UrfaPacket
      * @throws UrfaClientException
      */
-    public function setDataLong(string $data): Packet
+    public function setDataLong(string $data): UrfaPacket
     {
         if (PHP_INT_SIZE === 4) {
             throw new UrfaClientException('Not implemented for PHP x32');
@@ -285,9 +285,9 @@ class Packet
     /**
      * Приводим пакет к исходному состоянию
      *
-     * @return Packet
+     * @return UrfaPacket
      */
-    public function clean(): Packet
+    public function clean(): UrfaPacket
     {
         $this->len = 4;
         $this->iterator = 0;

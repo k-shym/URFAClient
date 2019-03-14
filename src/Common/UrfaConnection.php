@@ -2,15 +2,19 @@
 
 namespace UrfaClient\Common;
 
+use UrfaClient\Config\UrfaConfig;
+use UrfaClient\Exception\UrfaAuthException;
 use UrfaClient\Exception\UrfaClientException;
+use UrfaClient\Exception\UrfaConnectException;
 
 /**
  * Объект соединения с ядром UTM5
  *
  * @license https://github.com/k-shym/UrfaClient/blob/master/LICENSE.md
  * @author  Konstantin Shum <k.shym@ya.ru>
+ * @author Siomkin Alexander <siomkin.alexander@gmail.com>
  */
-final class Connection
+final class UrfaConnection
 {
 
     /**
@@ -29,78 +33,100 @@ final class Connection
     protected $code;
 
     /**
+     * @var UrfaConfig
+     */
+    protected $config;
+
+    /**
      * @var bool
      */
     public $ipv6 = true;
 
     /**
-     * Конструктор соединения
+     * UrfaConnection constructor.
      *
-     * @param array $data Конфигурация
-     * @throws UrfaClientException
+     * @param UrfaConfig|array $config Конфигурация
      */
-    public function __construct(array $data)
+    public function __construct($config)
     {
+        $this->setConfigParams($config);
+
+    }
+
+    /**
+     * @param null $sessionId
+     * @return UrfaConnection
+     */
+    public function connect(): UrfaConnection
+    {
+
         $context = stream_context_create();
 
-        if ($data['admin'] and $data['protocol'] === 'ssl') {
+        if ($this->config->admin and $this->config->protocol === 'ssl') {
             stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
             stream_context_set_option($context, 'ssl', 'local_cert', __DIR__.'/../../admin.crt');
             stream_context_set_option($context, 'ssl', 'passphrase', 'netup');
             stream_context_set_option($context, 'ssl', 'ciphers', 'SSLv3');
-        } elseif ($data['protocol'] === 'tls' or $data['protocol'] === 'ssl') {
+        } elseif ($this->config->protocol === 'tls' || $this->config->protocol === 'ssl') {
             stream_context_set_option($context, 'ssl', 'ciphers', 'ADH-RC4-MD5');
         }
 
         stream_context_set_option($context, 'ssl', 'verify_peer', false);
         stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
 
-        $data['address'] = gethostbyname($data['address']);
-
-        $this->socket = stream_socket_client("tcp://{$data['address']}:{$data['port']}", $err_no, $err_str, $data['timeout'], STREAM_CLIENT_CONNECT, $context);
-
+        $this->config->address = gethostbyname($this->config->address);
+        try {
+            $this->socket = stream_socket_client("tcp://{$this->config->address}:{$this->config->port}", $err_no, $err_str, $this->config->timeout, STREAM_CLIENT_CONNECT,
+                $context);
+        } catch (\Exception $e) {
+        }
         if (!$this->socket) {
-            throw new UrfaClientException("$err_str ($err_no)");
+            throw new UrfaConnectException("$err_str ($err_no)");
         }
 
-        stream_set_timeout($this->socket, $data['timeout']);
+        stream_set_timeout($this->socket, $this->config->timeout);
 
-        if (!$this->auth($data['login'], $data['password'], $data['admin'], $data['protocol'])) {
-            throw new UrfaClientException('Login or password incorrect');
+
+        if (!$this->auth($this->config)) {
+            throw new UrfaAuthException('Login or password incorrect');
         }
+
+        return $this;
     }
 
     /**
      * Аутентификация пользователя
      *
-     * @param   string $login
-     * @param   string $password
-     * @param   bool $admin
-     * @param   string $protocol
+     * @param   UrfaConfig $config
      * @return  bool
      * @throws UrfaClientException
      */
-    protected function auth($login, $password, $admin, $protocol): bool
+    protected function auth($config): bool
     {
         $packet = $this->packet();
 
         while (!feof($this->socket)) {
             $packet->clean();
             $this->read($packet);
-
             switch ($this->code) {
                 case 192:
                     $digest = $packet->attr[6]['data'];
                     $ctx = hash_init('md5');
                     hash_update($ctx, $digest);
-                    hash_update($ctx, $password);
+                    hash_update($ctx, $config->password);
                     $hash = hash_final($ctx, true);
                     $packet->clean();
                     $this->code = 193;
-                    $packet->setAttrString($login, 2);
+                    $packet->setAttrString($config->login, 2);
+                    // Восстанавливать авторизацию из сессии
+                    if ($config->session !== null) {
+                        $packet->setAttrString(pack('H32', $config->session), 6);
+                    } else {
+                        $config->session = bin2hex($digest);
+                    }
                     $packet->setAttrString($digest, 8);
                     $packet->setAttrString($hash, 9);
-                    $packet->setAttrInt(($protocol === 'ssl') ? ($admin ? 4 : 2) : 6, 10);
+                    $packet->setAttrInt(($config->protocol === 'ssl') ? ($config->admin ? 4 : 2) : 6, 10);
                     $packet->setAttrInt(2, 1);
                     $this->write($packet);
                     break;
@@ -152,10 +178,10 @@ final class Connection
     /**
      * Результат вызова функции
      *
-     * @return  Packet
+     * @return  UrfaPacket
      * @throws UrfaClientException
      */
-    public function result(): Packet
+    public function result(): UrfaPacket
     {
         $packet = $this->packet();
 
@@ -174,10 +200,10 @@ final class Connection
     /**
      * Читаем данные из соединения
      *
-     * @param   Packet $packet
+     * @param   UrfaPacket $packet
      * @throws UrfaClientException
      */
-    public function read(Packet $packet): void
+    public function read(UrfaPacket $packet): void
     {
         $this->code = ord(fread($this->socket, 1));
 
@@ -214,9 +240,9 @@ final class Connection
     /**
      * Записываем данные в соединение
      *
-     * @param   Packet $packet
+     * @param   UrfaPacket $packet
      */
-    public function write(Packet $packet): void
+    public function write(UrfaPacket $packet): void
     {
         fwrite($this->socket, chr($this->code));
         fwrite($this->socket, chr($this->version));
@@ -238,12 +264,41 @@ final class Connection
     /**
      * Создает объект пакета
      *
-     * @return  Packet
+     * @return  UrfaPacket
      */
-    public function packet(): Packet
+    public function packet(): UrfaPacket
     {
-        return new Packet($this->ipv6);
+        return new UrfaPacket($this->ipv6);
     }
+
+    /**
+     * @return UrfaConfig
+     */
+    public function getConfig(): UrfaConfig
+    {
+        return $this->config;
+    }
+
+
+    /**
+     * @param $config
+     * @return UrfaConnection
+     */
+    public function setConfigParams($config): UrfaConnection
+    {
+        if (\is_array($config)) {
+            if ($this->config === null) {
+                $this->config = new UrfaConfig($config);
+            } else {
+                $this->config->update($config);
+            }
+        } else {
+            $this->config = $config;
+        }
+
+        return $this;
+    }
+
 
     /**
      * Закрываем соединение при уничтожении объекта
