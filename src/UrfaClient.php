@@ -2,10 +2,13 @@
 
 namespace UrfaClient;
 
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use UrfaClient\Client\UrfaClientAbstract;
 use UrfaClient\Client\UrfaClientApi;
 use UrfaClient\Client\UrfaClientCollector;
-use UrfaClient\Common\Connection;
+use UrfaClient\Common\UrfaConnection;
+use UrfaClient\Config\UrfaConfig;
 
 /**
  * Главный класс
@@ -24,32 +27,27 @@ class UrfaClient
 
     /**
      * @param array $data
+     * @param LoggerInterface|null $logger
+     * @param CacheItemPoolInterface|null $cache
      * @return UrfaClientAbstract
-     * @throws \UrfaClient\Exception\UrfaClientException
+     * @throws Exception\UrfaClientException
      */
-    public static function init(array $data)
+    public function create(array $data, LoggerInterface $logger = null, CacheItemPoolInterface $cache = null)
     {
-        $data = array_merge([
-            'login' => 'init',
-            'password' => 'init',
-            'address' => 'localhost',
-            'port' => 11758,
-            'timeout' => 30,
-            'protocol' => 'auto',
-            'admin' => true,
-            'api' => __DIR__.'/../xml/'.self::API_XML,
-            'log' => true,
-        ], $data);
 
-        $api = new UrfaClientApi($data['api'], new Connection($data));
+        $config = new UrfaConfig($data);
+        $connection = new UrfaConnection($config);
+        $api = new UrfaClientApi($connection->connect(), $cache);
 
 
         //TODO Вынести подключение и настройку логера
-        $logger = new \Monolog\Logger('UrfaClient');
+        if ($logger === null) {
+            $logger = new \Monolog\Logger('UrfaClient');
+        }
 
         // $logger->pushHandler(new StreamHandler('/var/www/telecom/UrfaClient/your.log', \Monolog\Logger::DEBUG));
 
 
-        return $data['log'] ? new UrfaClientCollector($api, $logger) : $api;
+        return $config->log ? new UrfaClientCollector($api, $logger) : $api;
     }
 }
