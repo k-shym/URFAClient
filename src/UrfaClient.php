@@ -11,8 +11,6 @@ use UrfaClient\Common\UrfaConnection;
 use UrfaClient\Config\UrfaConfig;
 
 /**
- * Главный класс
- *
  * @license https://github.com/k-shym/UrfaClient/blob/master/LICENSE.md
  * @author Konstantin Shum <k.shym@ya.ru>
  *
@@ -48,11 +46,6 @@ class UrfaClient
      */
     public function __construct(array $data = [], LoggerInterface $logger = null, CacheItemPoolInterface $cache = null)
     {
-        //TODO Вынести подключение и настройку логера
-        //        if ($logger === null) {
-        //            $logger = new \Monolog\LoggerWrapper('UrfaClient');
-        //        }
-        // $logger->pushHandler(new StreamHandler('/var/www/telecom/UrfaClient/your.log', \Monolog\LoggerWrapper::DEBUG));
 
         $this->setLogger($logger);
 
@@ -69,7 +62,7 @@ class UrfaClient
      */
     public function getApi($data = null)
     {
-        $this->getConfig()->update($data);
+        $this->setConfig($data);
 
         $this->api = new UrfaClientApi($this->getConnection()->connect(), $this->getCache());
 
