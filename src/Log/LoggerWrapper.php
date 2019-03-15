@@ -6,7 +6,7 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
-class Logger implements LoggerInterface
+class LoggerWrapper implements LoggerInterface
 {
 
     /**
@@ -15,7 +15,7 @@ class Logger implements LoggerInterface
     private $loggerInstance;
 
     /**
-     * Logger constructor.
+     * LoggerWrapper constructor.
      * @param object|callable $logger
      */
     public function __construct($logger)
@@ -24,28 +24,6 @@ class Logger implements LoggerInterface
             $this->loggerInstance = $logger;
         } else {
             throw new InvalidArgumentException('Invalid wrapped logger');
-        }
-    }
-
-    /**
-     * Метод записи вызова метода
-     *
-     * @param string $name Имя метода
-     * @param mixed $params Переданные параметры метода
-     * @param mixed $result Результат работы метода
-     * @param float $time Время работы метода
-     * @param string $error Сообщение ошибки
-     */
-    public function method(string $name, $params = null, $result = null, $time = 0, $error = '')
-    {
-        $params = trim(preg_replace('/\s+/', ' ', print_r($params, true)));
-        $result = trim(preg_replace('/\s+/', ' ', print_r($result, true)));
-        $time = round($time, 3);
-
-        if ($error) {
-            $this->error("$name( $params ): $error");
-        } else {
-            $this->info("$name( $params ) -> $result {$time}ms");
         }
     }
 

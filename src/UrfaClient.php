@@ -25,29 +25,125 @@ class UrfaClient
 
     public const API_XML = 'api_53-005.xml';
 
+    /** @var UrfaConnection $connection */
+    private $connection;
+
+    /** @var UrfaClientAbstract $api */
+    private $api;
+
+    /** @var LoggerInterface $logger */
+    private $logger;
+
+    /** @var CacheItemPoolInterface $cache */
+    private $cache;
+
+    /** @var UrfaConfig $config */
+    private $config;
+
+    public function __construct(array $data = [], LoggerInterface $logger = null, CacheItemPoolInterface $cache = null)
+    {
+        //TODO Вынести подключение и настройку логера
+        //        if ($logger === null) {
+        //            $logger = new \Monolog\LoggerWrapper('UrfaClient');
+        //        }
+        // $logger->pushHandler(new StreamHandler('/var/www/telecom/UrfaClient/your.log', \Monolog\LoggerWrapper::DEBUG));
+
+        $this->setLogger($logger);
+
+        $this->setCache($cache);
+
+        $this->setConfig($data);
+    }
+
     /**
-     * @param array $data
-     * @param LoggerInterface|null $logger
-     * @param CacheItemPoolInterface|null $cache
+     * @param array|null $data
      * @return UrfaClientAbstract
      * @throws Exception\UrfaClientException
      */
-    public function create(array $data, LoggerInterface $logger = null, CacheItemPoolInterface $cache = null)
+    public function getApi($data = null)
     {
+        $this->getConfig()->update($data);
 
-        $config = new UrfaConfig($data);
-        $connection = new UrfaConnection($config);
-        $api = new UrfaClientApi($connection->connect(), $cache);
+        $this->api = new UrfaClientApi($this->getConnection()->connect(), $this->getCache());
 
+        return $this->getConfig()->log ?
+            new UrfaClientCollector($this->api, $this->getLogger()) :
+            $this->api;
+    }
 
-        //TODO Вынести подключение и настройку логера
-        if ($logger === null) {
-            $logger = new \Monolog\Logger('UrfaClient');
+    /**
+     * @return UrfaConnection
+     */
+    public function getConnection()
+    {
+        if ($this->connection === null) {
+            $this->connection = new UrfaConnection($this->config);
         }
 
-        // $logger->pushHandler(new StreamHandler('/var/www/telecom/UrfaClient/your.log', \Monolog\Logger::DEBUG));
-
-
-        return $config->log ? new UrfaClientCollector($api, $logger) : $api;
+        return $this->connection;
     }
+
+
+    /**
+     * @return mixed
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @param mixed $logger
+     * @return UrfaClient
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCache()
+    {
+        return $this->cache;
+    }
+
+    /**
+     * @param mixed $cache
+     * @return UrfaClient
+     */
+    public function setCache($cache)
+    {
+        $this->cache = $cache;
+
+        return $this;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param mixed $config
+     * @return UrfaClient
+     */
+    public function setConfig($config)
+    {
+        if ($this->config === null) {
+            $this->config = new UrfaConfig($config);
+        }
+
+        $this->getConfig()->update($config);
+
+        return $this;
+    }
+
 }

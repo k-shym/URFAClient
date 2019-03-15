@@ -4,7 +4,7 @@ namespace UrfaClient\Client;
 
 use Psr\Log\LoggerInterface;
 use UrfaClient\Exception\UrfaClientException;
-use UrfaClient\Log\Logger;
+use UrfaClient\Log\LoggerWrapper;
 
 /**
  * Сборщик информации для класса UrfaClient_API
@@ -34,7 +34,7 @@ final class UrfaClientCollector extends UrfaClientAbstract
     }
 
     /**
-     * @var Logger|null
+     * @var LoggerWrapper|null
      */
     private $logger;
 
@@ -45,7 +45,7 @@ final class UrfaClientCollector extends UrfaClientAbstract
      */
     public function setLogger($value)
     {
-        $this->logger = new Logger($value);
+        $this->logger = new LoggerWrapper($value);
     }
 
     /**
@@ -62,13 +62,35 @@ final class UrfaClientCollector extends UrfaClientAbstract
             $ts = microtime(true);
             $result = call_user_func_array([$this->api, $name], $args);
             $te = microtime(true);
-            $this->logger->method($name, $args ? $args[0] : [], $result, $te - $ts);
+            $this->log($name, $args ? $args[0] : [], $result, $te - $ts);
 
             return $result;
         } catch (UrfaClientException $e) {
-            $this->logger->method($name, $args ? $args[0] : [], null, 0, $e->getMessage());
+            $this->log($name, $args ? $args[0] : [], null, 0, $e->getMessage());
 
             return false;
+        }
+    }
+
+    /**
+     * Логирование информации
+     *
+     * @param string $name Имя метода
+     * @param mixed $params Переданные параметры метода
+     * @param mixed $result Результат работы метода
+     * @param float $time Время работы метода
+     * @param string $error Сообщение ошибки
+     */
+    public function log(string $name, $params = null, $result = null, $time = 0, $error = '')
+    {
+        $params = trim(preg_replace('/\s+/', ' ', print_r($params, true)));
+        $result = trim(preg_replace('/\s+/', ' ', print_r($result, true)));
+        $time = round($time, 3);
+
+        if ($error) {
+            $this->logger->error("$name( $params ): $error");
+        } else {
+            $this->logger->info("$name( $params ) -> $result {$time}ms");
         }
     }
 }
