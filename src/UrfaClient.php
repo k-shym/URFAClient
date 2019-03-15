@@ -40,6 +40,12 @@ class UrfaClient
     /** @var UrfaConfig $config */
     private $config;
 
+    /**
+     * UrfaClient constructor.
+     * @param array $data
+     * @param LoggerInterface|null $logger
+     * @param CacheItemPoolInterface|null $cache
+     */
     public function __construct(array $data = [], LoggerInterface $logger = null, CacheItemPoolInterface $cache = null)
     {
         //TODO Вынести подключение и настройку логера
@@ -85,7 +91,7 @@ class UrfaClient
 
 
     /**
-     * @return mixed
+     * @return LoggerInterface
      */
     public function getLogger()
     {
@@ -104,7 +110,7 @@ class UrfaClient
     }
 
     /**
-     * @return mixed
+     * @return CacheItemPoolInterface
      */
     public function getCache()
     {
@@ -124,7 +130,7 @@ class UrfaClient
 
 
     /**
-     * @return mixed
+     * @return UrfaConfig
      */
     public function getConfig()
     {
