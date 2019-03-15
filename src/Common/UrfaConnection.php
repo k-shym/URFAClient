@@ -74,9 +74,9 @@ final class UrfaConnection
         stream_context_set_option($context, 'ssl', 'verify_peer', false);
         stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
 
-        $this->config->address = gethostbyname($this->config->address);
+        $this->config->host = gethostbyname($this->config->host);
         try {
-            $this->socket = stream_socket_client("tcp://{$this->config->address}:{$this->config->port}", $err_no, $err_str, $this->config->timeout, STREAM_CLIENT_CONNECT,
+            $this->socket = stream_socket_client("tcp://{$this->config->host}:{$this->config->port}", $err_no, $err_str, $this->config->timeout, STREAM_CLIENT_CONNECT,
                 $context);
         } catch (\Exception $e) {
         }

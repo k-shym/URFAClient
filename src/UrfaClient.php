@@ -59,6 +59,7 @@ class UrfaClient
         $this->setCache($cache);
 
         $this->setConfig($data);
+
     }
 
     /**

@@ -23,7 +23,7 @@ class UrfaConfig
     /**
      * @var string
      */
-    public $address = 'localhost';
+    public $host = 'localhost';
     /**
      * @var int
      */
@@ -134,18 +134,18 @@ class UrfaConfig
     /**
      * @return string
      */
-    public function getAddress(): string
+    public function getHost(): string
     {
-        return $this->address;
+        return $this->host;
     }
 
     /**
-     * @param string $address
+     * @param string $host
      * @return UrfaConfig
      */
-    public function setAddress(string $address): UrfaConfig
+    public function setHost(string $host): UrfaConfig
     {
-        $this->address = $address;
+        $this->host = $host;
 
         return $this;
     }
