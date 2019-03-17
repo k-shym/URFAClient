@@ -40,33 +40,31 @@ class UrfaClient
 
     /**
      * UrfaClient constructor.
-     * @param array $data
+     * @param array $options
      * @param LoggerInterface|null $logger
      * @param CacheItemPoolInterface|null $cache
      */
-    public function __construct(array $data = [], LoggerInterface $logger = null, CacheItemPoolInterface $cache = null)
+    public function __construct(array $options = [], LoggerInterface $logger = null, CacheItemPoolInterface $cache = null)
     {
+        $this->setOptions($options);
 
         $this->setLogger($logger);
 
         $this->setCache($cache);
-
-        $this->setConfig($data);
-
     }
 
     /**
-     * @param array|null $data
+     * @param array|null $options
      * @return UrfaClientAbstract
      * @throws Exception\UrfaClientException
      */
-    public function getApi($data = null)
+    public function getApi($options = null)
     {
-        $this->setConfig($data);
+        $this->setOptions($options);
 
         $this->api = new UrfaClientApi($this->getConnection()->connect(), $this->getCache());
 
-        return $this->getConfig()->log ?
+        return $this->getConfig()->isLog() ?
             new UrfaClientCollector($this->api, $this->getLogger()) :
             $this->api;
     }
@@ -74,7 +72,7 @@ class UrfaClient
     /**
      * @return UrfaConnection
      */
-    public function getConnection()
+    public function getConnection(): UrfaConnection
     {
         if ($this->connection === null) {
             $this->connection = new UrfaConnection($this->config);
@@ -93,10 +91,10 @@ class UrfaClient
     }
 
     /**
-     * @param mixed $logger
+     * @param LoggerInterface $logger
      * @return UrfaClient
      */
-    public function setLogger($logger)
+    public function setLogger(?LoggerInterface $logger): UrfaClient
     {
         $this->logger = $logger;
 
@@ -112,10 +110,10 @@ class UrfaClient
     }
 
     /**
-     * @param mixed $cache
+     * @param CacheItemPoolInterface $cache
      * @return UrfaClient
      */
-    public function setCache($cache)
+    public function setCache(?CacheItemPoolInterface $cache): UrfaClient
     {
         $this->cache = $cache;
 
@@ -126,22 +124,22 @@ class UrfaClient
     /**
      * @return UrfaConfig
      */
-    public function getConfig()
+    public function getConfig(): UrfaConfig
     {
         return $this->config;
     }
 
     /**
-     * @param mixed $config
+     * @param array $options
      * @return UrfaClient
      */
-    public function setConfig($config)
+    public function setOptions($options): UrfaClient
     {
         if ($this->config === null) {
-            $this->config = new UrfaConfig($config);
+            $this->config = new UrfaConfig($options);
         }
 
-        $this->getConfig()->update($config);
+        $this->getConfig()->updateOptions($options);
 
         return $this;
     }

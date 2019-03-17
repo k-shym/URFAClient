@@ -75,14 +75,14 @@ class UrfaConfig
 
     public function __construct(array $params = [])
     {
-        $this->update($params);
+        $this->updateOptions($params);
     }
 
     /**
      * @param array $params
      * @return UrfaConfig
      */
-    public function update(array $params): UrfaConfig
+    public function updateOptions(array $params): UrfaConfig
     {
         foreach ($params as $key => $param) {
             if (property_exists(__CLASS__, $key)) {

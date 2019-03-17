@@ -45,11 +45,11 @@ final class UrfaConnection
     /**
      * UrfaConnection constructor.
      *
-     * @param UrfaConfig|array $config Конфигурация
+     * @param UrfaConfig $config Конфигурация
      */
-    public function __construct($config)
+    public function __construct(UrfaConfig $config)
     {
-        $this->setConfigParams($config);
+        $this->setConfig($config);
 
     }
 
@@ -284,17 +284,9 @@ final class UrfaConnection
      * @param $config
      * @return UrfaConnection
      */
-    public function setConfigParams($config): UrfaConnection
+    public function setConfig(UrfaConfig $config): UrfaConnection
     {
-        if (\is_array($config)) {
-            if ($this->config === null) {
-                $this->config = new UrfaConfig($config);
-            } else {
-                $this->config->update($config);
-            }
-        } else {
-            $this->config = $config;
-        }
+        $this->config = $config;
 
         return $this;
     }
