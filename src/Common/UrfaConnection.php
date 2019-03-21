@@ -50,11 +50,9 @@ final class UrfaConnection
     public function __construct(UrfaConfig $config)
     {
         $this->setConfig($config);
-
     }
 
     /**
-     * @param null $sessionId
      * @return UrfaConnection
      */
     public function connect(): UrfaConnection
@@ -76,8 +74,14 @@ final class UrfaConnection
 
         $this->config->host = gethostbyname($this->config->host);
         try {
-            $this->socket = stream_socket_client("tcp://{$this->config->host}:{$this->config->port}", $err_no, $err_str, $this->config->timeout, STREAM_CLIENT_CONNECT,
-                $context);
+            $this->socket = stream_socket_client(
+                "tcp://{$this->config->host}:{$this->config->port}",
+                $err_no,
+                $err_str,
+                $this->config->timeout,
+                STREAM_CLIENT_CONNECT,
+                $context
+            );
         } catch (\Exception $e) {
         }
         if (!$this->socket) {
@@ -99,7 +103,7 @@ final class UrfaConnection
      *
      * @param   UrfaConfig $config
      * @return  bool
-     * @throws UrfaClientException
+     * @throws  UrfaClientException
      */
     protected function auth($config): bool
     {
@@ -154,7 +158,7 @@ final class UrfaConnection
      *
      * @param   integer $code
      * @return  bool
-     * @throws UrfaClientException
+     * @throws  UrfaClientException
      */
     public function call($code): bool
     {
@@ -179,7 +183,7 @@ final class UrfaConnection
      * Результат вызова функции
      *
      * @return  UrfaPacket
-     * @throws UrfaClientException
+     * @throws  UrfaClientException
      */
     public function result(): UrfaPacket
     {
@@ -201,7 +205,7 @@ final class UrfaConnection
      * Читаем данные из соединения
      *
      * @param   UrfaPacket $packet
-     * @throws UrfaClientException
+     * @throws  UrfaClientException
      */
     public function read(UrfaPacket $packet): void
     {

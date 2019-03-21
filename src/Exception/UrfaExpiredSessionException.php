@@ -2,7 +2,7 @@
 
 namespace UrfaClient\Exception;
 
-class UrfaConnectException extends UrfaClientException
+class UrfaExpiredSessionException extends UrfaClientException
 {
 
     /**
@@ -12,6 +12,6 @@ class UrfaConnectException extends UrfaClientException
      */
     public function getMessageKey()
     {
-        return 'Connection refused.';
+        return 'Expired Session';
     }
 }

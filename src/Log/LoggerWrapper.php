@@ -153,9 +153,16 @@ class LoggerWrapper implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-
         if ($this->loggerInstance !== null) {
             $this->loggerInstance->log($level, $message, $context);
         }
+        $this->lastLog = array($level, $message, $context);
+    }
+
+    private $lastLog;
+
+    public function getLastLog()
+    {
+        return $this->lastLog;
     }
 }

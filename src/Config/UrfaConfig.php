@@ -2,7 +2,6 @@
 
 namespace UrfaClient\Config;
 
-
 use UrfaClient\UrfaClient;
 
 /**
@@ -320,6 +319,4 @@ class UrfaConfig
 
         return $this;
     }
-    
-    
 }

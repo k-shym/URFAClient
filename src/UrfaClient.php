@@ -58,7 +58,7 @@ class UrfaClient
      * @return UrfaClientAbstract
      * @throws Exception\UrfaClientException
      */
-    public function getApi($options = null)
+    public function getApi($options = null): UrfaClientAbstract
     {
         $this->setOptions($options);
 
@@ -75,7 +75,7 @@ class UrfaClient
     public function getConnection(): UrfaConnection
     {
         if ($this->connection === null) {
-            $this->connection = new UrfaConnection($this->config);
+            $this->connection = new UrfaConnection($this->getConfig());
         }
 
         return $this->connection;
@@ -143,5 +143,4 @@ class UrfaClient
 
         return $this;
     }
-
 }

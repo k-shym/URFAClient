@@ -426,7 +426,7 @@ class UrfaClientApi extends UrfaClientAbstract
                         break;
                     }
 
-                    $count = (int)(isset($result[$name]) ? $result[$name] : $this->dataOutput[$name]);
+                    $count = (int)($result[$name] ?? $this->dataOutput[$name]);
                     $array = [];
                     for ($i = 0; $i < $count; $i++) {
                         $array[] = $this->processDataOutput($node, $packet);
