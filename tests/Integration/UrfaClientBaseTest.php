@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use UrfaClient\UrfaClient;
-
 /**
  * Базовый класс для тестов UrfaClient
  *
@@ -44,9 +42,9 @@ abstract class UrfaClientBaseTest extends \PHPUnit\Framework\TestCase
      * Создаем соединение для тестов
      * @throws \UrfaClient\Exception\UrfaClientException
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->api = UrfaClient::init($this->config);
+        $this->api = new \UrfaClient\UrfaClient($this->config);
     }
 
     public function test_rpcf_liburfa_list()
@@ -62,7 +60,7 @@ abstract class UrfaClientBaseTest extends \PHPUnit\Framework\TestCase
     /**
      * Делаем финальные проверки и закрываем соединение
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
 //        $this->assertTrue(is_array(UrfaClient::trace_log()));
 //        $this->assertTrue(is_string(UrfaClient::last_error()));

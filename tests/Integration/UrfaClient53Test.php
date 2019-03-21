@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Integration;
 
 use Tests\UrfaClientBaseTest;
+use UrfaClient\Client\UrfaClientAbstract;
 use UrfaClient\Client\UrfaClientCollector;
 
 /**
@@ -93,15 +94,16 @@ class UrfaClient53Test extends UrfaClientBaseTest
         $this->config['login'] = 'user'.self::prefix();
         $this->config['password'] = 'pass'.self::prefix();
         $this->config['admin'] = false;
-        $apiUser = \UrfaClient\UrfaClient::init($this->config);
+        $apiUser = new \UrfaClient\UrfaClient($this->config);
 
-        $this->assertInstanceOf(UrfaClientCollector::class, $apiUser);
+        $this->assertInstanceOf(UrfaClientAbstract::class, $apiUser);
 
         return $apiUser;
     }
 
     /**
      * @depends test_init_api_user
+     * @param UrfaClientCollector $api
      */
     public function test_rpcf_user5_change_password(UrfaClientCollector $api)
     {
@@ -147,7 +149,7 @@ class UrfaClient53Test extends UrfaClientBaseTest
      */
     public function test_rpcf_save_user_othersets(array $user)
     {
-        $this->assertTrue(is_array($this->api->rpcf_save_user_othersets([
+        $this->assertIsArray($this->api->rpcf_save_user_othersets([
             'user_id' => $user['user_id'],
             'count' => [
                 [
@@ -155,7 +157,7 @@ class UrfaClient53Test extends UrfaClientBaseTest
                     'currency_id' => 978,
                 ],
             ],
-        ])));
+        ]));
     }
 
     public function test_rpcf_add_iptraffic_service_ex()
@@ -262,7 +264,7 @@ class UrfaClient53Test extends UrfaClientBaseTest
         $this->assertTrue((bool)$result);
         $this->assertEquals($discount_period['discount_period_id'], $result['discount_period_id']);
         $this->assertEquals(2000000000, $result['expire_date']);
-        $this->assertTrue(is_array($result['ip_groups_count']));
+        $this->assertIsArray($result['ip_groups_count']);
 
         foreach ($result['ip_groups_count'] as $ip_group) {
             $this->assertTrue((bool)filter_var($ip_group['ip_address'], FILTER_VALIDATE_IP));
@@ -296,13 +298,13 @@ class UrfaClient53Test extends UrfaClientBaseTest
             'st' => 10000,
         ]);
 
-        $this->assertTrue(count($result['radius_data_size']) === count($radius_attrs));
+        $this->assertCount(count($result['radius_data_size']), $radius_attrs);
         foreach ($result['radius_data_size'] as $k => $v) {
-            $this->assertTrue($v['vendor'] === $radius_attrs[$k]['vendor']);
-            $this->assertTrue($v['attr'] === $radius_attrs[$k]['attr']);
-            $this->assertTrue($v['usage_flags'] === $radius_attrs[$k]['usage_flags']);
-            $this->assertTrue($v['param1'] === $radius_attrs[$k]['param1']);
-            $this->assertTrue($v['val'] === $radius_attrs[$k]['cval']);
+            $this->assertSame($v['vendor'], $radius_attrs[$k]['vendor']);
+            $this->assertSame($v['attr'], $radius_attrs[$k]['attr']);
+            $this->assertSame($v['usage_flags'], $radius_attrs[$k]['usage_flags']);
+            $this->assertSame($v['param1'], $radius_attrs[$k]['param1']);
+            $this->assertSame($v['val'], $radius_attrs[$k]['cval']);
         }
     }
 
@@ -329,7 +331,7 @@ class UrfaClient53Test extends UrfaClientBaseTest
         ]);
 
         $this->assertArrayHasKey('slink_id', $result);
-        $this->assertTrue($result['slink_id'] === -1);
+        $this->assertSame($result['slink_id'], -1);
     }
 
     /**
