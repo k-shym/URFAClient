@@ -55,7 +55,7 @@ class UrfaConfig
 
     /**
      * Время кеширование результатов (сек)
-     * @var bool
+     * @var int
      */
     public $cache_time = 60;
 
@@ -247,7 +247,7 @@ class UrfaConfig
     /**
      * @return bool
      */
-    public function isCache(): bool
+    public function useCache(): bool
     {
         return $this->cache;
     }
@@ -264,18 +264,18 @@ class UrfaConfig
     }
 
     /**
-     * @return bool
+     * @return int
      */
-    public function isCacheTime(): bool
+    public function getCacheTime(): int
     {
         return $this->cache_time;
     }
 
     /**
-     * @param bool $cache_time
+     * @param int $cache_time
      * @return UrfaConfig
      */
-    public function setCacheTime(bool $cache_time): UrfaConfig
+    public function setCacheTime(int $cache_time): UrfaConfig
     {
         $this->cache_time = $cache_time;
 
