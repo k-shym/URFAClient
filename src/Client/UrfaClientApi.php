@@ -17,7 +17,7 @@ use UrfaClient\Exception\UrfaClientException;
  * @author Siomkin Alexander <siomkin.alexander@gmail.com>
  *
  */
-class UrfaClientApi extends UrfaClientAbstract
+class UrfaClientApi
 {
 
     /**
@@ -41,22 +41,15 @@ class UrfaClientApi extends UrfaClientAbstract
     protected $dataOutput = [];
 
     /**
-     * @var CacheItemPoolInterface
-     */
-    private $cache;
-
-
-    /**
      * Конструктор класса
      *
      * @param UrfaConnection $connection Объект соединения с ядром
-     * @param CacheItemPoolInterface|null $cache
      */
-    public function __construct(UrfaConnection $connection, CacheItemPoolInterface $cache = null)
+    public function __construct(UrfaConnection $connection)
     {
         $this->connection = $connection;
 
-        $apiXmlFile = $connection->getConfig()->api;
+        $apiXmlFile = $connection->getConfig()->getApi();
 
         if (!file_exists($apiXmlFile)) {
             throw new \InvalidArgumentException("File $apiXmlFile not found");
@@ -67,7 +60,6 @@ class UrfaClientApi extends UrfaClientAbstract
         if (!$this->apiXmlContent->xpath("/urfa/function[contains(@name, 'ipv6')]")) {
             $this->connection->ipv6 = false;
         }
-        $this->cache = $cache;
     }
 
     /**

@@ -3,20 +3,21 @@
 namespace UrfaClient;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use UrfaClient\Client\UrfaClientAbstract;
 use UrfaClient\Client\UrfaClientApi;
-use UrfaClient\Client\UrfaClientCollector;
 use UrfaClient\Common\UrfaConnection;
 use UrfaClient\Config\UrfaConfig;
+use UrfaClient\Exception\UrfaClientException;
 
 /**
- * @license https://github.com/k-shym/UrfaClient/blob/master/LICENSE.md
+ * @license GNU General Public License v3.0
  * @author Konstantin Shum <k.shym@ya.ru>
  *
  * @author Siomkin Alexander <siomkin.alexander@gmail.com>
  */
-class UrfaClient
+class UrfaClient extends UrfaClientAbstract implements LoggerAwareInterface
 {
 
     public const VERSION = '2.0.0';
@@ -62,11 +63,47 @@ class UrfaClient
     {
         $this->setOptions($options);
 
-        $this->api = new UrfaClientApi($this->getConnection()->connect(), $this->getCache());
+        $this->api = new UrfaClientApi($this->getConnection()->connect());
 
-        return $this->getConfig()->isLog() ?
-            new UrfaClientCollector($this->api, $this->getLogger()) :
-            $this->api;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param array $args
+     * @return bool|mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function __call(string $name, array $args)
+    {
+        try {
+            $ts = microtime(true);
+
+            if (($this->getCache() instanceof CacheItemPoolInterface) && $this->getConfig()->useCache()) {
+                $cacheKey = $name.'_'.sha1($this->getConfig()->getSession().serialize($args));
+                $cacheCount = $this->getCache()->getItem($cacheKey);
+                if (!$cacheCount->isHit()) {
+                    if ($this->getConfig()->getCacheTime()) {
+                        $cacheCount->expiresAfter($this->getConfig()->getCacheTime());
+                    }
+                    $data = call_user_func_array([$this->api, $name], $args);
+                    $cacheCount->set($data);
+                    $this->getCache()->save($cacheCount);
+                }
+                $result = $cacheCount->get();
+            } else {
+                $result = call_user_func_array([$this->api, $name], $args);
+            }
+
+            $te = microtime(true);
+            $this->log($name, $args ? $args[0] : [], $result, $te - $ts);
+
+            return $result;
+        } catch (UrfaClientException $e) {
+            $this->log($name, $args ? $args[0] : [], null, 0, $e->getMessage());
+
+            return false;
+        }
     }
 
     /**
@@ -80,7 +117,6 @@ class UrfaClient
 
         return $this->connection;
     }
-
 
     /**
      * @return LoggerInterface
@@ -120,7 +156,6 @@ class UrfaClient
         return $this;
     }
 
-
     /**
      * @return UrfaConfig
      */
@@ -142,5 +177,29 @@ class UrfaClient
         $this->getConfig()->updateOptions($options);
 
         return $this;
+    }
+
+    /**
+     * Логирование информации
+     *
+     * @param string $name Имя метода
+     * @param mixed $params Переданные параметры метода
+     * @param mixed $result Результат работы метода
+     * @param float $time Время работы метода
+     * @param string $error Сообщение ошибки
+     */
+    public function log(string $name, $params = null, $result = null, $time = 0, $error = '')
+    {
+        if (($this->getLogger() instanceof LoggerInterface) && $this->getConfig()->isLog()) {
+            $params = trim(preg_replace('/\s+/', ' ', print_r($params, true)));
+            $result = trim(preg_replace('/\s+/', ' ', print_r($result, true)));
+            $time = round($time, 3);
+
+            if ($error) {
+                $this->getLogger()->error("$name( $params ): $error");
+            } else {
+                $this->getLogger()->info("$name( $params ) -> $result {$time} ms");
+            }
+        }
     }
 }
