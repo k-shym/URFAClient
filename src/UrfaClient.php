@@ -22,8 +22,6 @@ class UrfaClient extends UrfaClientAbstract implements LoggerAwareInterface
 
     public const VERSION = '2.0.0';
 
-    public const API_XML = 'api_53-005.xml';
-
     /** @var UrfaConnection $connection */
     private $connection;
 
@@ -81,6 +79,7 @@ class UrfaClient extends UrfaClientAbstract implements LoggerAwareInterface
 
             if (($this->getCache() instanceof CacheItemPoolInterface) && $this->getConfig()->useCache()) {
                 $cacheKey = $name.'_'.sha1($this->getConfig()->getSession().serialize($args));
+
                 $cacheCount = $this->getCache()->getItem($cacheKey);
                 if (!$cacheCount->isHit()) {
                     if ($this->getConfig()->getCacheTime()) {
@@ -190,7 +189,7 @@ class UrfaClient extends UrfaClientAbstract implements LoggerAwareInterface
      */
     public function log(string $name, $params = null, $result = null, $time = 0, $error = '')
     {
-        if (($this->getLogger() instanceof LoggerInterface) && $this->getConfig()->isLog()) {
+        if (($this->getLogger() instanceof LoggerInterface) && $this->getConfig()->useLog()) {
             $params = trim(preg_replace('/\s+/', ' ', print_r($params, true)));
             $result = trim(preg_replace('/\s+/', ' ', print_r($result, true)));
             $time = round($time, 3);

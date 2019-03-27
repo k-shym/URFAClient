@@ -34,7 +34,7 @@ abstract class UrfaClientBaseTest extends \PHPUnit\Framework\TestCase
     protected $config = [];
 
     /**
-     * @var \UrfaClient\Client\UrfaClientApi
+     * @var \UrfaClient\Client\UrfaClientAbstract
      */
     protected $api;
 

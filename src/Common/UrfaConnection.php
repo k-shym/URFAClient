@@ -60,25 +60,25 @@ final class UrfaConnection
 
         $context = stream_context_create();
 
-        if ($this->config->admin and $this->config->protocol === 'ssl') {
+        if ($this->config->isAdmin() && $this->config->getProtocol() === 'ssl') {
             stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
             stream_context_set_option($context, 'ssl', 'local_cert', __DIR__.'/../../admin.crt');
             stream_context_set_option($context, 'ssl', 'passphrase', 'netup');
             stream_context_set_option($context, 'ssl', 'ciphers', 'SSLv3');
-        } elseif ($this->config->protocol === 'tls' || $this->config->protocol === 'ssl') {
+        } elseif ($this->config->getProtocol() === 'tls' || $this->config->getProtocol() === 'ssl') {
             stream_context_set_option($context, 'ssl', 'ciphers', 'ADH-RC4-MD5');
         }
 
         stream_context_set_option($context, 'ssl', 'verify_peer', false);
         stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
 
-        $this->config->host = gethostbyname($this->config->host);
+        $this->config->setHost(gethostbyname($this->config->getHost()));
         try {
             $this->socket = stream_socket_client(
-                "tcp://{$this->config->host}:{$this->config->port}",
+                "tcp://{$this->config->getHost()}:{$this->config->getPort()}",
                 $err_no,
                 $err_str,
-                $this->config->timeout,
+                $this->config->getTimeout(),
                 STREAM_CLIENT_CONNECT,
                 $context
             );
@@ -88,7 +88,7 @@ final class UrfaConnection
             throw new UrfaConnectException("$err_str ($err_no)");
         }
 
-        stream_set_timeout($this->socket, $this->config->timeout);
+        stream_set_timeout($this->socket, $this->config->getTimeout());
 
 
         if (!$this->auth($this->config)) {
@@ -117,20 +117,20 @@ final class UrfaConnection
                     $digest = $packet->attr[6]['data'];
                     $ctx = hash_init('md5');
                     hash_update($ctx, $digest);
-                    hash_update($ctx, $config->password);
+                    hash_update($ctx, $config->getPassword());
                     $hash = hash_final($ctx, true);
                     $packet->clean();
                     $this->code = 193;
-                    $packet->setAttrString($config->login, 2);
+                    $packet->setAttrString($config->getLogin(), 2);
                     // Восстанавливать авторизацию из сессии
-                    if ($config->session !== null) {
-                        $packet->setAttrString(pack('H32', $config->session), 6);
+                    if ($config->getSession() !== null) {
+                        $packet->setAttrString(pack('H32', $config->getSession()), 6);
                     } else {
-                        $config->session = bin2hex($digest);
+                        $config->setSession(bin2hex($digest));
                     }
                     $packet->setAttrString($digest, 8);
                     $packet->setAttrString($hash, 9);
-                    $packet->setAttrInt(($config->protocol === 'ssl') ? ($config->admin ? 4 : 2) : 6, 10);
+                    $packet->setAttrInt(($config->getProtocol() === 'ssl') ? ($config->isAdmin() ? 4 : 2) : 6, 10);
                     $packet->setAttrInt(2, 1);
                     $this->write($packet);
                     break;

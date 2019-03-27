@@ -2,75 +2,78 @@
 
 namespace UrfaClient\Config;
 
-use UrfaClient\UrfaClient;
-
 /**
  * Class UrfaConfig
  * @author Siomkin Alexander <siomkin.alexander@gmail.com>
  * @package UrfaClient\UrfaConfig
  */
-class UrfaConfig
+final class UrfaConfig
 {
+    public const PROTOCOL_ALLOWED = ['auto', 'tls', 'ssl'];
+
+    public const API_XML = 'api_53-005.xml';
+
     /**
      * @var string
      */
-    public $login = 'init';
+    private $login = 'init';
     /**
      * @var string
      */
-    public $password = 'init';
+    private $password = 'init';
     /**
      * @var string
      */
-    public $host = 'localhost';
+    private $host = 'localhost';
     /**
      * @var int
      */
-    public $port = 11758;
+    private $port = 11758;
     /**
      * @var int
      */
-    public $timeout = 30;
+    private $timeout = 30;
     /**
      * @var string
      */
-    public $protocol = 'auto';
+    private $protocol = 'auto';
 
     /**
      * @var string|null
      */
-    public $session = null;
+    private $session;
 
     /**
      * Выполнять от имени админа
      * @var bool
      */
-    public $admin = false;
+    private $admin = false;
 
     /**
      * Кеширование результатов
      * @var bool
      */
-    public $cache = false;
+    private $cache = false;
 
     /**
      * Время кеширование результатов (сек)
      * @var int
      */
-    public $cache_time = 60;
+    private $cacheTime = 60;
 
 
     /**
      * Путь до xml файла с функциями
      * @var string
      */
-    public $api = __DIR__.'/../../xml/'.UrfaClient::API_XML;
+    private $api = __DIR__.'/../../xml/'.self::API_XML;
 
     /**
      * Логирование ошибок
      * @var bool
      */
-    public $log = false;
+    private $log = false;
+
 
     public function __construct(array $params = [])
     {
@@ -83,9 +86,11 @@ class UrfaConfig
      */
     public function updateOptions(array $params): UrfaConfig
     {
-        foreach ($params as $key => $param) {
-            if (property_exists(__CLASS__, $key)) {
-                $this->$key = $param;
+        foreach ($params as $property => $value) {
+            [$getterFunction, $setterFunction] = $this->takeGetterAndSetterName($property);
+
+            if (method_exists(__CLASS__, $setterFunction)) {
+                $this->{$setterFunction}($value);
             }
         }
 
@@ -201,7 +206,10 @@ class UrfaConfig
      */
     public function setProtocol(string $protocol): UrfaConfig
     {
-        $this->protocol = $protocol;
+        $allowed = self::PROTOCOL_ALLOWED;
+        if (\in_array($protocol, $allowed, true)) {
+            $this->protocol = $protocol;
+        }
 
         return $this;
     }
@@ -268,16 +276,16 @@ class UrfaConfig
      */
     public function getCacheTime(): int
     {
-        return $this->cache_time;
+        return $this->cacheTime;
     }
 
     /**
-     * @param int $cache_time
+     * @param int $cacheTime
      * @return UrfaConfig
      */
-    public function setCacheTime(int $cache_time): UrfaConfig
+    public function setCacheTime(int $cacheTime): UrfaConfig
     {
-        $this->cache_time = $cache_time;
+        $this->cacheTime = $cacheTime;
 
         return $this;
     }
@@ -304,7 +312,7 @@ class UrfaConfig
     /**
      * @return bool
      */
-    public function isLog(): bool
+    public function useLog(): bool
     {
         return $this->log;
     }
@@ -318,5 +326,25 @@ class UrfaConfig
         $this->log = $log;
 
         return $this;
+    }
+
+    /**
+     * @param string $property
+     * @return array
+     */
+    private function takeGetterAndSetterName(string $property): array
+    {
+        $prefix = 'get';
+        switch ($property) {
+            case 'cache':
+            case 'log':
+                $prefix = 'use';
+                break;
+            case 'admin':
+                $prefix = 'is';
+                break;
+        }
+
+        return [$prefix.ucfirst($property), 'set'.ucfirst($property)];
     }
 }
