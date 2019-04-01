@@ -3,7 +3,6 @@
 namespace UrfaClient;
 
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use UrfaClient\Client\UrfaClientAbstract;
 use UrfaClient\Client\UrfaClientApi;
@@ -17,10 +16,10 @@ use UrfaClient\Exception\UrfaClientException;
  *
  * @author Siomkin Alexander <siomkin.alexander@gmail.com>
  */
-class UrfaClient extends UrfaClientAbstract implements LoggerAwareInterface
+class UrfaClient extends UrfaClientAbstract
 {
 
-    public const VERSION = '2.0.0';
+    public const VERSION = '2.0.1';
 
     /** @var UrfaConnection $connection */
     private $connection;
@@ -77,7 +76,7 @@ class UrfaClient extends UrfaClientAbstract implements LoggerAwareInterface
         try {
             $ts = microtime(true);
 
-            if (($this->getCache() instanceof CacheItemPoolInterface) && $this->getConfig()->useCache()) {
+            if ($this->getCache() && $this->getConfig()->useCache()) {
                 $cacheKey = $name.'_'.sha1($this->getConfig()->getSession().serialize($args));
 
                 $cacheCount = $this->getCache()->getItem($cacheKey);
@@ -187,17 +186,16 @@ class UrfaClient extends UrfaClientAbstract implements LoggerAwareInterface
      * @param float $time Время работы метода
      * @param string $error Сообщение ошибки
      */
-    public function log(string $name, $params = null, $result = null, $time = 0, $error = '')
+    private function log(string $name, $params = null, $result = null, $time = 0, $error = ''): void
     {
-        if (($this->getLogger() instanceof LoggerInterface) && $this->getConfig()->useLog()) {
-            $params = trim(preg_replace('/\s+/', ' ', print_r($params, true)));
-            $result = trim(preg_replace('/\s+/', ' ', print_r($result, true)));
+        if ($this->getLogger() && $this->getConfig()->useLog()) {
+
             $time = round($time, 3);
 
             if ($error) {
-                $this->getLogger()->error("$name( $params ): $error");
+                $this->getLogger()->error("$name: $error", ['params' => $params]);
             } else {
-                $this->getLogger()->info("$name( $params ) -> $result {$time} ms");
+                $this->getLogger()->info("$name -> {$time} ms", ['params' => $params, 'result' => $result]);
             }
         }
     }
