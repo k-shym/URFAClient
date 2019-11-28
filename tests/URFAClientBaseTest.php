@@ -61,21 +61,10 @@ abstract class URFAClientBaseTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
-     */
-    public function testNotExist()
-    {
-        $this->assertFalse($this->api->not_exist());
-    }
-
-    /**
      * Делаем финальные проверки и закрываем соединение
      */
     protected function tearDown()
     {
-        $this->assertTrue(is_array(URFAClient::traceLog()));
-        $this->assertTrue(is_string(URFAClient::lastError()));
-
         unset($this->api);
     }
 }

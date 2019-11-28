@@ -7,14 +7,13 @@ require_once 'URFAClientBaseTest.php';
  * @author  Konstantin Shum <k.shym@ya.ru>
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-class URFAClient53Test extends URFAClientBaseTest
+abstract class URFAClient53Test extends URFAClientBaseTest
 {
     protected $config = [
         'login'    => 'init',
         'password' => 'init',
         'address'  => 'localhost',
         'protocol' => 'tls',
-        'log'      => true,
     ];
 
     /**
@@ -73,13 +72,13 @@ class URFAClient53Test extends URFAClientBaseTest
     {
         $result = $this->api->rpcf_search_users_new([
             'select_type'    => 0,
-            'patterns_count' => array(
-                array(
+            'patterns_count' => [
+                [
                     'what'        => 2,
                     'criteria_id' => 3,
                     'pattern'     => 'user' . self::prefix(),
-                ),
-            ),
+                ],
+            ],
         ]);
 
         $this->assertArrayHasKey('user_data_size', $result);
@@ -103,7 +102,7 @@ class URFAClient53Test extends URFAClientBaseTest
         $this->config['admin'] = false;
         $api_user = URFAClient::init($this->config);
 
-        $this->assertInstanceOf('URFAClient_Collector', $api_user);
+        $this->assertInstanceOf('URFAClient_API', $api_user);
 
         return $api_user;
     }
@@ -113,7 +112,7 @@ class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testChangePassword(URFAClient_Collector $api)
+    public function testChangePassword(URFAClient_API $api)
     {
          $result = $api->rpcf_user5_change_password([
              'old_password'     => 'pass' . self::prefix(),
@@ -129,7 +128,7 @@ class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testEditUser(URFAClient_Collector $api)
+    public function testEditUser(URFAClient_API $api)
     {
         $data = [
             'full_name'         => 'full_name' . self::prefix(),
@@ -402,15 +401,5 @@ class URFAClient53Test extends URFAClientBaseTest
             [9013],
             ['922334069862591'],
         ];
-    }
-
-    /**
-     * @return array
-     */
-    public function testGetUserinfoNotUser()
-    {
-        $this->assertFalse((bool) $this->api->rpcf_get_userinfo(array(
-            'user_id' => 0,
-        )));
     }
 }

@@ -1,13 +1,13 @@
 {
     "name": "k-shym/urfa-client",
     "description": "Universal PHP client billing system NetUp UTM5 based api.xml",
-    "version": "1.3.1",
+    "version": "1.4.0",
     "type": "library",
     "license": "GPL-3.0",
     "authors": [
         {
             "name": "Konstantin Shum",
-            "email": "ks.shym@gmail.com",
+            "email": "k.shym@ya.ru",
             "homepage": "http://www.shym.su",
             "role": "Developer"
         }

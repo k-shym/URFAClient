@@ -9,9 +9,9 @@
  */
 abstract class URFAClient
 {
-    const VERSION = '1.3.1';
+    const VERSION = '1.4.0';
 
-    const API_XML = 'api_53-003.xml';
+    const API_XML = 'api_53-005.xml';
 
     /**
      * Автозагрузка класса
@@ -42,7 +42,7 @@ abstract class URFAClient
      */
     public static function registerAutoload()
     {
-        spl_autoload_register(array('URFAClient', 'autoload'));
+        spl_autoload_register(['URFAClient', 'autoload']);
     }
 
     /**
@@ -61,34 +61,11 @@ abstract class URFAClient
             'address'  => 'localhost',
             'port'     => 11758,
             'timeout'  => 30,
-            'protocol' => 'ssl',
+            'protocol' => 'auto',
             'admin'    => true,
             'api'      => __DIR__ . '/../xml/' . self::API_XML,
-            'log'      => false,
         ], $data);
 
-        $api = new URFAClient_API($data['api'], new URFAClient_Connection($data));
-
-        return ($data['log']) ? new URFAClient_Collector($api) : $api;
-    }
-
-    /**
-     * Лог выполненых запросов
-     *
-     * @return array
-     */
-    public static function traceLog()
-    {
-        return URFAClient_Log::instance()->extract_trace_log();
-    }
-
-    /**
-     * Последняя ошибка
-     *
-     * @return string
-     */
-    public static function lastError()
-    {
-        return URFAClient_Log::instance()->get_last_error();
+        return new URFAClient_API($data['api'], new URFAClient_Connection($data));
     }
 }

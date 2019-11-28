@@ -1,20 +1,19 @@
 <?php
 
-require_once 'URFAClientBaseTest.php';
+require_once 'URFAClient53Test.php';
 
 /**
- * Тесты для версии сервера 5.2
- *
  * @package URFAClient
  * @author  Konstantin Shum <k.shym@ya.ru>
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-abstract class URFAClient52Test extends URFAClientBaseTest
+class URFAClient53003Test extends URFAClient53Test
 {
     protected $config = [
         'login'    => 'init',
         'password' => 'init',
         'address'  => 'localhost',
-        'protocol' => 'ssl',
+        'protocol' => 'tls',
+        'api'      => '../xml/api_53-003.xml',
     ];
 }
