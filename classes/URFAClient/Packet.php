@@ -3,47 +3,68 @@
 /**
  * Объект для подготовки получения/отправки бинарных данных ядру
  *
- * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md
+ * @package URFAClient
  * @author  Konstantin Shum <k.shym@ya.ru>
+ * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-class URFAClient_Packet {
-
+class URFAClient_Packet
+{
     /**
+     * Поддрежка IPv6 сервером
+     *
      * @var bool
      */
-    protected $_ipv6;
+    protected $ipv6;
 
     /**
-     * @var integer  Длина пакета
+     * Длина пакета
+     *
+     * @var integer
      */
     public $len = 4;
 
     /**
-     * @var integer  Счетчик пакета
+     * Счетчик пакета
+     *
+     * @var integer
      */
     public $iterator = 0;
 
     /**
-     * @var array    Атрибуты пакета
+     * Атрибуты пакета
+     *
+     * @var array
      */
-    public $attr = array();
+    public $attr = [];
 
     /**
-     * @var array    Данные пакета
+     * Данные пакета
+     *
+     * @var array
      */
-    public $data = array();
+    public $data = [];
 
+    /**
+     * Конструктор пакета
+     *
+     * @param bool $ipv6 Поддержка IPv6
+     *
+     * @throws Exception
+     */
     public function __construct($ipv6)
     {
-        $this->_ipv6 = $ipv6;
+        $this->ipv6 = $ipv6;
     }
 
     /**
-     * @param   integer             $data
-     * @param   integer             $code
-     * @return  URFAClient_Packet
+     * Записать целое число в атрибут пакета
+     *
+     * @param integer $data Целое число
+     * @param integer $code Код атрибута
+     *
+     * @return $this
      */
-    public function set_attr_int($data, $code)
+    public function setAttrInt($data, $code)
     {
         $this->attr[$code]['data'] = pack('N', $data);
         $this->attr[$code]['len'] = 8;
@@ -53,20 +74,28 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   integer   $code
-     * @return  mixed
+     * Получить целое число из атрибутов пакета
+     *
+     * @param integer $code Код атрибута
+     *
+     * @return mixed
      */
-    public function get_attr_int($code)
+    public function getAttrInt($code)
     {
-        return (isset($this->attr[$code]['data'])) ? $this->_bin2int($this->attr[$code]['data']) : FALSE;
+        return (isset($this->attr[$code]['data']))
+            ? $this->bin2int($this->attr[$code]['data'])
+            : false;
     }
 
     /**
-     * @param   string              $data
-     * @param   integer             $code
-     * @return  URFAClient_Packet
+     * Записать строку в атрибут пакет
+     *
+     * @param string  $data Строка
+     * @param integer $code Код атрибута
+     *
+     * @return $this
      */
-    public function set_attr_string($data, $code)
+    public function setAttrString($data, $code)
     {
         $this->attr[$code]['data'] = $data;
         $this->attr[$code]['len'] = strlen($data) + 4;
@@ -76,10 +105,13 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   integer             $data
-     * @return  URFAClient_Packet
+     * Добавить целое число в пакет
+     *
+     * @param integer $data Целое число
+     *
+     * @return $this
      */
-    public function set_data_int($data)
+    public function setDataInt($data)
     {
         $this->data[] = pack('N', $data);
         $this->len += 8;
@@ -88,18 +120,23 @@ class URFAClient_Packet {
     }
 
     /**
+     * Получить целое число
+     *
      * @return integer
      */
-    public function get_data_int()
+    public function getDataInt()
     {
-        return $this->_bin2int($this->data[$this->iterator++]);
+        return $this->bin2int($this->data[$this->iterator++]);
     }
 
     /**
-     * @param   float               $data
-     * @return  URFAClient_Packet
+     * Добавить число с плавающей точкой в пакет
+     *
+     * @param float $data Число с плавающей точкой
+     *
+     * @return $this
      */
-    public function set_data_double($data)
+    public function setDataDouble($data)
     {
         $this->data[] = strrev(pack('d', $data));
         $this->len += 12;
@@ -108,22 +145,27 @@ class URFAClient_Packet {
     }
 
     /**
+     * Получить число с плавающей точкой
+     *
      * @return float
      */
-    public function get_data_double()
+    public function getDataDouble()
     {
         $data = unpack('d', strrev($this->data[$this->iterator++]));
-
-        if ( ! $data) return NULL;
-
+        if (!$data) {
+            return null;
+        }
         return (float) $data[1];
     }
 
     /**
-     * @param   string              $data
-     * @return  URFAClient_Packet
+     * Записать строку в пакет
+     *
+     * @param string $data Строка
+     *
+     * @return $this
      */
-    public function set_data_string($data)
+    public function setDataString($data)
     {
         $this->data[] = $data;
         $this->len += strlen($data) + 4;
@@ -132,20 +174,28 @@ class URFAClient_Packet {
     }
 
     /**
+     * Получить строку из пакета
+     *
      * @return string
      */
-    public function get_data_string()
+    public function getDataString()
     {
         return (string) $this->data[$this->iterator++];
     }
 
     /**
-     * @param   string              $data
-     * @return  URFAClient_Packet
+     * Записать IP адрес в пакет
+     *
+     * @param string $data IP адрес
+     *
+     * @return $this
      */
-    public function set_data_ip($data)
+    public function setDataIp($data)
     {
-        $data = (($this->_ipv6) ? pack("C", (filter_var($data, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? 4 : 6) : '') . inet_pton($data);
+        $data = (($this->ipv6)
+            ? pack("C", (filter_var($data, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? 4 : 6)
+            : ''
+        ) . inet_pton($data);
         $this->data[] = $data;
         $this->len += strlen($data) + 4;
 
@@ -153,38 +203,38 @@ class URFAClient_Packet {
     }
 
     /**
-     * @return  string
+     * Получить IP адрес из пакета
+     *
+     * @return string
      */
-    public function get_data_ip()
+    public function getDataIp()
     {
         $data = $this->data[$this->iterator++];
-        return (string) inet_ntop(($this->_ipv6) ? substr($data, 1) : $data);
+        return (string) inet_ntop(($this->ipv6) ? substr($data, 1) : $data);
     }
 
     /**
-     * @param   string                 $data
-     * @return  URFAClient_Packet
-     * @throws  Exception
+     * Записать bigint в пакет
+     *
+     * @param string $data Большое целое число
+     *
+     * @return $this
+     * @throws Exception
      */
-    public function set_data_long($data)
+    public function setDataLong($data)
     {
-        if (PHP_INT_SIZE == 4)
-        {
+        if (PHP_INT_SIZE == 4) {
             throw new Exception('Not implemented for PHP x32');
-        }
-        else
-        {
+        } else {
             $hi = bcdiv($data, 0xffffffff + 1);
             $lo = bcmod($data, 0xffffffff + 1);
 
-            if ($hi & 0x80000000)
-            {
+            if ($hi & 0x80000000) {
                 $hi = $hi & 0xffffffff - 1;
                 $lo = $lo & 0xffffffff;
             }
 
-            if ($lo & 0x80000000)
-            {
+            if ($lo & 0x80000000) {
                 $lo = $lo & 0xffffffff;
                 $hi = ( ! $hi) ? 0xffffffff : $hi;
             }
@@ -197,44 +247,41 @@ class URFAClient_Packet {
     }
 
     /**
+     * Получить bigint из пакета
+     *
      * @return string
      */
-    public function get_data_long()
+    public function getDataLong()
     {
         $data = unpack('N2', $this->data[$this->iterator++]);
 
-        if ( ! $data) return NULL;
+        if (!$data) {
+            return null;
+        }
 
-        if (PHP_INT_SIZE == 4)
-        {
+        if (PHP_INT_SIZE == 4) {
             $hi = $data[1];
             $lo = $data[2];
             $neg = $hi < 0;
 
-            if ($neg)
-            {
+            if ($neg) {
                 $hi = ~$hi & (int) 0xffffffff;
                 $lo = ~$lo & (int) 0xffffffff;
 
-                if ($lo == (int) 0xffffffff)
-                {
+                if ($lo == (int) 0xffffffff) {
                     $hi++;
                     $lo = 0;
-                }
-                else
-                {
+                } else {
                     $lo++;
                 }
             }
 
-            if ($hi & (int) 0x80000000)
-            {
+            if ($hi & (int) 0x80000000) {
                 $hi &= (int) 0x7fffffff;
                 $hi += 0x80000000;
             }
 
-            if ($lo & (int) 0x80000000)
-            {
+            if ($lo & (int) 0x80000000) {
                 $lo &= (int) 0x7fffffff;
                 $lo += 0x80000000;
             }
@@ -242,12 +289,11 @@ class URFAClient_Packet {
             $value = bcmul($hi, 0xffffffff + 1);
             $value = bcadd($value, $lo);
 
-            if ($neg) $value = bcsub(0, $value);
-        }
-        else
-        {
-            if ($data[1] & 0x80000000)
-            {
+            if ($neg) {
+                $value = bcsub(0, $value);
+            }
+        } else {
+            if ($data[1] & 0x80000000) {
                 $data[1] = $data[1] & 0xffffffff;
                 $data[1] = $data[1] ^ 0xffffffff;
                 $data[2] = $data[2] ^ 0xffffffff;
@@ -256,9 +302,7 @@ class URFAClient_Packet {
                 $value = bcmul($data[1], 0xffffffff + 1);
                 $value = bcsub(0, $value);
                 $value = bcsub($value, $data[2]);
-            }
-            else
-            {
+            } else {
                 $value = bcmul($data[1], 0xffffffff + 1);
                 $value = bcadd($value, $data[2]);
             }
@@ -268,18 +312,23 @@ class URFAClient_Packet {
     }
 
     /**
-     * @param   string      Бианрые данные
-     * @return  integer
+     * Преобразовать бинарные данные в число
+     *
+     * @param string $data Бианрые данные
+     *
+     * @return integer
      */
-    protected function _bin2int($data)
+    protected function bin2int($data)
     {
         $data = unpack('N', $data);
 
-        if ( ! $data) return NULL;
-
+        if (!$data) {
+            return null;
+        }
         // для 64-х битной версии php
-        if ($data[1] >= 0x80000000)
+        if ($data[1] >= 0x80000000) {
             return $data[1] - (0xffffffff + 1);
+        }
 
         return (int) $data[1];
     }
@@ -287,14 +336,14 @@ class URFAClient_Packet {
     /**
      * Приводим пакет к исходному состоянию
      *
-     * @return URFAClient_Packet
+     * @return $this
      */
     public function clean()
     {
         $this->len = 4;
         $this->iterator = 0;
-        $this->attr = array();
-        $this->data = array();
+        $this->attr = [];
+        $this->data = [];
 
         return $this;
     }

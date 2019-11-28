@@ -3,11 +3,12 @@
 /**
  * Главный класс
  *
- * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md
+ * @package URFAClient
  * @author  Konstantin Shum <k.shym@ya.ru>
+ * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-abstract class URFAClient {
-
+abstract class URFAClient
+{
     const VERSION = '1.3.1';
 
     const API_XML = 'api_53-003.xml';
@@ -15,23 +16,31 @@ abstract class URFAClient {
     /**
      * Автозагрузка класса
      *
-     * @param string $class		Имя класса
+     * @param string $class Имя класса
+     *
+     * @return string
      */
     public static function autoload($class)
     {
-        if (strpos($class, 'URFAClient_') !== 0) return;
+        if (strpos($class, 'URFAClient_') !== 0) {
+            return null;
+        }
 
         $path = __DIR__ . '/' . str_replace('_', '/', $class) . '.php';
 
-        if ( ! file_exists($path)) return;
+        if (!file_exists($path)) {
+            return null;
+        }
 
-        require $path;
+        include $path;
     }
 
     /**
      * Включаем автозагрузку классов
+     *
+     * @return void
      */
-    public static function register_autoload()
+    public static function registerAutoload()
     {
         spl_autoload_register(array('URFAClient', 'autoload'));
     }
@@ -39,23 +48,24 @@ abstract class URFAClient {
     /**
      * Метод инициализации
      *
-     * @param   array $data
-     * @return  URFAClient_Function
-     * @throws  Exception
+     * @param array $data Массив с параметрами
+     *
+     * @return URFAClient_API
+     * @throws Exception
      */
     public static function init(array $data)
     {
-        $data = array_merge(array(
+        $data = array_merge([
             'login'    => 'init',
             'password' => 'init',
             'address'  => 'localhost',
             'port'     => 11758,
             'timeout'  => 30,
             'protocol' => 'ssl',
-            'admin'    => TRUE,
+            'admin'    => true,
             'api'      => __DIR__ . '/../xml/' . self::API_XML,
-            'log'      => FALSE,
-        ), $data);
+            'log'      => false,
+        ], $data);
 
         $api = new URFAClient_API($data['api'], new URFAClient_Connection($data));
 
@@ -67,7 +77,8 @@ abstract class URFAClient {
      *
      * @return array
      */
-    public static function trace_log() {
+    public static function traceLog()
+    {
         return URFAClient_Log::instance()->extract_trace_log();
     }
 
@@ -76,7 +87,8 @@ abstract class URFAClient {
      *
      * @return string
      */
-    public static function last_error() {
+    public static function lastError()
+    {
         return URFAClient_Log::instance()->get_last_error();
     }
 }

@@ -1,34 +1,39 @@
 <?php
-
 /**
- * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md
+ * Объект работы из командной строки
+ *
+ * @package URFAClient
  * @author  Konstantin Shum <k.shym@ya.ru>
+ * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-class URFAClient_Cmd extends URFAClient_API {
-
+class URFAClient_Cmd extends URFAClient_API
+{
     /**
      * Возвращает функцию из api.xml в определённом виде
      *
-     * @param  string $name   Имя функции
-     * @param  string $type   Тип представления
+     * @param string $name Имя функции
+     * @param string $type Тип представления
+     *
      * @return mixed
      * @throws Exception
      */
-    public function method($name, $type = NULL)
+    public function method($name, $type = null)
     {
-        $method = FALSE;
-        foreach ($this->_api->function as $function)
-        {
-            if ((string) $function->attributes()->{'name'} === $name)
-            {
+        $method = false;
+        foreach ($this->api->function as $function) {
+            if ((string) $function->attributes()->{'name'} === $name) {
                 $method = $function;
                 break;
             }
         }
 
-        if ( ! $method) throw new Exception("Function $name not found");
+        if (!$method) {
+            throw new Exception("Function $name not found");
+        }
 
-        return ($type === 'xml') ? $method->asXML() : $this->_process_options_input($method->input);
+        return ($type === 'xml')
+            ? $method->asXML()
+            : $this->_processOptionsInput($method->input);
     }
 
     /**
@@ -38,9 +43,8 @@ class URFAClient_Cmd extends URFAClient_API {
      */
     public function methods()
     {
-        $list = array();
-        foreach ($this->_api->function as $function)
-        {
+        $list = [];
+        foreach ($this->api->function as $function) {
             $attr = $function->attributes();
             $list[(string) $attr->{'name'}] = (string) $attr->{'id'};
         }
@@ -53,32 +57,43 @@ class URFAClient_Cmd extends URFAClient_API {
     /**
      * Рекурсивная функция обработки входных параметров api.xml
      *
-     * @param  SimpleXMLElement  $input           Элемент дерева api.xml
-     * @param  array             $options_input   Опции функции
+     * @param SimpleXMLElement $input         Элемент дерева api.xml
+     * @param array            $options_input Опции функции
+     *
      * @return array
      * @throws Exception
      */
-    protected function _process_options_input(SimpleXMLElement $input, Array &$options_input = array())
+    protected function _processOptionsInput(SimpleXMLElement $input, array &$options_input = [])
     {
-        foreach ($input->children() as $node)
-        {
+        foreach ($input->children() as $node) {
             $name = (string) $node->attributes()->{'name'};
 
             switch ($node->getName())
             {
-                case 'integer':
-                case 'long': $options_input[$name] = 0; break;
-                case 'double': $options_input[$name] = 0.0; break;
-                case 'ip_address': $options_input[$name] = '0.0.0.0'; break;
-                case 'string': $options_input[$name] = ''; break;
-                case 'if': $this->_process_options_input($node, $options_input); break;
-                case 'for':
-                    $sibling = $node->xpath('preceding-sibling::*[1]');
+            case 'integer':
+            case 'long':
+                $options_input[$name] = 0;
+                break;
+            case 'double':
+                $options_input[$name] = 0.0;
+                break;
+            case 'ip_address':
+                $options_input[$name] = '0.0.0.0';
+                break;
+            case 'string':
+                $options_input[$name] = '';
+                break;
+            case 'if':
+                $this->_processOptionsInput($node, $options_input);
+                break;
+            case 'for':
+                $sibling = $node->xpath('preceding-sibling::*[1]');
 
-                    if ( ! isset($sibling[0])) throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
-
-                    $options_input[(string) $sibling[0]->attributes()->{'name'}] = array($this->_process_options_input($node));
-                    break;
+                if (!isset($sibling[0])) {
+                    throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                }
+                $options_input[(string) $sibling[0]->attributes()->{'name'}] = [$this->_processOptionsInput($node)];
+                break;
             }
         }
 

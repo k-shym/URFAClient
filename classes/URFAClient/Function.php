@@ -1,6 +1,9 @@
 <?php
-
 /**
+ * @package URFAClient
+ * @author  Konstantin Shum <k.shym@ya.ru>
+ * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
+ *
  * @method bool not_exist()
  *
  * @method array rpcf_core_version_user(array $input = array())
@@ -620,4 +623,6 @@
  * @method array rpcf_dealer_del_tech_param(array $input = array())
  * @method array rpcf_dealer_get_tariffs_list(array $input = array())
  */
-abstract class URFAClient_Function {}
+abstract class URFAClient_Function
+{
+}
