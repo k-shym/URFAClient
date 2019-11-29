@@ -42,7 +42,7 @@ final class URFAClient_Connection
      *
      * @param array $data Конфигурация
      *
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function __construct(array $data)
     {
@@ -69,13 +69,13 @@ final class URFAClient_Connection
         );
 
         if (!$this->socket) {
-            throw new Exception("$err_str ($err_no)");
+            throw new URFAClient_Exception("$err_str ($err_no)");
         }
 
         stream_set_timeout($this->socket, $data['timeout']);
 
         if (!$this->auth($data['login'], $data['password'], $data['admin'], $data['protocol'])) {
-            throw new Exception('Login or password incorrect');
+            throw new URFAClient_Exception('Login or password incorrect');
         }
     }
 
@@ -88,7 +88,7 @@ final class URFAClient_Connection
      * @param string $protocol Протокол ssl|tls|auto
      *
      * @return bool
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     protected function auth($login, $password, $admin, $protocol)
     {
@@ -151,7 +151,7 @@ final class URFAClient_Connection
      * @param integer $code Код функции
      *
      * @return bool
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function call($code)
     {
@@ -177,7 +177,7 @@ final class URFAClient_Connection
      * Результат вызова функции
      *
      * @return URFAClient_Packet
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function result()
     {
@@ -200,20 +200,20 @@ final class URFAClient_Connection
      *
      * @param URFAClient_Packet $packet Пакет с бинарными данными
      *
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function read(URFAClient_Packet $packet)
     {
         $this->code = ord(fread($this->socket, 1));
 
         if (!$this->code) {
-            throw new Exception("Error code {$this->code}");
+            throw new URFAClient_Exception("Error code {$this->code}");
         }
 
         $version = ord(fread($this->socket, 1));
 
         if ($version !== $this->version) {
-            throw new Exception("Error code {$this->code}. Version: $version");
+            throw new URFAClient_Exception("Error code {$this->code}. Version: $version");
         }
 
         list(, $packet->len) = unpack('n', fread($this->socket, 2));
@@ -264,6 +264,8 @@ final class URFAClient_Connection
      * Создает объект пакета
      *
      * @return URFAClient_Packet
+     *
+     * @throws URFAClient_Exception
      */
     public function packet()
     {

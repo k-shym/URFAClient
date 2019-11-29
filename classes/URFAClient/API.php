@@ -42,14 +42,14 @@ class URFAClient_API extends URFAClient_Function
      * @param string                $api        Путь до файла api
      * @param URFAClient_Connection $connection Объект соединения с ядром
      *
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function __construct($api, URFAClient_Connection $connection = null)
     {
         $this->connection = $connection;
 
         if (!file_exists($api)) {
-            throw new Exception("File $api not found");
+            throw new URFAClient_Exception("File $api not found");
         }
 
         $this->api = simplexml_load_file($api);
@@ -67,12 +67,12 @@ class URFAClient_API extends URFAClient_Function
      * @param array  $args Параметры функции
      *
      * @return array
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function __call($name, $args)
     {
         if (!$this->connection) {
-            throw new Exception("No object URFAClient_Connection");
+            throw new URFAClient_Exception("No object URFAClient_Connection");
         }
 
 
@@ -87,7 +87,7 @@ class URFAClient_API extends URFAClient_Function
         }
 
         if (!$method) {
-            throw new Exception("Function $name not found");
+            throw new URFAClient_Exception("Function $name not found");
         }
         $args = (isset($args[0]) AND is_array($args[0])) ? (array) $args[0] : [];
 
@@ -97,7 +97,7 @@ class URFAClient_API extends URFAClient_Function
         $code = ($code{0} === '-') ? -1 * hexdec($code) : hexdec($code);
 
         if (!$this->connection->call($code)) {
-            throw new Exception("Error calling function $name");
+            throw new URFAClient_Exception("Error calling function $name");
         }
 
         $packet = $this->connection->packet();
@@ -119,7 +119,7 @@ class URFAClient_API extends URFAClient_Function
                 $packet->setDataString($v['value']);
                 break;
             default:
-                throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
             }
         }
         if ($this->data_input) {
@@ -136,7 +136,7 @@ class URFAClient_API extends URFAClient_Function
      * @param array            $args  Переданные аргументы метода
      *
      * @return void
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     protected function processDataInput(SimpleXMLElement $input, array $args)
     {
@@ -166,7 +166,7 @@ class URFAClient_API extends URFAClient_Function
                 }
 
                 if (!is_array($variable)) {
-                    throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
                 }
 
                 switch ($variable['type'])
@@ -200,7 +200,7 @@ class URFAClient_API extends URFAClient_Function
                 $sibling = $node->xpath('preceding-sibling::integer[1]');
 
                 if (!isset($sibling[0])) {
-                    throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
                 }
 
                 $name = (string) $sibling[0]->attributes()->{'name'};
@@ -210,12 +210,12 @@ class URFAClient_API extends URFAClient_Function
                 }
 
                 if (!is_array($args[$name])) {
-                    throw new Exception("$name can only be an array");
+                    throw new URFAClient_Exception("$name can only be an array");
                 }
 
                 foreach ($args[$name] as $v) {
                     if (!is_array($v)) {
-                        throw new Exception('To tag "for" an array must be two-dimensional');
+                        throw new URFAClient_Exception('To tag "for" an array must be two-dimensional');
                     }
 
                     $this->processDataInput($node, $v);
@@ -233,7 +233,7 @@ class URFAClient_API extends URFAClient_Function
      * @param string           $type Тип данных integer|long|double|ip_address|string
      *
      * @return void
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     protected function processDataInputScalar(SimpleXMLElement $node, array $args, $type)
     {
@@ -283,13 +283,13 @@ class URFAClient_API extends URFAClient_Function
             if ($valid) {
                 $value = $args[$name];
             } else {
-                throw new Exception("$name can only be a $type");
+                throw new URFAClient_Exception("$name can only be a $type");
             }
         } else {
             if (!is_null($default)) {
                 $value = $default;
             } else {
-                throw new Exception("Required parameter $name ($type)");
+                throw new URFAClient_Exception("Required parameter $name ($type)");
             }
         }
 
@@ -307,7 +307,7 @@ class URFAClient_API extends URFAClient_Function
      * @param URFAClient_Packet $packet Пакет с бинарными данными
      *
      * @return array
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     protected function processDataOutput(SimpleXMLElement $output, URFAClient_Packet $packet)
     {
@@ -389,7 +389,7 @@ class URFAClient_API extends URFAClient_Function
                     $value = (string) $attr->{'value'};
                     break;
                 default:
-                    throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
                 }
 
                 switch ((string) $attr->{'condition'})
@@ -415,7 +415,7 @@ class URFAClient_API extends URFAClient_Function
                 }
 
                 if (!isset($sibling[0])) {
-                    throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
                 }
 
                 $name = (string) $sibling[0]->attributes()->{'name'};
@@ -449,7 +449,7 @@ class URFAClient_API extends URFAClient_Function
      * @param SimpleXMLElement $node Элемент дерева api.xml
      *
      * @return void
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     protected function processDataError(SimpleXMLElement $node)
     {
@@ -459,6 +459,6 @@ class URFAClient_API extends URFAClient_Function
         $comment = (isset($attr->{'comment'})) ? "Comment: {$attr->{'comment'}}" : '';
         $variable = (isset($attr->{'variable'})) ? "Variable: {$attr->{'variable'}}" : '';
 
-        throw new Exception("XML Described error: $code $comment $variable");
+        throw new URFAClient_Exception("XML Described error: $code $comment $variable");
     }
 }

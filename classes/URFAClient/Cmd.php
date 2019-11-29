@@ -15,7 +15,7 @@ class URFAClient_Cmd extends URFAClient_API
      * @param string $type Тип представления
      *
      * @return mixed
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function method($name, $type = null)
     {
@@ -28,7 +28,7 @@ class URFAClient_Cmd extends URFAClient_API
         }
 
         if (!$method) {
-            throw new Exception("Function $name not found");
+            throw new URFAClient_Exception("Function $name not found");
         }
 
         return ($type === 'xml')
@@ -61,7 +61,7 @@ class URFAClient_Cmd extends URFAClient_API
      * @param array            $options_input Опции функции
      *
      * @return array
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     protected function _processOptionsInput(SimpleXMLElement $input, array &$options_input = [])
     {
@@ -90,7 +90,7 @@ class URFAClient_Cmd extends URFAClient_API
                 $sibling = $node->xpath('preceding-sibling::*[1]');
 
                 if (!isset($sibling[0])) {
-                    throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
                 }
                 $options_input[(string) $sibling[0]->attributes()->{'name'}] = [$this->_processOptionsInput($node)];
                 break;

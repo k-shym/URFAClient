@@ -51,7 +51,7 @@ abstract class URFAClient
      * @param array $data Массив с параметрами
      *
      * @return URFAClient_API
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public static function init(array $data)
     {

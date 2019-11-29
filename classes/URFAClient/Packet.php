@@ -49,7 +49,7 @@ class URFAClient_Packet
      *
      * @param bool $ipv6 Поддержка IPv6
      *
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function __construct($ipv6)
     {
@@ -219,12 +219,12 @@ class URFAClient_Packet
      * @param string $data Большое целое число
      *
      * @return $this
-     * @throws Exception
+     * @throws URFAClient_Exception
      */
     public function setDataLong($data)
     {
         if (PHP_INT_SIZE == 4) {
-            throw new Exception('Not implemented for PHP x32');
+            throw new URFAClient_Exception('Not implemented for PHP x32');
         } else {
             $hi = bcdiv($data, 0xffffffff + 1);
             $lo = bcmod($data, 0xffffffff + 1);
