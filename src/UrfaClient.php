@@ -59,10 +59,17 @@ class UrfaClient extends UrfaClientAbstract
     public function getApi(array $options = []): UrfaClientAbstract
     {
         $this->setOptions($options);
-
         $this->api = new UrfaClientApi($this->getConnection()->connect());
 
         return $this;
+    }
+
+    public function createClient(array $options = []): UrfaClientApi
+    {
+        $config = clone $this->config;
+        $config->updateOptions($options);
+
+        return new UrfaClientApi(new UrfaConnection($config));
     }
 
     /**
