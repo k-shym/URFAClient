@@ -44,19 +44,19 @@ class UrfaClient extends UrfaClientAbstract
      */
     public function __construct(array $options = [], LoggerInterface $logger = null, CacheItemPoolInterface $cache = null)
     {
-        $this->setOptions($options);
-
-        $this->setLogger($logger);
-
-        $this->setCache($cache);
+        $this
+            ->setOptions($options)
+            ->setLogger($logger)
+            ->setCache($cache)
+        ;
     }
 
     /**
-     * @param array|null $options
+     * @param array $options
      * @return UrfaClientAbstract
      * @throws Exception\UrfaClientException
      */
-    public function getApi($options = null): UrfaClientAbstract
+    public function getApi(array $options = []): UrfaClientAbstract
     {
         $this->setOptions($options);
 
@@ -166,7 +166,7 @@ class UrfaClient extends UrfaClientAbstract
      * @param array $options
      * @return UrfaClient
      */
-    public function setOptions($options): UrfaClient
+    public function setOptions(array $options): UrfaClient
     {
         if ($this->config === null) {
             $this->config = new UrfaConfig($options);
