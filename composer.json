@@ -1,7 +1,6 @@
 {
-    "name": "siomkin/urfa-client",
+    "name": "zorn-v/urfa-client",
     "description": "Universal PHP client for UTM5 NetUp billing system based on api.xml",
-    "version": "2.0.0",
     "type": "library",
     "license": "GPL-3.0",
     "authors": [
