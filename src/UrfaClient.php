@@ -18,9 +18,6 @@ use UrfaClient\Exception\UrfaClientException;
  */
 class UrfaClient extends UrfaClientAbstract
 {
-
-    public const VERSION = '2.0.1';
-
     /** @var UrfaConnection $connection */
     private $connection;
 
