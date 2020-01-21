@@ -8,7 +8,7 @@ URFAClient 2.0.0
 
 ## Зависимости
 - UTM 5.3-005 >=
-- PHP 7.2 >=
+- PHP 7.1 >=
 - Ext: OpenSSL, SimpleXML, Bcmath, Hash, Filter
 
 ## Описание параметров
