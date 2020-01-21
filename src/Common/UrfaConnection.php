@@ -52,6 +52,11 @@ final class UrfaConnection
         $this->setConfig($config);
     }
 
+    public function isConnected(): bool
+    {
+        return is_resource($this->socket);
+    }
+
     /**
      * @return UrfaConnection
      */
@@ -295,14 +300,18 @@ final class UrfaConnection
         return $this;
     }
 
+    public function close()
+    {
+        if ($this->socket) {
+            fclose($this->socket);
+        }
+    }
 
     /**
      * Закрываем соединение при уничтожении объекта
      */
     public function __destruct()
     {
-        if ($this->socket) {
-            fclose($this->socket);
-        }
+        $this->close();
     }
 }

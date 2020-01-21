@@ -62,6 +62,11 @@ class UrfaClientApi
         }
     }
 
+    public function close()
+    {
+        $this->connection->close();
+    }
+
     /**
      * Магический метод для вызова функций из api.xml
      *
@@ -96,6 +101,10 @@ class UrfaClientApi
 
         $code = (string)$method->attributes()->{'id'};
         $code = (strpos($code, '-') === 0) ? -1 * hexdec($code) : hexdec($code);
+
+        if (!$this->connection->isConnected()) {
+            $this->connection->connect();
+        }
 
         if (!$this->connection->call($code)) {
             throw new UrfaClientException("Error calling function $name");
