@@ -206,7 +206,7 @@ class UrfaClient extends UrfaClientAbstract
             if ($error) {
                 $this->getLogger()->error("$name: $error", ['params' => $params]);
             } else {
-                $this->getLogger()->info("$name -> {$time} ms", ['params' => $params, 'result' => $result]);
+                $this->getLogger()->debug("$name -> {$time} ms", ['params' => $params, 'result' => $result]);
             }
         }
     }
