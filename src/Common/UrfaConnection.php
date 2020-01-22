@@ -238,11 +238,10 @@ final class UrfaConnection
         while ($len < $packet->len) {
             list(, $code) = unpack('s', fread($this->socket, 2));
             list(, $length) = unpack('n', fread($this->socket, 2));
-            $this->debug(sprintf("\n code: %d len: %d ", $code, $length));
             $len += $length;
 
             $data = ($length === 4) ? null : fread($this->socket, $length - 4);
-            $this->debug(sprintf("data: %s ", $data), $data);
+            $this->debug(sprintf("\n PACKET code: %d len: %d ", $code, $length), $data);
 
             if ($code === 5) {
                 $packet->data[] = $data;
@@ -267,14 +266,14 @@ final class UrfaConnection
         fwrite($this->socket, pack('n', $packet->len));
 
         foreach ($packet->attr as $code => $value) {
-            $this->debug(sprintf("\n ATTR code: %d len: %d data: %s", $code, $value['len'], $value['data']), $value['data']);
+            $this->debug(sprintf("\n PACKET code: %d len: %d ", $code, $value['len']), $value['data']);
             fwrite($this->socket, pack('v', $code));
             fwrite($this->socket, pack('n', $value['len']));
             fwrite($this->socket, $value['data']);
         }
 
         foreach ($packet->data as $code => $value) {
-            $this->debug(sprintf("\n DATA code: %d len: %d data: %s", 5, strlen($value) + 4, $value), $value);
+            $this->debug(sprintf("\n PACKET code: %d len: %d ", 5, strlen($value) + 4), $value);
             fwrite($this->socket, pack('v', 5));
             fwrite($this->socket, pack('n', strlen($value) + 4));
             fwrite($this->socket, $value);
@@ -331,8 +330,12 @@ final class UrfaConnection
     {
         if ($this->config->isDebug()) {
             echo $string;
-            for ($i = 0; $i < strlen($data); ++$i) {
-                printf(' %02X', ord($data[$i]));
+            if ($data) {
+                echo 'data:';
+                for ($i = 0; $i < strlen($data); ++$i) {
+                    printf(' %02X', ord($data[$i]));
+                }
+                echo ' | '.preg_replace('#[^[:print:]]#', ' ', $data);
             }
         }
     }
