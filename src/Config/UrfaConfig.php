@@ -74,6 +74,12 @@ final class UrfaConfig
      */
     private $log = false;
 
+    /**
+     * Отладочный вывод
+     * @var bool
+     */
+    private $debug = false;
+
 
     public function __construct(array $params = [])
     {
@@ -328,6 +334,18 @@ final class UrfaConfig
         return $this;
     }
 
+    public function isDebug(): bool
+    {
+        return $this->debug;
+    }
+
+    public function setDebug(bool $debug): UrfaConfig
+    {
+        $this->debug = $debug;
+
+        return $this;
+    }
+
     /**
      * @param string $property
      * @return array
@@ -341,6 +359,7 @@ final class UrfaConfig
                 $prefix = 'use';
                 break;
             case 'admin':
+            case 'debug':
                 $prefix = 'is';
                 break;
         }

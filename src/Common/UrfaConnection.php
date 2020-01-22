@@ -214,28 +214,35 @@ final class UrfaConnection
      */
     public function read(UrfaPacket $packet): void
     {
+        $this->debug("READ <= ");
+
         $this->code = ord(fread($this->socket, 1));
+        $this->debug(sprintf('code: %d ', $this->code));
 
         if (!$this->code) {
             throw new UrfaClientException("Error code {$this->code}");
         }
 
         $version = ord(fread($this->socket, 1));
+        $this->debug(sprintf('version: %d ', $version));
 
         if ($version !== $this->version) {
             throw new UrfaClientException("Error code {$this->code}. Version: $version");
         }
 
         list(, $packet->len) = unpack('n', fread($this->socket, 2));
+        $this->debug(sprintf('packet_len: %d ', $packet->len));
 
         $len = 4;
 
         while ($len < $packet->len) {
             list(, $code) = unpack('s', fread($this->socket, 2));
             list(, $length) = unpack('n', fread($this->socket, 2));
+            $this->debug(sprintf("\n code: %d len: %d ", $code, $length));
             $len += $length;
 
             $data = ($length === 4) ? null : fread($this->socket, $length - 4);
+            $this->debug(sprintf("data: %s ", $data), $data);
 
             if ($code === 5) {
                 $packet->data[] = $data;
@@ -244,6 +251,7 @@ final class UrfaConnection
                 $packet->attr[$code]['len'] = $length;
             }
         }
+        $this->debug("\n");
     }
 
     /**
@@ -253,21 +261,25 @@ final class UrfaConnection
      */
     public function write(UrfaPacket $packet): void
     {
+        $this->debug(sprintf("WRITE => code: %d version: %d packet_len: %d ", $this->code, $this->version, $packet->len));
         fwrite($this->socket, chr($this->code));
         fwrite($this->socket, chr($this->version));
         fwrite($this->socket, pack('n', $packet->len));
 
         foreach ($packet->attr as $code => $value) {
+            $this->debug(sprintf("\n ATTR code: %d len: %d data: %s", $code, $value['len'], $value['data']), $value['data']);
             fwrite($this->socket, pack('v', $code));
             fwrite($this->socket, pack('n', $value['len']));
             fwrite($this->socket, $value['data']);
         }
 
         foreach ($packet->data as $code => $value) {
+            $this->debug(sprintf("\n DATA code: %d len: %d data: %s", 5, strlen($value) + 4, $value), $value);
             fwrite($this->socket, pack('v', 5));
             fwrite($this->socket, pack('n', strlen($value) + 4));
             fwrite($this->socket, $value);
         }
+        $this->debug("\n");
     }
 
     /**
@@ -313,5 +325,15 @@ final class UrfaConnection
     public function __destruct()
     {
         $this->close();
+    }
+
+    private function debug(string $string, $data = '')
+    {
+        if ($this->config->isDebug()) {
+            echo $string;
+            for ($i = 0; $i < strlen($data); ++$i) {
+                printf(' %02X', ord($data[$i]));
+            }
+        }
     }
 }
