@@ -142,10 +142,14 @@ final class UrfaConnection
 
                 case 194:
                     $attr_protocol = $packet->getAttrInt(10);
-                    if ($attr_protocol === 6) {
-                        stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
-                    } elseif ($attr_protocol) {
-                        stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_SSLv3_CLIENT);
+                    if (
+                        $attr_protocol &&
+                        !stream_socket_enable_crypto(
+                            $this->socket, true,
+                            $attr_protocol === 6 ? STREAM_CRYPTO_METHOD_TLS_CLIENT : STREAM_CRYPTO_METHOD_SSLv3_CLIENT
+                        )
+                    ) {
+                        throw new UrfaConnectException('Can not enable socket crypto: '.openssl_error_string());
                     }
 
                     return true;
