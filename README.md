@@ -99,7 +99,7 @@ log | FALSE | сборщик логов, если TRUE, перехватывае
 ```php
 require __DIR__ . '/vendor/autoload.php';
 
-$urfa = (new \UrfaClient\UrfaClient())->createClient();
+$urfa = new \UrfaClient\UrfaClient();
 var_export($urfa->method('rpcf_add_user_new'));
 ```
 ```php
@@ -217,6 +217,11 @@ $result = $urfa->rpcf_add_user_new(array(
 По возникшим проблемам присылайте лог(URFAClient::trace_log()), api.xml и полную версию ядра UTM5. Удачи!
 
 ## История изменений
+**v2.1.0**
+- Добавлен иммутабельный метод `UrfaClient::createClient`
+- Удален метод `UrfaClient::getApi`
+- Метод `UrfaClient::__call` теперь пробрасывает исключение `UrfaClientException` наверх, если отключено логирование
+
 **v2.0.0**
 - Рефакторинг
 - Использование стандарта PSR-4 для автозагрузки (PSR-4: Autoloader)

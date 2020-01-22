@@ -61,12 +61,12 @@ class UrfaClient extends UrfaClientAbstract
         return $this;
     }
 
-    public function createClient(array $options = []): UrfaClientApi
+    public function createClient(array $options = []): UrfaClientAbstract
     {
         $config = clone $this->config;
         $config->updateOptions($options);
 
-        return new UrfaClientApi(new UrfaConnection($config));
+        return new self($config, $this->logger, $this->cache);
     }
 
     /**
@@ -79,6 +79,9 @@ class UrfaClient extends UrfaClientAbstract
     {
         try {
             $ts = microtime(true);
+            if (!$this->api) {
+                $this->api = new UrfaClientApi($this->getConnection());
+            }
 
             if ($this->getCache() && $this->getConfig()->useCache()) {
                 $cacheKey = $name.'_'.sha1($this->getConfig()->getSession().serialize($args));
@@ -102,9 +105,13 @@ class UrfaClient extends UrfaClientAbstract
 
             return $result;
         } catch (UrfaClientException $e) {
-            $this->log($name, $args ? $args[0] : [], null, 0, $e->getMessage());
+            if (!$this->getLogger() || !$this->getConfig()->useLog()) {
+                throw $e;
+            } else {
+                $this->log($name, $args ? $args[0] : [], null, 0, $e->getMessage());
 
-            return false;
+                return false;
+            }
         }
     }
 
