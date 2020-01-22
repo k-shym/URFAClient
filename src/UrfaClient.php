@@ -48,25 +48,24 @@ class UrfaClient extends UrfaClientAbstract
         ;
     }
 
-    /**
-     * @param array $options
-     * @return UrfaClientAbstract
-     * @throws Exception\UrfaClientException
-     */
-    public function getApi(array $options = []): UrfaClientAbstract
-    {
-        $this->setOptions($options);
-        $this->api = new UrfaClientApi($this->getConnection()->connect());
-
-        return $this;
-    }
-
     public function createClient(array $options = []): UrfaClientAbstract
     {
-        $config = clone $this->config;
-        $config->updateOptions($options);
+        $client = clone $this;
 
-        return new self($config, $this->logger, $this->cache);
+        return $client
+            ->setOptions($options)
+            ->close()
+        ;
+    }
+
+    public function close(): UrfaClient
+    {
+        if ($this->api) {
+            $this->api->close();
+        }
+        $this->api = null;
+
+        return $this;
     }
 
     /**
