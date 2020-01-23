@@ -120,7 +120,7 @@ class UrfaClient extends UrfaClientAbstract
     public function getConnection(): UrfaConnection
     {
         if ($this->connection === null) {
-            $this->connection = new UrfaConnection($this->getConfig());
+            $this->connection = new UrfaConnection($this->getConfig(), $this->logger);
         }
 
         return $this->connection;

@@ -2,6 +2,7 @@
 
 namespace UrfaClient\Common;
 
+use Psr\Log\LoggerInterface;
 use UrfaClient\Config\UrfaConfig;
 use UrfaClient\Exception\UrfaAuthException;
 use UrfaClient\Exception\UrfaClientException;
@@ -38,6 +39,11 @@ final class UrfaConnection
     protected $config;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var bool
      */
     public $ipv6 = true;
@@ -47,9 +53,10 @@ final class UrfaConnection
      *
      * @param UrfaConfig $config Конфигурация
      */
-    public function __construct(UrfaConfig $config)
+    public function __construct(UrfaConfig $config, ?LoggerInterface $logger = null)
     {
         $this->setConfig($config);
+        $this->logger = $logger;
     }
 
     public function isConnected(): bool
@@ -218,24 +225,20 @@ final class UrfaConnection
      */
     public function read(UrfaPacket $packet): void
     {
-        $this->debug("READ <= ");
-
         $this->code = ord(fread($this->socket, 1));
-        $this->debug(sprintf('code: %d ', $this->code));
 
         if (!$this->code) {
             throw new UrfaClientException("Error code {$this->code}");
         }
 
         $version = ord(fread($this->socket, 1));
-        $this->debug(sprintf('version: %d ', $version));
 
         if ($version !== $this->version) {
             throw new UrfaClientException("Error code {$this->code}. Version: $version");
         }
 
         list(, $packet->len) = unpack('n', fread($this->socket, 2));
-        $this->debug(sprintf('packet_len: %d ', $packet->len));
+        $this->debug(sprintf('READ <= code: %d version: %d packet_len: %d', $this->code, $version, $packet->len));
 
         $len = 4;
 
@@ -245,7 +248,7 @@ final class UrfaConnection
             $len += $length;
 
             $data = ($length === 4) ? null : fread($this->socket, $length - 4);
-            $this->debug(sprintf("\n PACKET code: %d len: %d ", $code, $length), $data);
+            $this->debug(sprintf('  PACKET code: %d len: %d', $code, $length), $data);
 
             if ($code === 5) {
                 $packet->data[] = $data;
@@ -254,7 +257,6 @@ final class UrfaConnection
                 $packet->attr[$code]['len'] = $length;
             }
         }
-        $this->debug("\n");
     }
 
     /**
@@ -264,25 +266,24 @@ final class UrfaConnection
      */
     public function write(UrfaPacket $packet): void
     {
-        $this->debug(sprintf("WRITE => code: %d version: %d packet_len: %d ", $this->code, $this->version, $packet->len));
+        $this->debug(sprintf('WRITE => code: %d version: %d packet_len: %d', $this->code, $this->version, $packet->len));
         fwrite($this->socket, chr($this->code));
         fwrite($this->socket, chr($this->version));
         fwrite($this->socket, pack('n', $packet->len));
 
         foreach ($packet->attr as $code => $value) {
-            $this->debug(sprintf("\n PACKET code: %d len: %d ", $code, $value['len']), $value['data']);
+            $this->debug(sprintf('  PACKET code: %d len: %d', $code, $value['len']), $value['data']);
             fwrite($this->socket, pack('v', $code));
             fwrite($this->socket, pack('n', $value['len']));
             fwrite($this->socket, $value['data']);
         }
 
         foreach ($packet->data as $code => $value) {
-            $this->debug(sprintf("\n PACKET code: %d len: %d ", 5, strlen($value) + 4), $value);
+            $this->debug(sprintf('  PACKET code: %d len: %d', 5, strlen($value) + 4), $value);
             fwrite($this->socket, pack('v', 5));
             fwrite($this->socket, pack('n', strlen($value) + 4));
             fwrite($this->socket, $value);
         }
-        $this->debug("\n");
     }
 
     /**
@@ -330,17 +331,17 @@ final class UrfaConnection
         $this->close();
     }
 
-    private function debug(string $string, $data = '')
+    private function debug(string $message, $data = '')
     {
-        if ($this->config->isDebug()) {
-            echo $string;
+        if ($this->logger && $this->config->isDebug()) {
             if ($data) {
-                echo 'data:';
+                $message .= ' data:';
                 for ($i = 0; $i < strlen($data); ++$i) {
-                    printf(' %02X', ord($data[$i]));
+                    $message .= sprintf(' %02X', ord($data[$i]));
                 }
-                echo ' | '.preg_replace('#[^[:print:]]#', ' ', $data);
+                $message .= ' | '.preg_replace('#[^[:print:]]#', ' ', $data);
             }
+            $this->logger->debug($message);
         }
     }
 }
