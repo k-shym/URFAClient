@@ -8010,25 +8010,25 @@ _______________________________________
 
           <integer name="dhcp_options_size" array_index="i"/>
 	  <for name="j" from="0" count="ip_groups_count">
-            <integer name="dhcp_option_ids" array_index="i,j"/>	
+            <integer name="dhcp_option_ids" array_index="i,j"/>
             <integer name="dhcp_data_types" array_index="i,j"/>
 	    <if variable="dhcp_data_types" array_index="i,j" value="1" condition="eq">
-            	<integer name="dhcp_attr_data_int" array_index="i,j"/>		
-	    </if>	  
+            	<integer name="dhcp_attr_data_int" array_index="i,j"/>
+	    </if>
 	    <if variable="dhcp_data_types" array_index="i,j" value="2" condition="eq">
-            	<string name="dhcp_attr_data_string" array_index="i,j"/>		
-	    </if>  
+            	<string name="dhcp_attr_data_string" array_index="i,j"/>
+	    </if>
 	    <if variable="dhcp_data_types" array_index="i,j" value="3" condition="eq">
-            	<ip_address name="dhcp_attr_data_ip" array_index="i,j"/>		
+            	<ip_address name="dhcp_attr_data_ip" array_index="i,j"/>
 	    </if>
 	    <if variable="dhcp_data_types" array_index="i,j" value="4" condition="eq">
-            	<string name="dhcp_attr_data_hex_bin" array_index="i,j"/>		
+            	<string name="dhcp_attr_data_hex_bin" array_index="i,j"/>
 	    </if>
 	    <if variable="dhcp_data_types" array_index="i,j" value="5" condition="eq">
             	<integer name="ip_array_size" array_index="i,j"/>
 		<for name="k" from="0" count="ip_array_size" array_index="i,j">
 		  <ip_address name="dhcp_attr_data_array_ip" array_index="i,j,k"/>
-		</for>		
+		</for>
 	    </if>
 	  </for>
         </for>
@@ -10502,6 +10502,7 @@ fid_dealer_search_users = FID_DEALER(78)
       <integer name="contract_type" />
       <double name="cost" />
       <integer name="discount_method" />
+      <integer name="scheme_id" />
       <integer name="sessions_limit" />
       <integer name="null_service_prepaid" />
       <integer name="num_of_borders" default="size(tclass_b)"/>
@@ -11559,7 +11560,7 @@ fid_dealer_search_users = FID_DEALER(78)
             </for>
         </output>
     </function>
-    
+
     <function name="rpcf_get_dhcp_pool_links" id="0x1160">
         <input>
             <integer name="switch_id"/>
@@ -11585,7 +11586,7 @@ fid_dealer_search_users = FID_DEALER(78)
             </for>
         </output>
     </function>
-    
+
     <function name="rpcf_edit_switch_dhcp_pool_links" id="0x1163">
         <input>
             <integer name="switch_id"/>
@@ -11598,7 +11599,7 @@ fid_dealer_search_users = FID_DEALER(78)
             <integer name="error_code"/>
         </output>
     </function>
-    
+
     <function name="rpcf_get_switch_type" id="0x505">
         <input>
             <integer name="id"/>
@@ -12928,4 +12929,3 @@ fid_dealer_search_users = FID_DEALER(78)
   </function>
 
 </urfa>
-
