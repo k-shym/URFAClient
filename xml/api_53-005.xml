@@ -10540,6 +10540,7 @@ fid_dealer_search_users = FID_DEALER(78)
       <integer name="contract_type" />
       <double name="cost" />
       <integer name="discount_method_t" />
+      <integer name="scheme_id" />
       <integer name="sessions_limit" />
       <integer name="null_service_prepaid" />
       <integer name="num_of_borders" default="size(tclass_b)"/>
