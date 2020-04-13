@@ -21,7 +21,6 @@
         "php": ">=7.1",
         "ext-openssl": "*",
         "ext-SimpleXML": "*",
-        "ext-bcmath": "*",
         "ext-filter": "*",
         "ext-hash": "*",
         "psr/log": "^1.1",

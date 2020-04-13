@@ -180,16 +180,10 @@ class UrfaPacket
             throw new UrfaClientException('Not implemented for PHP x32');
         }
 
-        $hi = bcdiv($data, 0xffffffff + 1);
-        $lo = bcmod($data, 0xffffffff + 1);
-
-        if ($hi & 0x80000000) {
-            $hi = $hi & 0xffffffff - 1;
-            $lo = $lo & 0xffffffff;
-        }
+        $hi = ($data >> 32) & 0xffffffff;
+        $lo = $data & 0xffffffff;
 
         if ($lo & 0x80000000) {
-            $lo = $lo & 0xffffffff;
             $hi = (!$hi) ? 0xffffffff : $hi;
         }
 
@@ -204,62 +198,20 @@ class UrfaPacket
      */
     public function getDataLong(): ?string
     {
+        if (PHP_INT_SIZE === 4) {
+            throw new UrfaClientException('Not implemented for PHP x32');
+        }
+
         $data = unpack('N2', $this->data[$this->iterator++]);
 
         if (!$data) {
             return null;
         }
 
-        if (PHP_INT_SIZE === 4) {
-            $hi = $data[1];
-            $lo = $data[2];
-            $neg = $hi < 0;
+        $hi = $data[1];
+        $lo = $data[2];
 
-            if ($neg) {
-                $hi = ~$hi & (int)0xffffffff;
-                $lo = ~$lo & (int)0xffffffff;
-
-                if ($lo == (int)0xffffffff) {
-                    $hi++;
-                    $lo = 0;
-                } else {
-                    $lo++;
-                }
-            }
-
-            if ($hi & (int)0x80000000) {
-                $hi &= (int)0x7fffffff;
-                $hi += 0x80000000;
-            }
-
-            if ($lo & (int)0x80000000) {
-                $lo &= (int)0x7fffffff;
-                $lo += 0x80000000;
-            }
-
-            $value = bcmul($hi, 0xffffffff + 1);
-            $value = bcadd($value, $lo);
-
-            if ($neg) {
-                $value = bcsub(0, $value);
-            }
-        } else {
-            if ($data[1] & 0x80000000) {
-                $data[1] = $data[1] & 0xffffffff;
-                $data[1] = $data[1] ^ 0xffffffff;
-                $data[2] = $data[2] ^ 0xffffffff;
-                $data[2] = $data[2] + 1;
-
-                $value = bcmul($data[1], 0xffffffff + 1);
-                $value = bcsub(0, $value);
-                $value = bcsub($value, $data[2]);
-            } else {
-                $value = bcmul($data[1], 0xffffffff + 1);
-                $value = bcadd($value, $data[2]);
-            }
-        }
-
-        return $value;
+        return ($hi << 32) & $lo;
     }
 
     /**
