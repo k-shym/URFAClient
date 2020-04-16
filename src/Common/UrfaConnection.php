@@ -228,13 +228,13 @@ final class UrfaConnection
         $this->code = ord(fread($this->socket, 1));
 
         if (!$this->code) {
-            throw new UrfaClientException("Error code {$this->code}");
+            throw new UrfaClientException('Invalid urfa packet code: '.$this->code);
         }
 
         $version = ord(fread($this->socket, 1));
 
         if ($version !== $this->version) {
-            throw new UrfaClientException("Error code {$this->code}. Version: $version");
+            throw new UrfaClientException(sprintf('Invalid urfa packet version. Code: %d Version: %d (must be %d)', $this->code, $version, $this->version));
         }
 
         list(, $packet->len) = unpack('n', fread($this->socket, 2));
