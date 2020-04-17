@@ -77,8 +77,8 @@ final class UrfaConnection
             stream_context_set_option($context, 'ssl', 'local_cert', __DIR__.'/../../admin.crt');
             stream_context_set_option($context, 'ssl', 'passphrase', 'netup');
             stream_context_set_option($context, 'ssl', 'ciphers', 'SSLv3');
-        } elseif ($this->config->getProtocol() === 'tls' || $this->config->getProtocol() === 'ssl') {
-            stream_context_set_option($context, 'ssl', 'ciphers', 'ADH-RC4-MD5');
+        } else {
+            stream_context_set_option($context, 'ssl', 'ciphers', 'AES128-SHA256');
         }
 
         stream_context_set_option($context, 'ssl', 'verify_peer', false);
