@@ -100,7 +100,7 @@ class UrfaClientApi
         $this->processDataInput($method->input, $args);
 
         $code = (string)$method->attributes()->{'id'};
-        $code = (strpos($code, '-') === 0) ? -1 * hexdec($code) : hexdec($code);
+        $code = (strpos($code, '-') === 0) ? -1 * hexdec(substr($code, 1)) : hexdec($code);
 
         if (!$this->connection->isConnected()) {
             $this->connection->connect();
