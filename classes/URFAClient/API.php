@@ -94,7 +94,7 @@ class URFAClient_API extends URFAClient_Function
         $this->processDataInput($method->input, $args);
 
         $code = (string) $method->attributes()->{'id'};
-        $code = ($code{0} === '-') ? -1 * hexdec($code) : hexdec($code);
+        $code = ($code{0} === '-') ? -1 * hexdec(substr($code, 1)) : hexdec($code);
 
         if (!$this->connection->call($code)) {
             throw new URFAClient_Exception("Error calling function $name");
