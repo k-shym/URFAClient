@@ -1,15 +1,11 @@
-URFAClient 1.3.1
+URFAClient 1.3.2
 ==========
 
 Универсальный PHP клиент для биллинговой системы NetUp UTM5 на основе api.xml
 
 ## Установка (composer)
-```json
-{
-    "require":{
-        "k-shym/urfa-client": "1.*"
-    }
-}
+```bash
+composer require k-shym/urfa-client "1.3.*"
 ```
 
 ## Зависимости
@@ -233,6 +229,10 @@ $result = $urfa->rpcf_add_user_new(array(
 По возникшим проблемам присылайте лог(URFAClient::trace_log()), api.xml и полную версию ядра UTM5. Удачи!
 
 ## История изменений
+**v1.3.2**
+- Исправлен баг с пользовательскими функциями (user5)
+- Добавлен api.xml для версии ядра 5.3-006-update1
+
 **v1.3.1**
 - Добавлен автоматический выбор протокола SSL соединения, работает с OpenSSL 1.1 и ядром UTM-5.3-005-update2
 
