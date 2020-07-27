@@ -36,6 +36,8 @@ abstract class URFAClientBaseTest extends PHPUnit_Framework_TestCase {
 
     /**
      * Создаем соединение для тестов
+     *
+     * @throws Exception
      */
     protected function setUp()
     {

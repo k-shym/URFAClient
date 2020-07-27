@@ -6,7 +6,7 @@
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md
  * @author  Konstantin Shum <k.shym@ya.ru>
  */
-class URFAClient_API {
+class URFAClient_API extends URFAClient_Function {
 
     /**
      * @var URFAClient_Connection
@@ -19,20 +19,21 @@ class URFAClient_API {
     protected $_api;
 
     /**
-     * @var Array
+     * @var array
      */
     protected $_data_input = array();
 
     /**
-     * @var Array
+     * @var array
      */
     protected $_data_output = array();
 
     /**
      * Конструктор класса
      *
-     * @param String                $api            Путь до файла api
-     * @param URFAClient_Connection $connection     Объект соединения с ядром
+     * @param  string                $api            Путь до файла api
+     * @param  URFAClient_Connection $connection     Объект соединения с ядром
+     * @throws Exception
      */
     public function __construct($api, URFAClient_Connection $connection = NULL)
     {
@@ -51,9 +52,10 @@ class URFAClient_API {
     /**
      * Магический метод для вызова функций из api.xml
      *
-     * @param   String  $name
-     * @param   Array   $args
-     * @return  Array
+     * @param   string  $name
+     * @param   array   $args
+     * @return  array
+     * @throws  Exception
      */
     public function __call($name, $args)
     {
@@ -75,7 +77,7 @@ class URFAClient_API {
 
         $args = (isset($args[0]) AND is_array($args[0])) ? (array) $args[0] : array();
 
-        $this->_proccess_data_input($method->input, $args);
+        $this->_process_data_input($method->input, $args);
 
         $code = (string) $method->attributes()->{'id'};
         $code = ($code{0} === '-') ? -1 * hexdec($code) : hexdec($code);
@@ -97,16 +99,17 @@ class URFAClient_API {
         }
         if ($this->_data_input) $this->_connection->write($packet);
 
-        return $this->_proccess_data_output($method->output, $this->_connection->result());
+        return $this->_process_data_output($method->output, $this->_connection->result());
     }
 
     /**
      * Рекурсивная функция обработки входных параметров api.xml
      *
      * @param SimpleXMLElement  $input  Элемент дерева api.xml
-     * @param Array             $args   Переданные аргументы метода
+     * @param array             $args   Переданные аргументы метода
+     * @throws Exception
      */
-    protected function _proccess_data_input(SimpleXMLElement $input, Array $args)
+    protected function _process_data_input(SimpleXMLElement $input, Array $args)
     {
         foreach ($input->children() as $node)
         {
@@ -116,9 +119,9 @@ class URFAClient_API {
                 case 'long':
                 case 'double':
                 case 'ip_address':
-                case 'string': $this->_proccess_data_input_scalar($node, $args, $node->getName()); break;
+                case 'string': $this->_process_data_input_scalar($node, $args, $node->getName()); break;
 
-                case 'error': $this->_proccess_data_error($node); break;
+                case 'error': $this->_process_data_error($node); break;
 
                 case 'if':
                     $attr = $node->attributes();
@@ -144,11 +147,11 @@ class URFAClient_API {
                     switch ((string) $attr->{'condition'})
                     {
                         case 'eq':
-                            if ($variable['value'] === $value) $this->_proccess_data_input($node, $args);
+                            if ($variable['value'] === $value) $this->_process_data_input($node, $args);
                             break;
 
                         case 'ne':
-                            if ($variable['value'] !== $value) $this->_proccess_data_input($node, $args);
+                            if ($variable['value'] !== $value) $this->_process_data_input($node, $args);
                             break;
                     }
                     break;
@@ -169,7 +172,7 @@ class URFAClient_API {
                         if ( ! is_array($v))
                             throw new Exception('To tag "for" an array must be two-dimensional');
 
-                        $this->_proccess_data_input($node, $v);
+                        $this->_process_data_input($node, $v);
                     }
                     break;
             }
@@ -180,10 +183,11 @@ class URFAClient_API {
      * Обработка скалярных типов данных
      *
      * @param SimpleXMLElement  $node   Элемент дерева api.xml
-     * @param Array             $args   Переданные аргументы метода
-     * @param String            $type   Тип данных (integer|long|double|ip_address|string)
+     * @param array             $args   Переданные аргументы метода
+     * @param string            $type   Тип данных (integer|long|double|ip_address|string)
+     * @throws Exception
      */
-    protected function _proccess_data_input_scalar(SimpleXMLElement $node, Array $args, $type)
+    protected function _process_data_input_scalar(SimpleXMLElement $node, Array $args, $type)
     {
         $attr = $node->attributes();
 
@@ -248,11 +252,12 @@ class URFAClient_API {
     /**
      * Рекурсивная функция обработки выходных параметров api.xml
      *
-     * @param SimpleXMLElement  $node   Элемент дерева api.xml
-     * @param URFAClient_Packet $packet Пакет с бинарными данными
-     * @return Array
+     * @param SimpleXMLElement  $output   Элемент дерева api.xml
+     * @param URFAClient_Packet $packet   Пакет с бинарными данными
+     * @return array
+     * @throws Exception
      */
-    protected function _proccess_data_output(SimpleXMLElement $output, URFAClient_Packet $packet)
+    protected function _process_data_output(SimpleXMLElement $output, URFAClient_Packet $packet)
     {
         $result = array();
 
@@ -268,7 +273,7 @@ class URFAClient_API {
                 case 'ip_address': $result[(string) $attr->{'name'}] = $packet->get_data_ip(); break;
                 case 'string': $result[(string) $attr->{'name'}] = $packet->get_data_string(); break;
 
-                case 'error': $this->_proccess_data_error($node); break;
+                case 'error': $this->_process_data_error($node); break;
 
                 case 'set':
                     $dst = (string) $node->attributes()->{'dst'};
@@ -314,11 +319,11 @@ class URFAClient_API {
                     switch ((string) $attr->{'condition'})
                     {
                         case 'eq':
-                            if ($result_value === $value) $result = array_merge($result, $this->_proccess_data_output($node, $packet));
+                            if ($result_value === $value) $result = array_merge($result, $this->_process_data_output($node, $packet));
                             break;
 
                         case 'ne':
-                            if ($result_value !== $value) $result = array_merge($result, $this->_proccess_data_output($node, $packet));
+                            if ($result_value !== $value) $result = array_merge($result, $this->_process_data_output($node, $packet));
                             break;
                     }
                     break;
@@ -331,9 +336,12 @@ class URFAClient_API {
                     if ( ! isset($sibling[0])) throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
 
                     $name = (string) $sibling[0]->attributes()->{'name'};
-                    $count = (int) (isset($result[$name])) ? $result[$name] : $this->_data_output[$name];
+
+                    if (isset($result[$name]) AND is_array($result[$name])) break;
+
+                    $count = (int) ((isset($result[$name])) ? $result[$name] : $this->_data_output[$name]);
                     $array = array();
-                    for ($i=0; $i<$count; $i++) $array[] = $this->_proccess_data_output($node, $packet);
+                    for ($i=0; $i<$count; $i++) $array[] = $this->_process_data_output($node, $packet);
 
                     $result[$name] = $array;
 
@@ -350,9 +358,9 @@ class URFAClient_API {
      * Метод обработки элементов error в api.xml
      *
      * @param SimpleXMLElement  $node
-     * @return void
+     * @throws Exception
      */
-    protected function _proccess_data_error(SimpleXMLElement $node)
+    protected function _process_data_error(SimpleXMLElement $node)
     {
         $attr = $node->attributes();
 

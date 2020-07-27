@@ -12,7 +12,6 @@ class URFAClient52Test extends URFAClientBaseTest {
         'login'    => 'init',
         'password' => 'init',
         'address'  => 'localhost',
-        'api'      => __DIR__ . '/../xml/api_52-008.xml',
         'log'      => TRUE,
     );
 

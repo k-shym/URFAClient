@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Cборщик информации для класса API
+ * Сборщик информации для класса URFAClient_API
  *
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md
  * @author  Konstantin Shum <k.shym@ya.ru>
  */
-final class URFAClient_Collector {
+final class URFAClient_Collector extends URFAClient_Function {
 
     /**
      * @var URFAClient_API  $api
@@ -26,10 +26,11 @@ final class URFAClient_Collector {
     /**
      * Магический метод для сборки информации о вызваных методах API
      *
-     * @param   String    $name   Имя метода
-     * @param   Array     $args   Аргументы
+     * @param   string    $name   Имя метода
+     * @param   array     $args   Аргументы
+     * @return  bool
      */
-    public function __call($name, Array $args)
+    public function __call($name, array $args)
     {
         try
         {
