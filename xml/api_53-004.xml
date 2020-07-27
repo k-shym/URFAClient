@@ -5558,7 +5558,7 @@ _______________________________________
     </output>
   </function>
 
-  <function name="rpcf_user5_dhs_report" id="-0x4015">
+  <function name="rpcf_user5_dhs_report" id="-0x4050">
     <input>
       <integer name="time_start" />
       <integer name="time_end" />
