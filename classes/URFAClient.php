@@ -8,7 +8,7 @@
  */
 abstract class URFAClient {
 
-    const VERSION = '1.3.2';
+    const VERSION = '1.3.3';
 
     const API_XML = 'api_53-003.xml';
 
