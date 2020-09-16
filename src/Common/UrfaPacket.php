@@ -211,7 +211,7 @@ class UrfaPacket
         $hi = $data[1];
         $lo = $data[2];
 
-        return ($hi << 32) & $lo;
+        return ($hi << 32) | $lo;
     }
 
     /**

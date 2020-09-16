@@ -414,6 +414,10 @@ class UrfaClientApi
                     $sibling = $node->xpath('preceding-sibling::integer[1]');
 
                     if (!$sibling) {
+                        $sibling = $node->xpath('preceding-sibling::long[1]');
+                    }
+
+                    if (!$sibling) {
                         $sibling = $node->xpath('parent::*[1]/preceding-sibling::integer[1]');
                     }
 
