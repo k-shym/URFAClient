@@ -215,7 +215,7 @@ $result = $urfa->rpcf_add_user_new(array(
 ```php
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $options = [
     'host' => 'localhost',
