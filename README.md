@@ -209,6 +209,33 @@ $result = $urfa->rpcf_add_user_new(array(
 ```
 В переменную `$result` попадут данные которые описаны в элементе output.
 
+## debug опция
+
+Если хотите видеть что конкретно (в байтах) отсылается/принимается, можно поступить например так
+```php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$options = [
+    'host' => 'localhost',
+    'login' => 'init',
+    'password' => 'init',
+    'debug' => true,
+];
+
+class Logger extends \Psr\Log\AbstractLogger
+{
+    public function log($level, $message, array $context = array())
+    {
+        echo $level.' '.$message."\n";
+    }
+}
+
+$urfa = new \UrfaClient\UrfaClient($options, new Logger());
+print_r($urfa->rpcf_whoami());
+```
+
 ## Возможные проблемы
 
 - Тестировалось на версии биллинга UTM-5.3-005-update2
