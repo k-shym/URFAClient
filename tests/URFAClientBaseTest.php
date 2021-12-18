@@ -9,7 +9,7 @@ require_once __DIR__ . '/../init.php';
  * @author  Konstantin Shum <k.shym@ya.ru>
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-abstract class URFAClientBaseTest extends PHPUnit_Framework_TestCase
+abstract class URFAClientBaseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Уникальная строка
