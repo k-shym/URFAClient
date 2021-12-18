@@ -48,7 +48,7 @@ final class URFAClient_Connection
     {
         $context = stream_context_create();
 
-        if ($data['admin'] AND $data['protocol'] === 'ssl') {
+        if ($data['admin'] and $data['protocol'] === 'ssl') {
             stream_context_set_option($context, 'ssl', 'capture_peer_cert', true);
             stream_context_set_option($context, 'ssl', 'local_cert', __DIR__ . '/../../admin.crt');
             stream_context_set_option($context, 'ssl', 'passphrase', 'netup');
@@ -64,8 +64,11 @@ final class URFAClient_Connection
 
         $this->socket = stream_socket_client(
             "tcp://{$data['address']}:{$data['port']}",
-            $err_no, $err_str, $data['timeout'],
-            STREAM_CLIENT_CONNECT, $context
+            $err_no,
+            $err_str,
+            $data['timeout'],
+            STREAM_CLIENT_CONNECT,
+            $context
         );
 
         if (!$this->socket) {
@@ -98,47 +101,46 @@ final class URFAClient_Connection
             $packet->clean();
             $this->read($packet);
 
-            switch ($this->code)
-            {
-            case 192:
-                $digest = $packet->attr[6]['data'];
-                $ctx = hash_init('md5');
-                hash_update($ctx, $digest);
-                hash_update($ctx, $password);
-                $hash = hash_final($ctx, true);
-                $packet->clean();
-                $this->code = 193;
-                $packet->setAttrString($login, 2);
-                $packet->setAttrString($digest, 8);
-                $packet->setAttrString($hash, 9);
-                $packet->setAttrInt(
-                    ($protocol === 'ssl') ? (($admin) ? 4 : 2) : 6,
-                    10
-                );
-                $packet->setAttrInt(2, 1);
-                $this->write($packet);
-                break;
-
-            case 194:
-                $attr_protocol = $packet->getAttrInt(10);
-                if ($attr_protocol === 6) {
-                    stream_socket_enable_crypto(
-                        $this->socket,
-                        true,
-                        STREAM_CRYPTO_METHOD_ANY_CLIENT
+            switch ($this->code) {
+                case 192:
+                    $digest = $packet->attr[6]['data'];
+                    $ctx = hash_init('md5');
+                    hash_update($ctx, $digest);
+                    hash_update($ctx, $password);
+                    $hash = hash_final($ctx, true);
+                    $packet->clean();
+                    $this->code = 193;
+                    $packet->setAttrString($login, 2);
+                    $packet->setAttrString($digest, 8);
+                    $packet->setAttrString($hash, 9);
+                    $packet->setAttrInt(
+                        ($protocol === 'ssl') ? (($admin) ? 4 : 2) : 6,
+                        10
                     );
-                } elseif ($attr_protocol) {
-                    stream_socket_enable_crypto(
-                        $this->socket,
-                        true,
-                        STREAM_CRYPTO_METHOD_SSLv3_CLIENT
-                    );
-                }
+                    $packet->setAttrInt(2, 1);
+                    $this->write($packet);
+                    break;
 
-                return true;
+                case 194:
+                    $attr_protocol = $packet->getAttrInt(10);
+                    if ($attr_protocol === 6) {
+                        stream_socket_enable_crypto(
+                            $this->socket,
+                            true,
+                            STREAM_CRYPTO_METHOD_ANY_CLIENT
+                        );
+                    } elseif ($attr_protocol) {
+                        stream_socket_enable_crypto(
+                            $this->socket,
+                            true,
+                            STREAM_CRYPTO_METHOD_SSLv3_CLIENT
+                        );
+                    }
 
-            case 195:
-                return false;
+                    return true;
+
+                case 195:
+                    return false;
             }
         }
 
@@ -163,10 +165,9 @@ final class URFAClient_Connection
         if (!feof($this->socket)) {
             $packet->clean();
             $this->read($packet);
-            switch ($this->code)
-            {
-            case 200:
-                return ($packet->getAttrInt(3) == $code) ? true : false;
+            switch ($this->code) {
+                case 200:
+                    return ($packet->getAttrInt(3) == $code) ? true : false;
             }
         }
 

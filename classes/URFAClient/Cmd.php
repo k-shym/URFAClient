@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Объект работы из командной строки
  *
@@ -68,32 +69,31 @@ class URFAClient_Cmd extends URFAClient_API
         foreach ($input->children() as $node) {
             $name = (string) $node->attributes()->{'name'};
 
-            switch ($node->getName())
-            {
-            case 'integer':
-            case 'long':
-                $options_input[$name] = 0;
-                break;
-            case 'double':
-                $options_input[$name] = 0.0;
-                break;
-            case 'ip_address':
-                $options_input[$name] = '0.0.0.0';
-                break;
-            case 'string':
-                $options_input[$name] = '';
-                break;
-            case 'if':
-                $this->_processOptionsInput($node, $options_input);
-                break;
-            case 'for':
-                $sibling = $node->xpath('preceding-sibling::*[1]');
+            switch ($node->getName()) {
+                case 'integer':
+                case 'long':
+                    $options_input[$name] = 0;
+                    break;
+                case 'double':
+                    $options_input[$name] = 0.0;
+                    break;
+                case 'ip_address':
+                    $options_input[$name] = '0.0.0.0';
+                    break;
+                case 'string':
+                    $options_input[$name] = '';
+                    break;
+                case 'if':
+                    $this->_processOptionsInput($node, $options_input);
+                    break;
+                case 'for':
+                    $sibling = $node->xpath('preceding-sibling::*[1]');
 
-                if (!isset($sibling[0])) {
-                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
-                }
-                $options_input[(string) $sibling[0]->attributes()->{'name'}] = [$this->_processOptionsInput($node)];
-                break;
+                    if (!isset($sibling[0])) {
+                        throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    }
+                    $options_input[(string) $sibling[0]->attributes()->{'name'}] = [$this->_processOptionsInput($node)];
+                    break;
             }
         }
 

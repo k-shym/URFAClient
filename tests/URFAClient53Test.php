@@ -118,7 +118,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
              'old_password'     => 'pass' . self::prefix(),
              'new_password'     => 'pass' . self::prefix(),
              'new_password_ret' => 'pass' . self::prefix(),
-        ]);
+         ]);
 
         $this->assertTrue($result['result'] > 0);
     }

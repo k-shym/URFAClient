@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Объект предоставляет обращение к функциям из api.xml
  *
@@ -57,7 +58,6 @@ class URFAClient_API extends URFAClient_Function
         if (!$this->api->xpath("/urfa/function[contains(@name, 'ipv6')]")) {
             $connection->ipv6 = false;
         }
-
     }
 
     /**
@@ -89,7 +89,7 @@ class URFAClient_API extends URFAClient_Function
         if (!$method) {
             throw new URFAClient_Exception("Function $name not found");
         }
-        $args = (isset($args[0]) AND is_array($args[0])) ? (array) $args[0] : [];
+        $args = (isset($args[0]) and is_array($args[0])) ? (array) $args[0] : [];
 
         $this->processDataInput($method->input, $args);
 
@@ -103,23 +103,23 @@ class URFAClient_API extends URFAClient_Function
         $packet = $this->connection->packet();
         foreach ($this->data_input as $v) {
             switch ($v['type']) {
-            case 'integer':
-                $packet->setDataInt($v['value']);
-                break;
-            case 'long':
-                $packet->setDataLong($v['value']);
-                break;
-            case 'double':
-                $packet->setDataDouble($v['value']);
-                break;
-            case 'ip_address':
-                $packet->setDataIp($v['value']);
-                break;
-            case 'string':
-                $packet->setDataString($v['value']);
-                break;
-            default:
-                throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                case 'integer':
+                    $packet->setDataInt($v['value']);
+                    break;
+                case 'long':
+                    $packet->setDataLong($v['value']);
+                    break;
+                case 'double':
+                    $packet->setDataDouble($v['value']);
+                    break;
+                case 'ip_address':
+                    $packet->setDataIp($v['value']);
+                    break;
+                case 'string':
+                    $packet->setDataString($v['value']);
+                    break;
+                default:
+                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
             }
         }
         if ($this->data_input) {
@@ -140,87 +140,83 @@ class URFAClient_API extends URFAClient_Function
      */
     protected function processDataInput(SimpleXMLElement $input, array $args)
     {
-        foreach ($input->children() as $node)
-        {
-            switch ($node->getName())
-            {
-            case 'integer':
-            case 'long':
-            case 'double':
-            case 'ip_address':
-            case 'string':
-                $this->processDataInputScalar($node, $args, $node->getName());
-                break;
-            case 'error':
-                $this->processDataError($node);
-                break;
-            case 'if':
-                $attr = $node->attributes();
-                $variable = (string) $attr->{'variable'};
+        foreach ($input->children() as $node) {
+            switch ($node->getName()) {
+                case 'integer':
+                case 'long':
+                case 'double':
+                case 'ip_address':
+                case 'string':
+                    $this->processDataInputScalar($node, $args, $node->getName());
+                    break;
+                case 'error':
+                    $this->processDataError($node);
+                    break;
+                case 'if':
+                    $attr = $node->attributes();
+                    $variable = (string) $attr->{'variable'};
 
-                foreach ($this->data_input as $v) {
-                    if ($v['name'] === $variable) {
-                        $variable = $v;
+                    foreach ($this->data_input as $v) {
+                        if ($v['name'] === $variable) {
+                            $variable = $v;
+                            break;
+                        }
+                    }
+
+                    if (!is_array($variable)) {
+                        throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    }
+
+                    switch ($variable['type']) {
+                        case 'integer':
+                            $value = (int) $attr->{'value'};
+                            break;
+                        case 'double':
+                            $value = (float) $attr->{'value'};
+                            break;
+                        default:
+                            $value = (string) $attr->{'value'};
+                    }
+
+                    switch ((string) $attr->{'condition'}) {
+                        case 'eq':
+                            if ($variable['value'] === $value) {
+                                $this->processDataInput($node, $args);
+                            }
+                            break;
+                        case 'ne':
+                            if ($variable['value'] !== $value) {
+                                $this->processDataInput($node, $args);
+                            }
+                            break;
+                    }
+                    break;
+
+                case 'for':
+                    $sibling = $node->xpath('preceding-sibling::integer[1]');
+
+                    if (!isset($sibling[0])) {
+                        throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    }
+
+                    $name = (string) $sibling[0]->attributes()->{'name'};
+
+                    if (!isset($args[$name])) {
                         break;
                     }
-                }
 
-                if (!is_array($variable)) {
-                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
-                }
-
-                switch ($variable['type'])
-                {
-                case 'integer':
-                    $value = (int) $attr->{'value'};
-                    break;
-                case 'double':
-                    $value = (float) $attr->{'value'};
-                    break;
-                default:
-                    $value = (string) $attr->{'value'};
-                }
-
-                switch ((string) $attr->{'condition'})
-                {
-                case 'eq':
-                    if ($variable['value'] === $value) {
-                        $this->processDataInput($node, $args);
-                    }
-                    break;
-                case 'ne':
-                    if ($variable['value'] !== $value) {
-                        $this->processDataInput($node, $args);
-                    }
-                    break;
-                }
-                break;
-
-            case 'for':
-                $sibling = $node->xpath('preceding-sibling::integer[1]');
-
-                if (!isset($sibling[0])) {
-                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
-                }
-
-                $name = (string) $sibling[0]->attributes()->{'name'};
-
-                if (!isset($args[$name])) {
-                    break;
-                }
-
-                if (!is_array($args[$name])) {
-                    throw new URFAClient_Exception("$name can only be an array");
-                }
-
-                foreach ($args[$name] as $v) {
-                    if (!is_array($v)) {
-                        throw new URFAClient_Exception('To tag "for" an array must be two-dimensional');
+                    if (!is_array($args[$name])) {
+                        throw new URFAClient_Exception("$name can only be an array");
                     }
 
-                    $this->processDataInput($node, $v);
-                }
-                break;
+                    foreach ($args[$name] as $v) {
+                        if (!is_array($v)) {
+                            throw new URFAClient_Exception('To tag "for" an array must be two-dimensional');
+                        }
+
+                        $this->processDataInput($node, $v);
+                    }
+                    break;
             }
         }
     }
@@ -248,10 +244,10 @@ class URFAClient_API extends URFAClient_Function
         $sibling = $node->xpath('following-sibling::*[1]');
         $sibling = (isset($sibling[0])) ? $sibling[0] : false;
 
-        if ($sibling AND $sibling->getName() === 'for') {
+        if ($sibling and $sibling->getName() === 'for') {
             $this->data_input[] = [
                 'name'  => $name,
-                'value' => (isset($args[$name]) AND is_array($args[$name])) ? count($args[$name]) : 0,
+                'value' => (isset($args[$name]) and is_array($args[$name])) ? count($args[$name]) : 0,
                 'type'  => $type,
             ];
 
@@ -261,23 +257,22 @@ class URFAClient_API extends URFAClient_Function
         if (array_key_exists($name, $args)) {
             $valid = true;
 
-            switch ($type)
-            {
-            case 'integer':
-                $args[$name] = (int) $args[$name];
-                break;
-            case 'double':
-                $args[$name] = (float) $args[$name];
-                break;
-            case 'ip_address':
-                $valid = (bool) filter_var($args[$name], FILTER_VALIDATE_IP);
-                break;
-            case 'long':
-            case 'string':
-                $args[$name] = (string) $args[$name];
-                break;
-            default:
-                $valid = false;
+            switch ($type) {
+                case 'integer':
+                    $args[$name] = (int) $args[$name];
+                    break;
+                case 'double':
+                    $args[$name] = (float) $args[$name];
+                    break;
+                case 'ip_address':
+                    $valid = (bool) filter_var($args[$name], FILTER_VALIDATE_IP);
+                    break;
+                case 'long':
+                case 'string':
+                    $args[$name] = (string) $args[$name];
+                    break;
+                default:
+                    $valid = false;
             }
 
             if ($valid) {
@@ -316,125 +311,122 @@ class URFAClient_API extends URFAClient_Function
         foreach ($output->children() as $node) {
             $attr = $node->attributes();
 
-            switch ($node->getName())
-            {
-            case 'integer':
-                $result[(string) $attr->{'name'}] = $packet->getDataInt();
-                break;
-            case 'long':
-                $result[(string) $attr->{'name'}] = $packet->getDataLong();
-                break;
-            case 'double':
-                $result[(string) $attr->{'name'}] = $packet->getDataDouble();
-                break;
-            case 'ip_address':
-                $result[(string) $attr->{'name'}] = $packet->getDataIp();
-                break;
-            case 'string':
-                $result[(string) $attr->{'name'}] = $packet->getDataString();
-                break;
-
-            case 'error':
-                $this->processDataError($node);
-                break;
-
-            case 'set':
-                $dst = (string) $node->attributes()->{'dst'};
-                $src = (string) $node->attributes()->{'src'};
-                $value = (string) $node->attributes()->{'value'};
-
-                if (!$dst) {
+            switch ($node->getName()) {
+                case 'integer':
+                    $result[(string) $attr->{'name'}] = $packet->getDataInt();
                     break;
-                }
+                case 'long':
+                    $result[(string) $attr->{'name'}] = $packet->getDataLong();
+                    break;
+                case 'double':
+                    $result[(string) $attr->{'name'}] = $packet->getDataDouble();
+                    break;
+                case 'ip_address':
+                    $result[(string) $attr->{'name'}] = $packet->getDataIp();
+                    break;
+                case 'string':
+                    $result[(string) $attr->{'name'}] = $packet->getDataString();
+                    break;
 
-                if ($src and isset($result[$src])) {
-                    $value = $result[$src];
-                }
+                case 'error':
+                    $this->processDataError($node);
+                    break;
 
-                $result[$dst] = $value;
-                break;
+                case 'set':
+                    $dst = (string) $node->attributes()->{'dst'};
+                    $src = (string) $node->attributes()->{'src'};
+                    $value = (string) $node->attributes()->{'value'};
 
-            case 'if':
-                $variable = (string) $attr->{'variable'};
-
-                $result_value = false;
-                foreach ($result as $k => $v) {
-                    if ($k === $variable) {
-                        $result_value = $v;
+                    if (!$dst) {
                         break;
                     }
-                }
 
-                if ($result_value === false) {
-                    foreach ($this->data_input as $v) {
-                        if ($v['name'] === $variable) {
-                            $result_value = $v['value'];
+                    if ($src and isset($result[$src])) {
+                        $value = $result[$src];
+                    }
+
+                    $result[$dst] = $value;
+                    break;
+
+                case 'if':
+                    $variable = (string) $attr->{'variable'};
+
+                    $result_value = false;
+                    foreach ($result as $k => $v) {
+                        if ($k === $variable) {
+                            $result_value = $v;
                             break;
                         }
                     }
-                }
-                if ($result_value === false) {
-                    break;
-                }
 
-                switch (gettype($result_value))
-                {
-                case 'integer':
-                    $value = (int) $attr->{'value'};
-                    break;
-                case 'double':
-                    $value = (float) $attr->{'value'};
-                    break;
-                case 'string':
-                    $value = (string) $attr->{'value'};
-                    break;
-                default:
-                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
-                }
+                    if ($result_value === false) {
+                        foreach ($this->data_input as $v) {
+                            if ($v['name'] === $variable) {
+                                $result_value = $v['value'];
+                                break;
+                            }
+                        }
+                    }
+                    if ($result_value === false) {
+                        break;
+                    }
 
-                switch ((string) $attr->{'condition'})
-                {
-                case 'eq':
-                    if ($result_value === $value) {
-                        $result = array_merge($result, $this->processDataOutput($node, $packet));
+                    switch (gettype($result_value)) {
+                        case 'integer':
+                            $value = (int) $attr->{'value'};
+                            break;
+                        case 'double':
+                            $value = (float) $attr->{'value'};
+                            break;
+                        case 'string':
+                            $value = (string) $attr->{'value'};
+                            break;
+                        default:
+                            throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    }
+
+                    switch ((string) $attr->{'condition'}) {
+                        case 'eq':
+                            if ($result_value === $value) {
+                                $result = array_merge($result, $this->processDataOutput($node, $packet));
+                            }
+                            break;
+                        case 'ne':
+                            if ($result_value !== $value) {
+                                $result = array_merge($result, $this->processDataOutput($node, $packet));
+                            }
+                            break;
                     }
                     break;
-                case 'ne':
-                    if ($result_value !== $value) {
-                        $result = array_merge($result, $this->processDataOutput($node, $packet));
+
+                case 'for':
+                    $sibling = $node->xpath('preceding-sibling::integer[1]');
+
+                    if (!$sibling) {
+                        $sibling = $node->xpath('parent::*[1]/preceding-sibling::integer[1]');
                     }
-                    break;
-                }
-                break;
 
-            case 'for':
-                $sibling = $node->xpath('preceding-sibling::integer[1]');
+                    if (!isset($sibling[0])) {
+                        throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                    }
 
-                if (!$sibling) {
-                    $sibling = $node->xpath('parent::*[1]/preceding-sibling::integer[1]');
-                }
+                    $name = (string) $sibling[0]->attributes()->{'name'};
 
-                if (!isset($sibling[0])) {
-                    throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
-                }
+                    if (isset($result[$name]) and is_array($result[$name])) {
+                        break;
+                    }
 
-                $name = (string) $sibling[0]->attributes()->{'name'};
-
-                if (isset($result[$name]) and is_array($result[$name])) {
-                    break;
-                }
-
-                $count = (int) ((isset($result[$name]))
+                    $count = (int) ((isset($result[$name]))
                     ? $result[$name]
                     : $this->data_output[$name]);
 
-                $array = [];
-                for ($i=0; $i<$count; $i++) {
-                    $array[] = $this->processDataOutput($node, $packet);
-                }
-                $result[$name] = $array;
+                    $array = [];
+                    for ($i = 0; $i < $count; $i++) {
+                        $array[] = $this->processDataOutput($node, $packet);
+                    }
+                    $result[$name] = $array;
 
-                break;
+                    break;
             }
 
             $this->data_output += $result;
