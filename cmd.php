@@ -1,7 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__ . '/init.php';
+require __DIR__ . '/vendor/autoload.php';
+use URFAClient\URFAClient;
+use URFAClient\Cmd;
 
 $api_xml = '/xml/' . URFAClient::API_XML;
 
@@ -38,7 +40,7 @@ if (isset($options['v']) OR isset($options['version'])) {
     die('URFAClient ' . URFAClient::VERSION . "\n");
 }
 
-$api = new URFAClient_Cmd($api_xml);
+$api = new Cmd($api_xml);
 
 if (isset($options['l']) OR isset($options['list'])) {
     $methods = $api->methods();

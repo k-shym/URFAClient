@@ -1,5 +1,7 @@
 <?php
 
+namespace URFAClient;
+
 /**
  * Объект соединения с ядром UTM5
  *
@@ -7,7 +9,7 @@
  * @author  Konstantin Shum <k.shym@ya.ru>
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-final class URFAClient_Connection
+final class Connection
 {
     /**
      * Объект сокета
@@ -42,7 +44,7 @@ final class URFAClient_Connection
      *
      * @param array $data Конфигурация
      *
-     * @throws URFAClient_Exception
+     * @throws URFAException
      */
     public function __construct(array $data)
     {
@@ -72,13 +74,13 @@ final class URFAClient_Connection
         );
 
         if (!$this->socket) {
-            throw new URFAClient_Exception("$err_str ($err_no)");
+            throw new URFAException("$err_str ($err_no)");
         }
 
         stream_set_timeout($this->socket, $data['timeout']);
 
         if (!$this->auth($data['login'], $data['password'], $data['admin'], $data['protocol'])) {
-            throw new URFAClient_Exception('Login or password incorrect');
+            throw new URFAException('Login or password incorrect');
         }
     }
 
@@ -91,7 +93,7 @@ final class URFAClient_Connection
      * @param string $protocol Протокол ssl|tls|auto
      *
      * @return bool
-     * @throws URFAClient_Exception
+     * @throws URFAException
      */
     protected function auth($login, $password, $admin, $protocol)
     {
@@ -153,7 +155,7 @@ final class URFAClient_Connection
      * @param integer $code Код функции
      *
      * @return bool
-     * @throws URFAClient_Exception
+     * @throws URFAException
      */
     public function call($code)
     {
@@ -177,8 +179,8 @@ final class URFAClient_Connection
     /**
      * Результат вызова функции
      *
-     * @return URFAClient_Packet
-     * @throws URFAClient_Exception
+     * @return Packet
+     * @throws URFAException
      */
     public function result()
     {
@@ -199,22 +201,21 @@ final class URFAClient_Connection
     /**
      * Читаем данные из соединения
      *
-     * @param URFAClient_Packet $packet Пакет с бинарными данными
-     *
-     * @throws URFAClient_Exception
+     * @param Packet $packet Пакет с бинарными данными
+     * @throws URFAException
      */
-    public function read(URFAClient_Packet $packet)
+    public function read(Packet $packet)
     {
         $this->code = ord(fread($this->socket, 1));
 
         if (!$this->code) {
-            throw new URFAClient_Exception("Error code {$this->code}");
+            throw new URFAException("Error code {$this->code}");
         }
 
         $version = ord(fread($this->socket, 1));
 
         if ($version !== $this->version) {
-            throw new URFAClient_Exception("Error code {$this->code}. Version: $version");
+            throw new URFAException("Error code {$this->code}. Version: $version");
         }
 
         list(, $packet->len) = unpack('n', fread($this->socket, 2));
@@ -240,9 +241,9 @@ final class URFAClient_Connection
     /**
      * Записываем данные в соединение
      *
-     * @param URFAClient_Packet $packet Пакет с бинарными данными
+     * @param Packet $packet Пакет с бинарными данными
      */
-    public function write(URFAClient_Packet $packet)
+    public function write(Packet $packet)
     {
         fwrite($this->socket, chr($this->code));
         fwrite($this->socket, chr($this->version));
@@ -264,13 +265,12 @@ final class URFAClient_Connection
     /**
      * Создает объект пакета
      *
-     * @return URFAClient_Packet
-     *
-     * @throws URFAClient_Exception
+     * @return Packet
+     * @throws URFAException
      */
     public function packet()
     {
-        return new URFAClient_Packet($this->ipv6);
+        return new Packet($this->ipv6);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'URFAClientBaseTest.php';
+namespace Tests;
 
 /**
  * Тесты для версии сервера 5.2

@@ -4,6 +4,7 @@
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
     <arg value="p" />
+    <arg value="n" />
 
     <rule ref="PSR12"/>
 

@@ -8,7 +8,7 @@
         {
             "name": "Konstantin Shum",
             "email": "k.shym@ya.ru",
-            "homepage": "http://www.shym.su",
+            "homepage": "http://www.shum.su",
             "role": "Developer"
         }
     ],
@@ -27,6 +27,13 @@
         "squizlabs/php_codesniffer": "3.*"
     },
     "autoload": {
-        "files": ["init.php"]
+        "psr-4": {
+            "URFAClient\\": "classes/URFAClient"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
     }
 }

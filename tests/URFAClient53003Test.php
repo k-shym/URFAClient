@@ -1,6 +1,6 @@
 <?php
 
-require_once 'URFAClient53Test.php';
+namespace Tests;
 
 /**
  * @package URFAClient
@@ -14,6 +14,6 @@ class URFAClient53003Test extends URFAClient53Test
         'password' => 'init',
         'address'  => 'localhost',
         'protocol' => 'tls',
-        'api'      => '../xml/api_53-003.xml',
+        'api'      => __DIR__ . '/../xml/api_53-003.xml',
     ];
 }

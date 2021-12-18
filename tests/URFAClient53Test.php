@@ -1,6 +1,9 @@
 <?php
 
-require_once 'URFAClientBaseTest.php';
+namespace Tests;
+
+use URFAClient\URFAClient;
+use URFAClient\API;
 
 /**
  * @package URFAClient
@@ -92,8 +95,8 @@ abstract class URFAClient53Test extends URFAClientBaseTest
     /**
      * @depends testAddUser
      *
-     * @return URFAClient_API
-     * @throws Exception
+     * @return API
+     * @throws \Exception
      */
     public function testInitApiUser()
     {
@@ -102,7 +105,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
         $this->config['admin'] = false;
         $api_user = URFAClient::init($this->config);
 
-        $this->assertInstanceOf('URFAClient_API', $api_user);
+        $this->assertInstanceOf(API::class, $api_user);
 
         return $api_user;
     }
@@ -112,7 +115,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testChangePassword(URFAClient_API $api)
+    public function testChangePassword(API $api)
     {
          $result = $api->rpcf_user5_change_password([
              'old_password'     => 'pass' . self::prefix(),
@@ -128,7 +131,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testEditUser(URFAClient_API $api)
+    public function testEditUser(API $api)
     {
         $data = [
             'full_name'         => 'full_name' . self::prefix(),

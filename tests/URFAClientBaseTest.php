@@ -1,6 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../init.php';
+namespace Tests;
+
+use URFAClient\URFAClient;
+use URFAClient\API;
 
 /**
  * Базовый класс для тестов URFAClient
@@ -16,7 +19,7 @@ abstract class URFAClientBaseTest extends \PHPUnit\Framework\TestCase
      *
      * @var string
      */
-    private static $_prefix;
+    private static $prefix;
 
     /**
      * Уникальная строка для тестов
@@ -25,10 +28,10 @@ abstract class URFAClientBaseTest extends \PHPUnit\Framework\TestCase
      */
     protected static function prefix()
     {
-        if (is_null(self::$_prefix)) {
-            self::$_prefix = date('YmdHis');
+        if (is_null(self::$prefix)) {
+            self::$prefix = date('YmdHis');
         }
-        return self::$_prefix;
+        return self::$prefix;
     }
 
     /**
@@ -37,7 +40,7 @@ abstract class URFAClientBaseTest extends \PHPUnit\Framework\TestCase
     protected $config = [];
 
     /**
-     * @var URFAClient_API
+     * @var API
      */
     protected $api;
 
@@ -45,7 +48,7 @@ abstract class URFAClientBaseTest extends \PHPUnit\Framework\TestCase
      * Создаем соединение для тестов
      *
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     protected function setUp()
     {

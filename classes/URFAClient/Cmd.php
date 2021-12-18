@@ -1,5 +1,7 @@
 <?php
 
+namespace URFAClient;
+
 /**
  * Объект работы из командной строки
  *
@@ -7,7 +9,7 @@
  * @author  Konstantin Shum <k.shym@ya.ru>
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-class URFAClient_Cmd extends URFAClient_API
+class Cmd extends API
 {
     /**
      * Возвращает функцию из api.xml в определённом виде
@@ -16,7 +18,7 @@ class URFAClient_Cmd extends URFAClient_API
      * @param string $type Тип представления
      *
      * @return mixed
-     * @throws URFAClient_Exception
+     * @throws URFAException
      */
     public function method($name, $type = null)
     {
@@ -29,12 +31,12 @@ class URFAClient_Cmd extends URFAClient_API
         }
 
         if (!$method) {
-            throw new URFAClient_Exception("Function $name not found");
+            throw new URFAException("Function $name not found");
         }
 
         return ($type === 'xml')
             ? $method->asXML()
-            : $this->_processOptionsInput($method->input);
+            : $this->processOptionsInput($method->input);
     }
 
     /**
@@ -58,13 +60,13 @@ class URFAClient_Cmd extends URFAClient_API
     /**
      * Рекурсивная функция обработки входных параметров api.xml
      *
-     * @param SimpleXMLElement $input         Элемент дерева api.xml
+     * @param \SimpleXMLElement $input         Элемент дерева api.xml
      * @param array            $options_input Опции функции
      *
      * @return array
-     * @throws URFAClient_Exception
+     * @throws URFAException
      */
-    protected function _processOptionsInput(SimpleXMLElement $input, array &$options_input = [])
+    protected function processOptionsInput(\SimpleXMLElement $input, array &$options_input = [])
     {
         foreach ($input->children() as $node) {
             $name = (string) $node->attributes()->{'name'};
@@ -84,15 +86,15 @@ class URFAClient_Cmd extends URFAClient_API
                     $options_input[$name] = '';
                     break;
                 case 'if':
-                    $this->_processOptionsInput($node, $options_input);
+                    $this->processOptionsInput($node, $options_input);
                     break;
                 case 'for':
                     $sibling = $node->xpath('preceding-sibling::*[1]');
 
                     if (!isset($sibling[0])) {
-                        throw new URFAClient_Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
+                        throw new URFAException('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
                     }
-                    $options_input[(string) $sibling[0]->attributes()->{'name'}] = [$this->_processOptionsInput($node)];
+                    $options_input[(string) $sibling[0]->attributes()->{'name'}] = [$this->processOptionsInput($node)];
                     break;
             }
         }

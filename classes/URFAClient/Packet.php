@@ -1,5 +1,7 @@
 <?php
 
+namespace URFAClient;
+
 /**
  * Объект для подготовки получения/отправки бинарных данных ядру
  *
@@ -7,7 +9,7 @@
  * @author  Konstantin Shum <k.shym@ya.ru>
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-class URFAClient_Packet
+class Packet
 {
     /**
      * Поддрежка IPv6 сервером
@@ -49,7 +51,7 @@ class URFAClient_Packet
      *
      * @param bool $ipv6 Поддержка IPv6
      *
-     * @throws URFAClient_Exception
+     * @throws URFAException
      */
     public function __construct($ipv6)
     {
@@ -219,12 +221,12 @@ class URFAClient_Packet
      * @param string $data Большое целое число
      *
      * @return $this
-     * @throws URFAClient_Exception
+     * @throws URFAException
      */
     public function setDataLong($data)
     {
         if (PHP_INT_SIZE == 4) {
-            throw new URFAClient_Exception('Not implemented for PHP x32');
+            throw new URFAException('Not implemented for PHP x32');
         } else {
             $hi = bcdiv($data, 0xffffffff + 1);
             $lo = bcmod($data, 0xffffffff + 1);

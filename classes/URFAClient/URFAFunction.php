@@ -1,5 +1,7 @@
 <?php
 
+namespace URFAClient;
+
 /**
  * @package URFAClient
  * @author  Konstantin Shum <k.shym@ya.ru>
@@ -624,6 +626,6 @@
  * @method array rpcf_dealer_del_tech_param(array $input = array())
  * @method array rpcf_dealer_get_tariffs_list(array $input = array())
  */
-abstract class URFAClient_Function
+abstract class URFAFunction
 {
 }
