@@ -38,20 +38,24 @@ final class URFAClient_Connection {
     {
         $context = stream_context_create();
 
-        if ($data['admin'] AND $data['protocol'] === 'ssl')
+        if ($data['protocol'] !== 'none')
         {
-            stream_context_set_option($context, 'ssl', 'capture_peer_cert', TRUE);
-            stream_context_set_option($context, 'ssl', 'local_cert', __DIR__ . '/../../admin.crt');
-            stream_context_set_option($context, 'ssl', 'passphrase', 'netup');
-            stream_context_set_option($context, 'ssl', 'ciphers', 'SSLv3');
-        }
-        elseif ($data['protocol'] === 'tls' OR $data['protocol'] === 'ssl')
-        {
-            stream_context_set_option($context, 'ssl', 'ciphers', 'ADH-RC4-MD5');
+            if ($data['admin'] AND $data['protocol'] === 'ssl')
+            {
+                stream_context_set_option($context, 'ssl', 'capture_peer_cert', TRUE);
+                stream_context_set_option($context, 'ssl', 'local_cert', __DIR__ . '/../../admin.crt');
+                stream_context_set_option($context, 'ssl', 'passphrase', 'netup');
+                stream_context_set_option($context, 'ssl', 'ciphers', 'SSLv3');
+            }
+            elseif ($data['protocol'] === 'tls' OR $data['protocol'] === 'ssl')
+            {
+                stream_context_set_option($context, 'ssl', 'ciphers', 'ADH-RC4-MD5');
+            }
+
+            stream_context_set_option($context, 'ssl', 'verify_peer', FALSE);
+            stream_context_set_option($context, 'ssl', 'verify_peer_name', FALSE);
         }
 
-        stream_context_set_option($context, 'ssl', 'verify_peer', FALSE);
-        stream_context_set_option($context, 'ssl', 'verify_peer_name', FALSE);
 
         $data['address'] = gethostbyname($data['address']);
 
@@ -98,7 +102,10 @@ final class URFAClient_Connection {
                     $packet->set_attr_string($login, 2);
                     $packet->set_attr_string($digest, 8);
                     $packet->set_attr_string($hash, 9);
-                    $packet->set_attr_int(($protocol === 'ssl') ? (($admin) ? 4 : 2) : 6, 10);
+                    if ($protocol !== 'none')
+                        $packet->set_attr_int(($protocol === 'ssl') ? (($admin) ? 4 : 2) : 6, 10);
+                    else
+                        $packet->set_attr_int(0, 10);
                     $packet->set_attr_int(2, 1);
                     $this->write($packet);
                     break;
