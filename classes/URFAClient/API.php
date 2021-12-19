@@ -40,6 +40,20 @@ class API extends URFAFunction
     protected $data_output = [];
 
     /**
+     * Данные из тегов set с атрибутом src
+     *
+     * @var array
+     */
+    protected $data_set_src = [];
+
+    /**
+     * Данные из тегов set с атрибутом value
+     *
+     * @var array
+     */
+    protected $data_set_value = [];
+
+    /**
      * Конструктор класса
      *
      * @param string     $api        Путь до файла api
@@ -77,7 +91,6 @@ class API extends URFAFunction
             throw new URFAException("No object URFAClient_Connection");
         }
 
-
         $this->data_input = $this->data_output = [];
 
         $method = false;
@@ -94,7 +107,6 @@ class API extends URFAFunction
         $args = (isset($args[0]) and is_array($args[0])) ? (array) $args[0] : [];
 
         $this->processDataInput($method->input, $args);
-
         $code = (string) $method->attributes()->{'id'};
         $code = (substr($code, 0, 1) === '-') ? -1 * hexdec(substr($code, 1)) : hexdec($code);
 
@@ -143,6 +155,7 @@ class API extends URFAFunction
     protected function processDataInput(\SimpleXMLElement $input, array $args)
     {
         foreach ($input->children() as $node) {
+            $attr = $node->attributes();
             switch ($node->getName()) {
                 case 'integer':
                 case 'long':
@@ -153,14 +166,22 @@ class API extends URFAFunction
                     break;
                 case 'error':
                     $this->processDataError($node);
+                    // no break
                 case 'if':
-                    $attr = $node->attributes();
                     $variable = (string) $attr->{'variable'};
-
                     foreach ($this->data_input as $v) {
                         if ($v['name'] === $variable) {
                             $variable = $v;
                             break;
+                        }
+                    }
+
+                    if (!is_array($variable) and isset($this->data_set_src[$variable])) {
+                        foreach ($this->data_input as $v) {
+                            if ($v['name'] === $this->data_set_src[$variable]) {
+                                $variable = $v;
+                                break;
+                            }
                         }
                     }
 
@@ -218,6 +239,16 @@ class API extends URFAFunction
                         $this->processDataInput($node, $v);
                     }
                     break;
+                case 'set':
+                    if (!$dst = (string) $attr->{'dst'}) {
+                        break;
+                    }
+
+                    if ($src = (string) $attr->{'src'}) {
+                        $this->data_set_src[$dst] = $src;
+                    } elseif ($val = (string) $attr->{'value'}) {
+                        $this->data_set_value[$dst] = $val;
+                    }
             }
         }
     }
@@ -331,7 +362,7 @@ class API extends URFAFunction
 
                 case 'error':
                     $this->processDataError($node);
-
+                    // no break
                 case 'set':
                     $dst = (string) $node->attributes()->{'dst'};
                     $src = (string) $node->attributes()->{'src'};
