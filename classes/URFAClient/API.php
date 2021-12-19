@@ -29,6 +29,20 @@ class URFAClient_API extends URFAClient_Function {
     protected $_data_output = array();
 
     /**
+     * Данные из тегов set с атрибутом src
+     *
+     * @var array
+     */
+    protected $data_set_src = [];
+
+    /**
+     * Данные из тегов set с атрибутом value
+     *
+     * @var array
+     */
+    protected $data_set_value = [];
+
+    /**
      * Конструктор класса
      *
      * @param  string                $api            Путь до файла api
@@ -113,6 +127,7 @@ class URFAClient_API extends URFAClient_Function {
     {
         foreach ($input->children() as $node)
         {
+            $attr = $node->attributes();
             switch ($node->getName())
             {
                 case 'integer':
@@ -124,7 +139,6 @@ class URFAClient_API extends URFAClient_Function {
                 case 'error': $this->_process_data_error($node); break;
 
                 case 'if':
-                    $attr = $node->attributes();
                     $variable = (string) $attr->{'variable'};
 
                     foreach ($this->_data_input as $v)
@@ -133,6 +147,15 @@ class URFAClient_API extends URFAClient_Function {
                             $variable = $v;
                             break;
                         }
+
+                    if ( ! is_array($variable) and isset($this->data_set_src[$variable])) {
+                        foreach ($this->_data_input as $v) {
+                            if ($v['name'] === $this->data_set_src[$variable]) {
+                                $variable = $v;
+                                break;
+                            }
+                        }
+                    }
 
                     if ( ! is_array($variable))
                         throw new Exception('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
@@ -175,6 +198,16 @@ class URFAClient_API extends URFAClient_Function {
                         $this->_process_data_input($node, $v);
                     }
                     break;
+                case 'set':
+                    if (!$dst = (string) $attr->{'dst'}) {
+                        break;
+                    }
+
+                    if ($src = (string) $attr->{'src'}) {
+                        $this->data_set_src[$dst] = $src;
+                    } elseif ($val = (string) $attr->{'value'}) {
+                        $this->data_set_value[$dst] = $val;
+                    }
             }
         }
     }
