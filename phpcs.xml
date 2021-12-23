@@ -8,6 +8,6 @@
 
     <rule ref="PSR12"/>
 
-    <file>classes</file>
+    <file>src</file>
     <file>tests</file>
 </ruleset>

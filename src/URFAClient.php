@@ -33,7 +33,7 @@ abstract class URFAClient
             'timeout'  => 30,
             'protocol' => 'auto',
             'admin'    => true,
-            'api'      => __DIR__ . '/../../xml/' . self::API_XML,
+            'api'      => __DIR__ . '/../xml/' . self::API_XML,
         ], $data);
 
         return new API($data['api'], new Connection($data));

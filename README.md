@@ -27,7 +27,7 @@ composer require k-shym/urfa-client "2.*"
 
 ## CMD
 ```
-php cmd.php -h
+bin/urfaclient -h
 
 The options are as follows:
    [-a, --api <path> ]             Path to api.xml
@@ -112,7 +112,7 @@ The options are as follows:
 
 Получаем полное описание параметров функции `rpcf_add_user_new` из api.xml:
 ```bash
-php cmd.php -f rpcf_add_user_new
+bin/urfaclient -f rpcf_add_user_new
 ```
 ```php
 array (
@@ -204,18 +204,19 @@ C условиями `if` все просто, если истина, то за�
 
 В итоге, получаем минимальный набор параметров для создания пользователя:
 ```php
-include 'URFAClient/init.php';
+require __DIR__ . '/vendor/autoload.php';
+use URFAClient\URFAClient;
 
-$urfa = URFAClient::init(array(
+$urfa = URFAClient::init([
     'login'    => 'init',
     'password' => 'init',
     'address'  => 'localhost',
-));
+]);
 
-$result = $urfa->rpcf_add_user_new(array(
+$result = $urfa->rpcf_add_user_new([
     'login'=>'test',
     'password'=>'test',
-));
+]);
 ```
 В переменную `$result` попадут данные которые описаны в элементе output.
 

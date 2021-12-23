@@ -3,6 +3,9 @@
     "description": "Universal PHP client billing system NetUp UTM5 based api.xml",
     "version": "2.0.0",
     "type": "library",
+    "keywords": [
+        "utm5"
+    ],
     "license": "GPL-3.0",
     "authors": [
         {
@@ -12,6 +15,9 @@
             "role": "Developer"
         }
     ],
+    "support": {
+        "issues": "https://github.com/k-shym/URFAClient/issues"
+    },
     "require": {
         "php": ">=5.4",
         "ext-openssl": "*",
@@ -26,9 +32,12 @@
         "phpunit/phpunit": "7.*",
         "squizlabs/php_codesniffer": "3.*"
     },
+    "bin": [
+        "bin/urfaclient"
+    ],
     "autoload": {
         "psr-4": {
-            "URFAClient\\": "classes/URFAClient"
+            "URFAClient\\": "src/"
         }
     },
     "autoload-dev": {
