@@ -189,7 +189,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
             'comment'              => 'Тестовая услуга',
             'link_by_default'      => 0,
             'is_dynamic'           => 0,
-            'cost'                 => 0.13,
+            'cost'                 => 0,
             'discount_method'      => 1,
             'sessions_limit'       => 0,
             'null_service_prepaid' => 0,
@@ -203,6 +203,32 @@ abstract class URFAClient53Test extends URFAClientBaseTest
 
     /**
      * @depends testAddIptrafficService
+     * @return  array
+     */
+    public function testEditIptrafficService(ArrayObject $service)
+    {
+        $result = $this->api->rpcf_edit_iptraffic_service_ex([
+            'service_id'           => $service['service_id'],
+            'parent_id'            => 0,
+            'tariff_id'            => 0,
+            'service_name'         => 'service' . self::prefix(),
+            'comment'              => 'Тестовая услуга',
+            'link_by_default'      => 0,
+            'is_dynamic'           => 0,
+            'cost'                 => 0.13,
+            'discount_method_t'    => 1,
+            'sessions_limit'       => 0,
+            'null_service_prepaid' => 0,
+        ]);
+
+        $this->assertArrayHasKey('service_id', $result);
+        $this->assertEquals($result['service_id'], $service['service_id']);
+
+        return $result;
+    }
+
+    /**
+     * @depends testEditIptrafficService
      * @return  void
      */
     public function testGetIptrafficService(ArrayObject $service)
@@ -215,6 +241,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
         $this->assertEquals('service' . self::prefix(), $result['service_name']);
         $this->assertEquals('Тестовая услуга', $result['comment']);
         $this->assertEquals(1, $result['discount_method']);
+        $this->assertEquals(0.13, $result['cost']);
     }
 
     /**

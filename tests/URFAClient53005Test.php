@@ -10,16 +10,15 @@ use ArrayObject;
  * @author  Konstantin Shum <k.shym@ya.ru>
  * @license https://github.com/k-shym/URFAClient/blob/master/LICENSE.md GPLv3
  */
-class URFAClient53004Test extends URFAClient53Test
+class URFAClient53005Test extends URFAClient53004Test
 {
     protected $config = [
         'login'    => 'init',
         'password' => 'init',
         'address'  => 'localhost',
-        'protocol' => 'tls',
-        'api'      => __DIR__ . '/../xml/api_53-004.xml',
+        'protocol' => 'auto',
+        'api'      => __DIR__ . '/../xml/api_53-005.xml',
     ];
-
 
     public function testGetDiscountPeriods()
     {
@@ -84,19 +83,58 @@ class URFAClient53004Test extends URFAClient53Test
 
     public function testAddIptrafficService()
     {
-        return parent::testAddIptrafficService();
+        $result = $this->api->rpcf_add_iptraffic_service_ex([
+            'parent_id'            => 0,
+            'tariff_id'            => 0,
+            'service_name'         => 'service' . self::prefix(),
+            'comment'              => 'Тестовая услуга',
+            'link_by_default'      => 0,
+            'contract_type'        => 0,
+            'is_dynamic'           => 0,
+            'cost'                 => 0,
+            'discount_method'      => 1,
+            'sessions_limit'       => 0,
+            'scheme_id'            => 0,
+            'null_service_prepaid' => 0,
+        ]);
+
+        $this->assertArrayHasKey('service_id', $result);
+        $this->assertTrue($result['service_id'] > 0);
+
+        return $result;
     }
 
     /**
      * @depends testAddIptrafficService
+     * @return  array
      */
     public function testEditIptrafficService(ArrayObject $service)
     {
-        return parent::testEditIptrafficService($service);
+        $result = $this->api->rpcf_edit_iptraffic_service_ex([
+            'service_id'           => $service->service_id,
+            'parent_id'            => 0,
+            'tariff_id'            => 0,
+            'service_name'         => 'service' . self::prefix(),
+            'comment'              => 'Тестовая услуга',
+            'link_by_default'      => 0,
+            'contract_type'        => 0,
+            'is_dynamic'           => 0,
+            'cost'                 => 0.13,
+            'discount_method_t'    => 1,
+            'sessions_limit'       => 0,
+            'scheme_id'            => 0,
+            'null_service_prepaid' => 0,
+        ]);
+
+        $this->assertArrayHasKey('service_id', $result);
+        $this->assertEquals($result['service_id'], $service->service_id);
+
+        return $result;
     }
 
     /**
      * @depends testEditIptrafficService
+     * @return  void
      */
     public function testGetIptrafficService(ArrayObject $service)
     {
@@ -110,51 +148,7 @@ class URFAClient53004Test extends URFAClient53Test
      */
     public function testAddIptrafficServiceIpv6(ArrayObject $user, ArrayObject $service, ArrayObject $discount_periods)
     {
-        $discount_period = $discount_periods->offsetGet(0);
-
-        $result = $this->api->rpcf_add_iptraffic_service_link_ipv6([
-            'user_id'            => $user['user_id'],
-            'account_id'         => $user['basic_account'],
-            'service_id'         => $service['service_id'],
-            'tplink_id'          => 0,
-            'discount_period_id' => $discount_period['discount_period_id'],
-            'start_date'         => time(),
-            'expire_date'        => 2000000000,
-            'policy_id'          => 1,
-            'unabon'             => 0,
-            'unprepay'           => 0,
-            'ip_groups_count'    => [
-                [
-                    'id'             => 0,
-                    'ip'             => long2ip(rand()),
-                    'mask'           => 32,
-                    'mac'            => '',
-                    'login'          => 'inet4user' . self::prefix(),
-                    'allowed_cid'    => '',
-                    'password'       => 'inet4pass' . self::prefix(),
-                    'is_skip_radius' => 0,
-                    'is_skip_rfw'    => 0,
-                    'router_id'      => 0,
-                ],
-                [
-                    'id'             => 1,
-                    'ip'             => implode(':', str_split(md5(rand()), 4)),
-                    'mask'           => 32,
-                    'mac'            => '',
-                    'login'          => 'inet6user' . self::prefix(),
-                    'allowed_cid'    => '',
-                    'password'       => 'inet6pass' . self::prefix(),
-                    'is_skip_radius' => 0,
-                    'is_skip_rfw'    => 0,
-                    'router_id'      => 0,
-                ],
-            ],
-        ]);
-
-        $this->assertArrayHasKey('slink_id', $result);
-        $this->assertTrue($result['slink_id'] > 0);
-
-        return $result;
+        return parent::testAddIptrafficServiceIpv6($user, $service, $discount_periods);
     }
 
     /**

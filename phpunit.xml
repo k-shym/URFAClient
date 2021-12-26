@@ -3,10 +3,20 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
+         defaultTestSuite="53-006"
 >
     <testsuites>
-        <testsuite name="URFAClient Tests">
-            <directory>./tests</directory>
+        <testsuite name="53-003">
+            <file>./tests/URFAClient53003Test.php</file>
+        </testsuite>
+        <testsuite name="53-004">
+            <file>./tests/URFAClient53004Test.php</file>
+        </testsuite>
+        <testsuite name="53-005">
+            <file>./tests/URFAClient53005Test.php</file>
+        </testsuite>
+        <testsuite name="53-006">
+            <file>./tests/URFAClient53006Test.php</file>
         </testsuite>
     </testsuites>
     <filter>

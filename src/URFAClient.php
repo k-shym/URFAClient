@@ -13,7 +13,7 @@ abstract class URFAClient
 {
     const VERSION = '2.0.0';
 
-    const API_XML = 'api_53-005.xml';
+    const API_XML = 'api_53-006.xml';
 
     /**
      * Метод инициализации
