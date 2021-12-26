@@ -2,6 +2,7 @@
 **v2.0.0**
 - Убран параметр log
 - namespaces PSR-4
+- Функции возвращают ArrayObject
 
 **v1.3.3**
 - Исправления deprecated для PHP 7.4

@@ -3,6 +3,7 @@
 namespace Tests;
 
 use URFAClient\API;
+use ArrayObject;
 
 /**
  * @package URFAClient
@@ -36,7 +37,7 @@ class URFAClient53004Test extends URFAClient53Test
     /**
      * @depends testAddUser
      */
-    public function testGetUserinfo(array $user)
+    public function testGetUserinfo(ArrayObject $user)
     {
         parent::testGetUserinfo($user);
     }
@@ -44,7 +45,7 @@ class URFAClient53004Test extends URFAClient53Test
     /**
      * @depends testAddUser
      */
-    public function testSearchUsers(array $user)
+    public function testSearchUsers(ArrayObject $user)
     {
         parent::testSearchUsers($user);
     }
@@ -76,7 +77,7 @@ class URFAClient53004Test extends URFAClient53Test
     /**
      * @depends testAddUser
      */
-    public function testSaveUserOthersets(array $user)
+    public function testSaveUserOthersets(ArrayObject $user)
     {
         parent::testSaveUserOthersets($user);
     }
@@ -89,7 +90,7 @@ class URFAClient53004Test extends URFAClient53Test
     /**
      * @depends testAddIptrafficService
      */
-    public function testGetIptrafficService(array $service)
+    public function testGetIptrafficService(ArrayObject $service)
     {
         parent::testGetIptrafficService($service);
     }
@@ -99,9 +100,9 @@ class URFAClient53004Test extends URFAClient53Test
      * @depends testAddIptrafficService
      * @depends testGetDiscountPeriods
      */
-    public function testAddIptrafficServiceIpv6(array $user, array $service, array $discount_periods)
+    public function testAddIptrafficServiceIpv6(ArrayObject $user, ArrayObject $service, ArrayObject $discount_periods)
     {
-        $discount_period = array_pop($discount_periods);
+        $discount_period = $discount_periods->offsetGet(0);
 
         $result = $this->api->rpcf_add_iptraffic_service_link_ipv6([
             'user_id'            => $user['user_id'],
@@ -152,7 +153,7 @@ class URFAClient53004Test extends URFAClient53Test
      * @depends testAddIptrafficServiceIpv6
      * @depends testGetDiscountPeriods
      */
-    public function testGetIptrafficServiceIpv6(array $slink, array $discount_periods)
+    public function testGetIptrafficServiceIpv6(ArrayObject $slink, ArrayObject $discount_periods)
     {
         parent::testGetIptrafficServiceIpv6($slink, $discount_periods);
     }
@@ -160,7 +161,7 @@ class URFAClient53004Test extends URFAClient53Test
     /**
      * @depends testAddIptrafficServiceIpv6
      */
-    public function testSetRadiusAttr(array $slink)
+    public function testSetRadiusAttr(ArrayObject $slink)
     {
         $radiusAttrs = [
             [
@@ -199,7 +200,7 @@ class URFAClient53004Test extends URFAClient53Test
      * @depends testAddIptrafficService
      * @depends testGetDiscountPeriods
      */
-    public function testAddIptrafficServiceIpv6WithoutIp(array $user, array $service, array $discount_periods)
+    public function testAddIptrafficServiceIpv6WithoutIp(ArrayObject $user, ArrayObject $service, ArrayObject $discount_periods)
     {
         parent::testAddIptrafficServiceIpv6WithoutIp($user, $service, $discount_periods);
     }

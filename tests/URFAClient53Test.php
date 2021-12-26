@@ -4,6 +4,7 @@ namespace Tests;
 
 use URFAClient\URFAClient;
 use URFAClient\API;
+use ArrayObject;
 
 /**
  * @package URFAClient
@@ -17,6 +18,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
         'password' => 'init',
         'address'  => 'localhost',
         'protocol' => 'tls',
+        'api'      => __DIR__ . '/../xml/api_53-003.xml',
     ];
 
     /**
@@ -37,10 +39,11 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      */
     public function testAddUser()
     {
-        $result = $this->api->rpcf_add_user_new([
+        $param = new ArrayObject([
             'login'    => 'user' . self::prefix(),
             'password' => 'pass' . self::prefix(),
         ]);
+        $result = $this->api->rpcf_add_user_new($param);
 
         $this->assertArrayHasKey('user_id', $result);
         $this->assertArrayHasKey('basic_account', $result);
@@ -53,7 +56,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testGetUserinfo(array $user)
+    public function testGetUserinfo(ArrayObject $user)
     {
         $result = $this->api->rpcf_get_userinfo([
             'user_id' => $user['user_id'],
@@ -71,7 +74,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testSearchUsers(array $user)
+    public function testSearchUsers(ArrayObject $user)
     {
         $result = $this->api->rpcf_search_users_new([
             'select_type'    => 0,
@@ -161,9 +164,9 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testSaveUserOthersets(array $user)
+    public function testSaveUserOthersets(ArrayObject $user)
     {
-        $this->assertTrue(is_array($this->api->rpcf_save_user_othersets([
+        $this->assertInstanceOf(ArrayObject::class, $this->api->rpcf_save_user_othersets([
             'user_id' => $user['user_id'],
             'count'   => [
                 [
@@ -171,7 +174,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
                     'currency_id' => 978,
                 ],
             ],
-        ])));
+        ]));
     }
 
     /**
@@ -202,7 +205,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      * @depends testAddIptrafficService
      * @return  void
      */
-    public function testGetIptrafficService(array $service)
+    public function testGetIptrafficService(ArrayObject $service)
     {
         $result = $this->api->rpcf_get_iptraffic_service_ex([
             'sid' => $service['service_id'],
@@ -221,9 +224,9 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      *
      * @return array
      */
-    public function testAddIptrafficServiceIpv6(array $user, array $service, array $discount_periods)
+    public function testAddIptrafficServiceIpv6(ArrayObject $user, ArrayObject $service, ArrayObject $discount_periods)
     {
-        $discount_period = array_pop($discount_periods);
+        $discount_period = $discount_periods->offsetGet(0);
 
         $result = $this->api->rpcf_add_iptraffic_service_link_ipv6([
             'user_id'            => $user['user_id'],
@@ -274,18 +277,18 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testGetIptrafficServiceIpv6(array $slink, array $discount_periods)
+    public function testGetIptrafficServiceIpv6(ArrayObject $slink, ArrayObject $discount_periods)
     {
         $result = $this->api->rpcf_get_iptraffic_service_link_ipv6([
             'slink_id' => $slink['slink_id'],
         ]);
 
-        $discount_period = array_pop($discount_periods);
+        $discount_period = $discount_periods->offsetGet(0);
 
         $this->assertTrue((bool) $result);
         $this->assertEquals($discount_period['discount_period_id'], $result['discount_period_id']);
         $this->assertEquals(2000000000, $result['expire_date']);
-        $this->assertTrue(is_array($result['ip_groups_count']));
+        $this->assertInstanceOf(ArrayObject::class, $result['ip_groups_count']);
 
         foreach ($result['ip_groups_count'] as $ip_group) {
             $this->assertTrue((bool) filter_var($ip_group['ip_address'], FILTER_VALIDATE_IP));
@@ -297,7 +300,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      * @depends testAddIptrafficServiceIpv6
      * @return void
      */
-    public function testSetRadiusAttr(array $slink)
+    public function testSetRadiusAttr(ArrayObject $slink)
     {
         $radiusAttrs = [
             [
@@ -337,9 +340,9 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      *
      * @return void
      */
-    public function testAddIptrafficServiceIpv6WithoutIp(array $user, array $service, array $discount_periods)
+    public function testAddIptrafficServiceIpv6WithoutIp(ArrayObject $user, ArrayObject $service, ArrayObject $discount_periods)
     {
-        $discount_period = array_pop($discount_periods);
+        $discount_period = $discount_periods->offsetGet(0);
 
         $result = $this->api->rpcf_add_iptraffic_service_link_ipv6([
             'user_id'            => $user['user_id'],

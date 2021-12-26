@@ -2,6 +2,8 @@
 
 namespace URFAClient;
 
+use ArrayObject;
+
 /**
  * Объект предоставляет обращение к функциям из api.xml
  *
@@ -82,7 +84,7 @@ class API extends URFAFunction
      * @param string $name Имя функции
      * @param array  $args Параметры функции
      *
-     * @return array
+     * @return ArrayObject
      * @throws URFAException
      */
     public function __call($name, $args)
@@ -104,7 +106,9 @@ class API extends URFAFunction
         if (!$method) {
             throw new URFAException("Function $name not found");
         }
-        $args = (isset($args[0]) and is_array($args[0])) ? (array) $args[0] : [];
+        $args = (isset($args[0]))
+            ? ((is_array($args[0])) ? $args[0] : $args[0]->getArrayCopy())
+            : [];
 
         $this->processDataInput($method->input, $args);
         $code = (string) $method->attributes()->{'id'};
@@ -333,12 +337,12 @@ class API extends URFAFunction
      * @param \SimpleXMLElement  $output Элемент дерева api.xml
      * @param Packet $packet Пакет с бинарными данными
      *
-     * @return array
+     * @return ArrayObject
      * @throws URFAException
      */
     protected function processDataOutput(\SimpleXMLElement $output, Packet $packet)
     {
-        $result = [];
+        $result = new ArrayObject([], ArrayObject::ARRAY_AS_PROPS);
 
         foreach ($output->children() as $node) {
             $attr = $node->attributes();
@@ -421,12 +425,18 @@ class API extends URFAFunction
                     switch ((string) $attr->{'condition'}) {
                         case 'eq':
                             if ($result_value === $value) {
-                                $result = array_merge($result, $this->processDataOutput($node, $packet));
+                                $result = new ArrayObject(array_merge(
+                                    $result->getArrayCopy(),
+                                    $this->processDataOutput($node, $packet)->getArrayCopy()
+                                ), ArrayObject::ARRAY_AS_PROPS);
                             }
                             break;
                         case 'ne':
                             if ($result_value !== $value) {
-                                $result = array_merge($result, $this->processDataOutput($node, $packet));
+                                $result = new ArrayObject(array_merge(
+                                    $result->getArrayCopy(),
+                                    $this->processDataOutput($node, $packet)->getArrayCopy()
+                                ), ArrayObject::ARRAY_AS_PROPS);
                             }
                             break;
                     }
@@ -445,24 +455,24 @@ class API extends URFAFunction
 
                     $name = (string) $sibling[0]->attributes()->{'name'};
 
-                    if (isset($result[$name]) and is_array($result[$name])) {
+                    if (isset($result[$name]) and is_object($result[$name])) {
                         break;
                     }
 
                     $count = (int) ((isset($result[$name]))
-                    ? $result[$name]
-                    : $this->data_output[$name]);
+                        ? $result[$name]
+                        : $this->data_output[$name]);
 
-                    $array = [];
+                    $array = new ArrayObject([], ArrayObject::ARRAY_AS_PROPS);
                     for ($i = 0; $i < $count; $i++) {
-                        $array[] = $this->processDataOutput($node, $packet);
+                        $array->append($this->processDataOutput($node, $packet));
                     }
                     $result[$name] = $array;
 
                     break;
             }
 
-            $this->data_output += $result;
+            $this->data_output += $result->getArrayCopy();
         }
 
         return $result;
