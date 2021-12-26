@@ -10508,6 +10508,7 @@ fid_dealer_search_users = FID_DEALER(78)
       <double name="cost" />
       <integer name="discount_method" />
       <integer name="sessions_limit" />
+      <integer name="scheme_id" />
       <integer name="null_service_prepaid" />
       <integer name="num_of_borders" default="size(tclass_b)"/>
       <for name="i" from="0" count="size(tclass_b)">
@@ -10545,6 +10546,7 @@ fid_dealer_search_users = FID_DEALER(78)
       <double name="cost" />
       <integer name="discount_method_t" />
       <integer name="sessions_limit" />
+      <integer name="scheme_id" />
       <integer name="null_service_prepaid" />
       <integer name="num_of_borders" default="size(tclass_b)"/>
       <for name="i" from="0" count="size(tclass_b)">
@@ -11231,6 +11233,7 @@ fid_dealer_search_users = FID_DEALER(78)
        <integer name="deprecated" />
        <integer name="discount_method" />
        <integer name="sessions_limit"/>
+       <integer name="scheme_id" />
        <integer name="null_service_prepaid" />
        <integer name="borders_count" />
        <for name="i" from="0" count="borders_count">
