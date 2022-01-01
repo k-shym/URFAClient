@@ -50,7 +50,7 @@ abstract class URFAClientBaseTest extends \PHPUnit\Framework\TestCase
      * @return void
      * @throws \Exception
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->api = URFAClient::init($this->config);
     }
@@ -66,7 +66,7 @@ abstract class URFAClientBaseTest extends \PHPUnit\Framework\TestCase
     /**
      * Делаем финальные проверки и закрываем соединение
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->api);
     }
