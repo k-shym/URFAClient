@@ -18,6 +18,12 @@
         <testsuite name="53-006">
             <file>./tests/URFAClient53006Test.php</file>
         </testsuite>
+        <testsuite name="54-001">
+            <file>./tests/URFAClient54001Test.php</file>
+        </testsuite>
+        <testsuite name="54-004">
+            <file>./tests/URFAClient54004Test.php</file>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">

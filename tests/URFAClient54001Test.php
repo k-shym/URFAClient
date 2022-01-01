@@ -1,0 +1,18 @@
+<?php
+
+namespace Tests;
+
+/**
+ * @package URFAClient
+ * @author  Konstantin Shum <k.shym@ya.ru>
+ * @license https://github.com/k-shym/URFAClient/blob/main/LICENSE.md GPLv3
+ */
+class URFAClient54001Test extends URFAClient54Test
+{
+    protected $config = [
+        'login'    => 'init',
+        'password' => 'init',
+        'address'  => 'utm',
+        'api'      => __DIR__ . '/../xml/api_54-001.xml',
+    ];
+}
