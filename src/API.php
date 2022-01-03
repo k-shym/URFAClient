@@ -443,10 +443,10 @@ class API extends URFAFunction
                     break;
 
                 case 'for':
-                    $sibling = $node->xpath('preceding-sibling::integer[1]');
+                    $sibling = $node->xpath("preceding-sibling::*[name()='integer' or name()='long'][1]");
 
                     if (!$sibling) {
-                        $sibling = $node->xpath('parent::*[1]/preceding-sibling::integer[1]');
+                        $sibling = $node->xpath("parent::*[1]/preceding-sibling::*[name()='integer' or name()='long'][1]");
                     }
 
                     if (!isset($sibling[0])) {
