@@ -219,6 +219,20 @@ abstract class URFAClient53Test extends URFAClientBaseTest
             'discount_method_t'    => 1,
             'sessions_limit'       => 0,
             'null_service_prepaid' => 0,
+            'num_of_borders' => [
+                [
+                    'tclass_b' => 1,
+                    'size_b' => 2,
+                    'cost_b' => 1.5,
+                ],
+            ],
+            'num_of_prepaid' => [
+                [
+                    'tclass_p' => 1,
+                    'size_p' => 2,
+                    'size_max_p' => 3,
+                ],
+            ],
         ]);
 
         $this->assertArrayHasKey('service_id', $result);
@@ -242,6 +256,8 @@ abstract class URFAClient53Test extends URFAClientBaseTest
         $this->assertEquals('Тестовая услуга', $result['comment']);
         $this->assertEquals(1, $result['discount_method']);
         $this->assertEquals(0.13, $result['cost']);
+        $this->assertEquals(1, $result->borders_count->count());
+        $this->assertEquals(1, $result->prepaid_count->count());
     }
 
     /**
