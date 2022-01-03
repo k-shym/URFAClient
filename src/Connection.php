@@ -129,7 +129,7 @@ final class Connection
                         stream_socket_enable_crypto(
                             $this->socket,
                             true,
-                            STREAM_CRYPTO_METHOD_ANY_CLIENT
+                            STREAM_CRYPTO_METHOD_TLS_CLIENT
                         );
                     } elseif ($attr_protocol) {
                         stream_socket_enable_crypto(
