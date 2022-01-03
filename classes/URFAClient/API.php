@@ -75,8 +75,6 @@ class URFAClient_API extends URFAClient_Function {
     {
         if ( ! $this->_connection) throw new Exception("No object URFAClient_Connection");
 
-        $this->_data_input = $this->_data_output = array();
-
         $method = FALSE;
         foreach ($this->_api->function as $function)
         {
@@ -91,7 +89,7 @@ class URFAClient_API extends URFAClient_Function {
 
         $args = (isset($args[0]) AND is_array($args[0])) ? (array) $args[0] : array();
 
-        $this->_process_data_input($method->input, $args);
+        $this->_clean_data()->_process_data_input($method->input, $args);
 
         $code = (string) $method->attributes()->{'id'};
         $code = (substr($code, 0, 1) === '-') ? -1 * hexdec(substr($code, 1)) : hexdec($code);
@@ -402,5 +400,20 @@ class URFAClient_API extends URFAClient_Function {
         $variable = (isset($attr->{'variable'})) ? "Variable: {$attr->{'variable'}}" : '';
 
         throw new Exception("XML Described error: $code $comment $variable");
+    }
+
+    /**
+     * Освобождаем память от данных urfa функции
+     *
+     * @return self
+     */
+    protected function _clean_data()
+    {
+        $this->data_input = array();
+        $this->data_output = array();
+        $this->data_set_src = array();
+        $this->data_set_value = array();
+
+        return $this;
     }
 }
