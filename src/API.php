@@ -217,7 +217,7 @@ class API extends URFAFunction
                     break;
 
                 case 'for':
-                    $sibling = $node->xpath('preceding-sibling::integer[1]');
+                    $sibling = $node->xpath("preceding-sibling::*[name()='integer' or name()='long'][1]");
 
                     if (!isset($sibling[0])) {
                         throw new URFAException('Not provided an error, contact the developer (' . __FUNCTION__ . ')');
