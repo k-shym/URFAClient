@@ -113,7 +113,7 @@ final class URFAClient_Connection {
                 case 194:
                     $attr_protocol = $packet->get_attr_int(10);
                     if ($attr_protocol === 6)
-                        stream_socket_enable_crypto($this->_socket, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
+                        stream_socket_enable_crypto($this->_socket, TRUE, STREAM_CRYPTO_METHOD_TLS_CLIENT);
                     elseif ($attr_protocol)
                         stream_socket_enable_crypto($this->_socket, TRUE, STREAM_CRYPTO_METHOD_SSLv3_CLIENT);
 
