@@ -29,5 +29,11 @@
     <testsuite name="54-004">
       <file>./tests/URFAClient54004Test.php</file>
     </testsuite>
+    <testsuite name="55-002">
+      <file>./tests/URFAClient55002Test.php</file>
+    </testsuite>
+    <testsuite name="55-015">
+      <file>./tests/URFAClient55015Test.php</file>
+    </testsuite>
   </testsuites>
 </phpunit>
