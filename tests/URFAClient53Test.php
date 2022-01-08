@@ -177,6 +177,26 @@ abstract class URFAClient53Test extends URFAClientBaseTest
     }
 
     /**
+     * @depends testInitApiUser
+     *
+     * @return void
+     */
+    public function testAccountsPromisedPayment(API $api)
+    {
+        $accounts = $api->rpcf_user5_get_accounts();
+        $this->assertArrayHasKey('accounts_size', $accounts);
+
+        foreach ($accounts->accounts_size as $account) {
+            $result = $api->rpcf_user5_get_promised_payment(['account_id' => $account->account_id]);
+            $this->assertArrayHasKey('res', $result);
+            if ($result->res !== -1) {
+                $this->assertArrayHasKey('last_payment_date', $result);
+                $this->assertArrayHasKey('amount', $result);
+            }
+        }
+    }
+
+    /**
      * @depends testAddUser
      *
      * @return void
