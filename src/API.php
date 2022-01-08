@@ -229,11 +229,18 @@ class API extends URFAFunction
                         break;
                     }
 
+                    if (is_object($args[$name])) {
+                        $args[$name] = $args[$name]->getArrayCopy();
+                    }
+
                     if (!is_array($args[$name])) {
                         throw new URFAException("$name can only be an array");
                     }
 
                     foreach ($args[$name] as $v) {
+                        if (is_object($v)) {
+                            $v = $v->getArrayCopy();
+                        }
                         if (!is_array($v)) {
                             throw new URFAException('To tag "for" an array must be two-dimensional');
                         }
@@ -279,6 +286,10 @@ class API extends URFAFunction
         $sibling = (isset($sibling[0])) ? $sibling[0] : false;
 
         if ($sibling and $sibling->getName() === 'for') {
+            if (isset($args[$name]) and is_object($args[$name])) {
+                $args[$name] = $args[$name]->getArrayCopy();
+            }
+
             $this->data_input[] = [
                 'name'  => $name,
                 'value' => (isset($args[$name]) and is_array($args[$name])) ? count($args[$name]) : 0,

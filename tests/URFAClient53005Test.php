@@ -26,7 +26,7 @@ class URFAClient53005Test extends URFAClient53004Test
     }
 
     /**
-     * @return array
+     * @return ArrayObject
      */
     public function testAddUser()
     {
@@ -106,7 +106,7 @@ class URFAClient53005Test extends URFAClient53004Test
 
     /**
      * @depends testAddIptrafficService
-     * @return  array
+     * @return  ArrayObject
      */
     public function testEditIptrafficService(ArrayObject $service)
     {

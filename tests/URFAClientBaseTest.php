@@ -60,7 +60,7 @@ abstract class URFAClientBaseTest extends \PHPUnit\Framework\TestCase
      */
     public function testLiburfaList()
     {
-        $this->assertTrue((bool) count($this->api->rpcf_liburfa_list()));
+        $this->assertTrue((bool) $this->api->rpcf_liburfa_list()->count());
     }
 
     /**

@@ -27,7 +27,7 @@ class URFAClient53004Test extends URFAClient53Test
     }
 
     /**
-     * @return array
+     * @return ArrayObject
      */
     public function testAddUser()
     {

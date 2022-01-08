@@ -29,13 +29,13 @@ abstract class URFAClient53Test extends URFAClientBaseTest
         $result = $this->api->rpcf_get_discount_periods();
 
         $this->assertArrayHasKey('discount_periods_count', $result);
-        $this->assertTrue((bool) count($result['discount_periods_count']));
+        $this->assertTrue((bool) $result->discount_periods_count->count());
 
         return $result['discount_periods_count'];
     }
 
     /**
-     * @return array
+     * @return ArrayObject
      */
     public function testAddUser()
     {
@@ -93,6 +93,23 @@ abstract class URFAClient53Test extends URFAClientBaseTest
         $this->assertEquals($user['user_id'], $result['user_id']);
         $this->assertEquals($user['basic_account'], $result['basic_account']);
         $this->assertEquals('user' . self::prefix(), $result['login']);
+    }
+
+    /**
+     * @depends testAddUser
+     *
+     * @return void
+     */
+    public function testPaymentForAccount(ArrayObject $user)
+    {
+        $result = $this->api->rpcf_add_payment_for_account([
+            'account_id' => $user->basic_account,
+            'payment'    => 13,
+            'comment'    => 'Тестовый платеж',
+        ]);
+
+        $this->assertArrayHasKey('payment_transaction_id', $result);
+        $this->assertTrue($result->payment_transaction_id > 0);
     }
 
     /**
@@ -178,7 +195,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
     }
 
     /**
-     * @return array
+     * @return ArrayObject
      */
     public function testAddIptrafficService()
     {
@@ -203,7 +220,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
 
     /**
      * @depends testAddIptrafficService
-     * @return  array
+     * @return  ArrayObject
      */
     public function testEditIptrafficService(ArrayObject $service)
     {
@@ -219,20 +236,20 @@ abstract class URFAClient53Test extends URFAClientBaseTest
             'discount_method_t'    => 1,
             'sessions_limit'       => 0,
             'null_service_prepaid' => 0,
-            'num_of_borders' => [
-                [
+            'num_of_borders' => new ArrayObject([
+                new ArrayObject([
                     'tclass_b' => 1,
                     'size_b' => 2,
                     'cost_b' => 1.5,
-                ],
-            ],
-            'num_of_prepaid' => [
+                ]),
+            ]),
+            'num_of_prepaid' => new ArrayObject([
                 [
                     'tclass_p' => 1,
                     'size_p' => 2,
                     'size_max_p' => 3,
                 ],
-            ],
+            ]),
         ]);
 
         $this->assertArrayHasKey('service_id', $result);
@@ -265,7 +282,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      * @depends testAddIptrafficService
      * @depends testGetDiscountPeriods
      *
-     * @return array
+     * @return ArrayObject
      */
     public function testAddIptrafficServiceIpv6(ArrayObject $user, ArrayObject $service, ArrayObject $discount_periods)
     {
@@ -294,7 +311,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
                     'is_skip_rfw'    => 0,
                     'router_id'      => 0,
                 ],
-                [
+                new ArrayObject([
                     'ip'             => implode(':', str_split(md5(rand()), 4)),
                     'mask'           => 32,
                     'mac'            => '',
@@ -304,7 +321,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
                     'is_skip_radius' => 0,
                     'is_skip_rfw'    => 0,
                     'router_id'      => 0,
-                ],
+                ]),
             ],
         ]);
 
