@@ -1,3 +1,5 @@
+[![PHP Version Require](https://badgen.net/packagist/php/k-shym/urfa-client/dev-main?color=purple)](https://packagist.org/packages/k-shym/urfa-client) [![Latest Version](https://badgen.net/packagist/v/k-shym/urfa-client/latest)](https://packagist.org/packages/k-shym/urfa-client) [![Total Downloads](https://badgen.net/packagist/dt/k-shym/urfa-client)](https://packagist.org/packages/k-shym/urfa-client)
+
 URFAClient
 ==========
 
@@ -5,7 +7,7 @@ URFAClient
 
 ## Установка (composer)
 ```bash
-composer require k-shym/urfa-client "2.*"
+composer require k-shym/urfa-client "^2.0"
 ```
 
 ## Зависимости
