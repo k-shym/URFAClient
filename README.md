@@ -1,3 +1,5 @@
+[![PHP Version Require](https://badgen.net/packagist/php/k-shym/urfa-client/1.x-dev?color=purple)](https://packagist.org/packages/k-shym/urfa-client) [![Latest Version](https://badgen.net/packagist/v/k-shym/urfa-client/1.3.5)](https://packagist.org/packages/k-shym/urfa-client) [![Total Downloads](https://badgen.net/packagist/dt/k-shym/urfa-client)](https://packagist.org/packages/k-shym/urfa-client)
+
 URFAClient
 ==========
 
