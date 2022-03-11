@@ -104,9 +104,19 @@ class API extends URFAFunction
         if (!$method) {
             throw new URFAException("Function $name not found");
         }
-        $args = (isset($args[0]))
-            ? ((is_array($args[0])) ? $args[0] : $args[0]->getArrayCopy())
-            : [];
+
+        if (isset($args[0])) {
+            if (is_string($args[0])) {
+                $args = json_decode($args[0], JSON_BIGINT_AS_STRING | JSON_OBJECT_AS_ARRAY);
+                $args = $args ?: [];
+            } elseif (is_array($args[0])) {
+                $args = $args[0];
+            } else {
+                $args = $args[0]->getArrayCopy();
+            }
+        } else {
+            $args = [];
+        }
 
         $this->cleanData()->processDataInput($method->input, $args);
         $code = (string) $method->attributes()->{'id'};

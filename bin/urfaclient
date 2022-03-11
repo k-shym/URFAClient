@@ -12,7 +12,7 @@ $doc = <<<DOC
 The options are as follows:
    [-a, --api <path> ]             Path to api.xml, default: .$api_xml
    [-f, --function <name>]         Name function from api.xml
-   [-t, --type <type>]             Type return array or xml, default: array
+   [-t, --type <type>]             Type return (array, json, xml), default: array
    [-l, --list]                    List of functions from api.xml
    [-h, --help ]                   This help
    [-v, --version ]                Version URFAClient

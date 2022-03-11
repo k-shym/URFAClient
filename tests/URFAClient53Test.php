@@ -58,9 +58,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
      */
     public function testGetUserinfo(ArrayObject $user)
     {
-        $result = $this->api->rpcf_get_userinfo([
-            'user_id' => $user['user_id'],
-        ]);
+        $result = $this->api->rpcf_get_userinfo('{"user_id": ' . $user['user_id'] . '}');
 
         $this->assertTrue((bool) $result);
         $this->assertEquals($user['user_id'], $result['user_id']);

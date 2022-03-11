@@ -34,9 +34,17 @@ class Cmd extends API
             throw new URFAException("Function $name not found");
         }
 
-        return ($type === 'xml')
-            ? $method->asXML()
-            : $this->processOptionsInput($method->input);
+        if ($type === 'xml') {
+            return $method->asXML();
+        }
+
+        $result = $this->processOptionsInput($method->input);
+
+        if ($type === 'json') {
+            return json_encode($result);
+        }
+
+        return $result;
     }
 
     /**
