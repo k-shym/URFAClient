@@ -13,7 +13,7 @@ composer require k-shym/urfa-client "^2.0"
 ## Зависимости
 - UTM 5.2.1-008 >=
 - PHP 5.4 >=
-- Ext: OpenSSL, SimpleXML, Bcmath, Hash, Filter
+- Ext: JSON, OpenSSL, SimpleXML, Bcmath, Hash, Filter
 
 ## Описание параметров
 | option    | default            | описание                                                                                                                                          |
@@ -25,7 +25,7 @@ composer require k-shym/urfa-client "^2.0"
 | timeout   | **30**             | время ожидания ответа от сервера                                                                                                                  |
 | protocol  | **auto**           | **ssl** или **tls** (доступно с версии UTM-5.3-002-update16) или **auto** (доступно с версии UTM-5.3-005-update2, работает с OpenSSL 1.1)         |
 | admin     | **true**           | указываем какой пользователь подключается, если TRUE предоставляет сертификат admin.crt для соединения, используется только для протокола **ssl** |
-| api       | **api_53-005.xml** | путь до файла api.xml                                                                                                                             |
+| api       | **api_53-006.xml** | путь до файла api.xml                                                                                                                             |
 
 ## CMD
 ```
@@ -34,7 +34,7 @@ bin/urfaclient -h
 The options are as follows:
    [-a, --api <path> ]             Path to api.xml
    [-f, --function <name>]         Name function from api.xml
-   [-t, --type <type>]             Type return array or xml, default: array
+   [-t, --type <type>]             Type return (array, json, xml), default: array
    [-l, --list]                    List of functions from api.xml
    [-h, --help ]                   This help
    [-v, --version ]                Version URFAClient
@@ -114,63 +114,59 @@ The options are as follows:
 
 Получаем полное описание параметров функции `rpcf_add_user_new` из api.xml:
 ```bash
-bin/urfaclient -f rpcf_add_user_new
+bin/urfaclient -f rpcf_add_user_new -t json
 ```
-```php
-array (
-  'login' => '',
-  'password' => '',
-  'full_name' => '',
-  'is_juridical' => 0,
-  'jur_address' => '',
-  'act_address' => '',
-  'flat_number' => '',
-  'entrance' => '',
-  'floor' => '',
-  'district' => '',
-  'building' => '',
-  'passport' => '',
-  'house_id' => 0,
-  'work_tel' => '',
-  'home_tel' => '',
-  'mob_tel' => '',
-  'web_page' => '',
-  'icq_number' => '',
-  'tax_number' => '',
-  'kpp_number' => '',
-  'email' => '',
-  'bank_id' => 0,
-  'bank_account' => '',
-  'comments' => '',
-  'personal_manager' => '',
-  'connect_date' => 0,
-  'is_send_invoice' => 0,
-  'advance_payment' => 0,
-  'switch_id' => 0,
-  'port_number' => 0,
-  'binded_currency_id' => 0,
-  'parameters_count' =>
-  array (
-    0 =>
-    array (
-      'parameter_id' => 0,
-      'parameter_value' => '',
-    ),
-  ),
-  'groups_count' =>
-  array (
-    0 =>
-    array (
-      'groups' => 0,
-    ),
-  ),
-  'is_blocked' => 0,
-  'balance' => 0,
-  'credit' => 0,
-  'vat_rate' => 0,
-  'sale_tax_rate' => 0,
-  'int_status' => 0,
-);
+```json
+{
+  "login": "",
+  "password": "",
+  "full_name": "",
+  "is_juridical": 0,
+  "jur_address": "",
+  "act_address": "",
+  "flat_number": "",
+  "entrance": "",
+  "floor": "",
+  "district": "",
+  "building": "",
+  "passport": "",
+  "house_id": 0,
+  "work_tel": "",
+  "home_tel": "",
+  "mob_tel": "",
+  "web_page": "",
+  "icq_number": "",
+  "tax_number": "",
+  "kpp_number": "",
+  "email": "",
+  "bank_id": 0,
+  "bank_account": "",
+  "comments": "",
+  "personal_manager": "",
+  "connect_date": 0,
+  "is_send_invoice": 0,
+  "advance_payment": 0,
+  "switch_id": 0,
+  "port_number": 0,
+  "binded_currency_id": 0,
+  "parameters_count": [
+    {
+      "parameter_id": 0,
+      "parameter_value": ""
+    }
+  ],
+  "groups_count": [
+    {
+      "groups": 0
+    }
+  ],
+  "is_blocked": 0,
+  "balance": 0,
+  "credit": 0,
+  "vat_rate": 0,
+  "sale_tax_rate": 0,
+  "int_status": 0
+}
 ```
 На основе данного описания оставляем необходимые нам параметры, порядок параметров неважен.
 
@@ -219,11 +215,16 @@ $result = $urfa->rpcf_add_user_new([
     'login'=>'test',
     'password'=>'test',
 ]);
+
+$result = $urfa->rpcf_add_user_new('{
+  "login": "test2",
+  "password": "test2"
+}');
 ```
-В переменную `$result` попадут данные которые описаны в элементе output.
+В переменную `$result` попадут данные которые описаны в элементе `output`.
 
 ## Возможные проблемы
-- Тестировалось на версии биллинга UTM-5.3-003-update15 и UTM-5.3-005-update3
+- Тестировалось на версии биллинга UTM-5.3-003, UTM-5.4-004 и UTM-5.5-015
 - Тестировались не все функции из api.xml
 - Не реализована передача типа long для PHP x32
 - При обновлении api.xml обязательно проверяйте используемые функции
