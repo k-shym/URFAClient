@@ -62,7 +62,7 @@ $type = (isset($options['type'])) ? $options['type'] : $type;
 
 try
 {
-    var_export($api->method($function, $type));
+    print(trim(var_export($api->method($function, $type), true), "'"));
     die("\n");
 }
 catch (Exception $e)
