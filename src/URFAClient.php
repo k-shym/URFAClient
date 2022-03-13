@@ -11,7 +11,7 @@ namespace URFAClient;
  */
 abstract class URFAClient
 {
-    const VERSION = '2.0.0';
+    const VERSION = '2.0.1';
 
     const API_XML = 'api_53-006.xml';
 
