@@ -3,7 +3,7 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
-         defaultTestSuite="53-006"
+         defaultTestSuite="55-015"
 >
   <coverage processUncoveredFiles="true">
     <include>

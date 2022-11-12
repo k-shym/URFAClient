@@ -1,0 +1,39 @@
+version: '3'
+services:
+  urfa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html
+    networks:
+      - urfa
+  utm:
+      image: 'netup/utm:5.5.015-release'
+      ports:
+        - '11758:11758'
+        - '9080:9080'
+      networks:
+          - urfa
+      depends_on:
+        - utmdb
+      restart: on-failure
+  utmdb:
+    image: 'mysql:5.7'
+    environment:
+      MYSQL_DATABASE: 'UTM5'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - "3306:3306"
+    volumes:
+      - 'mysql:/var/lib/mysql'
+    networks:
+      - urfa
+
+networks:
+  urfa:
+    driver: bridge
+
+volumes:
+  mysql:
+    driver: local
