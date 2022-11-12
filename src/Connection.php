@@ -62,8 +62,13 @@ final class Connection
         stream_context_set_option($context, 'ssl', 'verify_peer', false);
         stream_context_set_option($context, 'ssl', 'verify_peer_name', false);
 
-        $data['address'] = gethostbyname($data['address']);
+        if (!filter_var($data, FILTER_VALIDATE_IP)) {
+            $data['address'] = gethostbyname($data['address']);
+        }
 
+        set_error_handler(function () {
+            return true;
+        }, E_WARNING);
         $this->socket = stream_socket_client(
             "tcp://{$data['address']}:{$data['port']}",
             $err_no,
@@ -72,6 +77,7 @@ final class Connection
             STREAM_CLIENT_CONNECT,
             $context
         );
+        restore_error_handler();
 
         if (!$this->socket) {
             throw new URFAException("$err_str ($err_no)");
