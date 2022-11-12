@@ -1,7 +1,7 @@
 {
     "name": "k-shym/urfa-client",
     "description": "Universal PHP client billing system NetUp UTM5 based api.xml",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "type": "library",
     "keywords": [
         "utm5"
