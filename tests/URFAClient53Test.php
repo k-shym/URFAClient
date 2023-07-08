@@ -18,7 +18,7 @@ abstract class URFAClient53Test extends URFAClientBaseTest
         'password' => 'init',
         'address'  => 'localhost',
         'protocol' => 'tls',
-        'api'      => __DIR__ . '/../xml/api_53-003.xml',
+        'api'      => 'api_53-003.xml',
     ];
 
     /**

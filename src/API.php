@@ -65,12 +65,15 @@ class API extends URFAFunction
      */
     public function __construct($api, Connection $connection = null)
     {
-        $this->connection = $connection;
+        if (strpos($api, DIRECTORY_SEPARATOR) === false) {
+            $api = __DIR__ . '/../xml/' . $api;
+        }
 
         if (!file_exists($api)) {
             throw new URFAException("File $api not found");
         }
 
+        $this->connection = $connection;
         $this->api = simplexml_load_file($api);
 
         if (!$this->api->xpath("/urfa/function[contains(@name, 'ipv6')]")) {
@@ -120,7 +123,7 @@ class API extends URFAFunction
 
         $this->cleanData()->processDataInput($method->input, $args);
         $code = (string) $method->attributes()->{'id'};
-        $code = (substr($code, 0, 1) === '-') ? -1 * hexdec(substr($code, 1)) : hexdec($code);
+        $code = ($code[0] === '-') ? -1 * hexdec(substr($code, 1)) : hexdec($code);
 
         if (!$this->connection->call($code)) {
             throw new URFAException("Error calling function $name");

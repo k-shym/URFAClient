@@ -17,7 +17,7 @@ class URFAClient53004Test extends URFAClient53Test
         'password' => 'init',
         'address'  => 'localhost',
         'protocol' => 'tls',
-        'api'      => __DIR__ . '/../xml/api_53-004.xml',
+        'api'      => 'api_53-004.xml',
     ];
 
 

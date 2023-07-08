@@ -16,5 +16,6 @@ abstract class URFAClient52Test extends URFAClientBaseTest
         'password' => 'init',
         'address'  => 'localhost',
         'protocol' => 'ssl',
+        'api'      => 'api_52-008.xml',
     ];
 }

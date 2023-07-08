@@ -11,12 +11,12 @@ foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../../vendor/autoload.
 use URFAClient\URFAClient;
 use URFAClient\Cmd;
 
-$api_xml = '/xml/' . URFAClient::API_XML;
+$api_xml = URFAClient::API_XML;
 
 $doc = <<<DOC
 
 The options are as follows:
-   [-a, --api <path> ]             Path to api.xml, default: .$api_xml
+   [-a, --api <path> ]             Path to api.xml, default: $api_xml
    [-f, --function <name>]         Name function from api.xml
    [-t, --type <type>]             Type return (array, json, xml), default: array
    [-l, --list]                    List of functions from api.xml
@@ -28,7 +28,6 @@ DOC;
 
 $options = getopt("a:f:t:lv", array('api:', 'function:', 'type:', 'list', 'version'));
 
-$api_xml = __DIR__ . '/..' . $api_xml;
 if (isset($options['a'])) {
     $api_xml = $options['a'];
     unset($options['a']);
@@ -37,13 +36,17 @@ if (isset($options['api'])) {
     $api_xml = $options['api'];
     unset($options['api']);
 }
+if (strpos($api_xml, DIRECTORY_SEPARATOR) === false) {
+    $api_xml = __DIR__ . '/../xml/' . $api_xml;
+}
 
 if (!$options) {
     die($doc);
 }
 
 if (isset($options['v']) OR isset($options['version'])) {
-    die('URFAClient ' . URFAClient::VERSION . "\n");
+    $composerJson = json_decode(file_get_contents(__DIR__ . '/../composer.json'));
+    die('URFAClient ' . $composerJson->version . "\n");
 }
 
 if (!file_exists($api_xml)) {

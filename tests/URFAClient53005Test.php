@@ -17,7 +17,7 @@ class URFAClient53005Test extends URFAClient53004Test
         'password' => 'init',
         'address'  => 'localhost',
         'protocol' => 'auto',
-        'api'      => __DIR__ . '/../xml/api_53-005.xml',
+        'api'      => 'api_53-005.xml',
     ];
 
     public function testGetDiscountPeriods()

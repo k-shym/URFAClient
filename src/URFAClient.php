@@ -11,8 +11,6 @@ namespace URFAClient;
  */
 abstract class URFAClient
 {
-    const VERSION = '2.0.1';
-
     const API_XML = 'api_53-006.xml';
 
     /**
@@ -33,7 +31,7 @@ abstract class URFAClient
             'timeout'  => 30,
             'protocol' => 'auto',
             'admin'    => true,
-            'api'      => __DIR__ . '/../xml/' . self::API_XML,
+            'api'      => self::API_XML,
         ], $data);
 
         return new API($data['api'], new Connection($data));

@@ -13,6 +13,6 @@ class URFAClient54004Test extends URFAClient54Test
         'login'    => 'init',
         'password' => 'init',
         'address'  => 'utm',
-        'api'      => __DIR__ . '/../xml/api_54-004.xml',
+        'api'      => 'api_54-004.xml',
     ];
 }
