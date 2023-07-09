@@ -3,9 +3,7 @@
     "description": "Universal PHP client billing system NetUp UTM5 based api.xml",
     "version": "2.1.0",
     "type": "library",
-    "keywords": [
-        "utm5"
-    ],
+    "keywords": ["netup", "utm5", "urfa"],
     "license": "GPL-3.0",
     "authors": [
         {

@@ -13,7 +13,7 @@ composer require k-shym/urfa-client "^2.0"
 ## Зависимости
 - UTM 5.2.1-008 >=
 - PHP 5.4 >=
-- Ext: JSON, OpenSSL, SimpleXML, Bcmath, Hash, Filter
+- Ext: JSON, OpenSSL, SimpleXML, Hash, Filter
 
 ## Описание параметров
 | option    | default            | описание                                                                                                                                          |
@@ -233,7 +233,6 @@ docker exec -t urfa vendor/bin/phpunit --coverage-text
 ## Возможные проблемы
 - Тестировалось на версии биллинга UTM-5.3-003, UTM-5.4-004 и UTM-5.5-015
 - Тестировались не все функции из api.xml
-- Не реализована передача типа long для PHP x32
 - При обновлении api.xml обязательно проверяйте используемые функции
 
 По возникшим проблемам присылайте api.xml и полную версию ядра UTM5. Удачи!
