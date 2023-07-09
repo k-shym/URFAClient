@@ -23,14 +23,12 @@
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-SimpleXML": "*",
-        "ext-bcmath": "*",
         "ext-filter": "*",
         "ext-hash": "*"
     },
     "require-dev": {
         "php": ">=7.3",
-        "ext-xdebug": "*",
-        "phpunit/phpunit": "9.*",
+        "phpunit/phpunit": "^9.5",
         "squizlabs/php_codesniffer": "3.*"
     },
     "bin": [
