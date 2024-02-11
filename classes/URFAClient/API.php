@@ -409,8 +409,8 @@ class URFAClient_API extends URFAClient_Function {
      */
     protected function _clean_data()
     {
-        $this->data_input = array();
-        $this->data_output = array();
+        $this->_data_input = array();
+        $this->_data_output = array();
         $this->data_set_src = array();
         $this->data_set_value = array();
 
